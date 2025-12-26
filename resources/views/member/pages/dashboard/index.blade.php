@@ -1,359 +1,362 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('member.layouts.app')
+@section('content')
+    <!-- Scrollable Content Area -->
+    <div class="scrollable-content">
+        <div class="content-section">
+            <!-- Greeting -->
+            <div class="mb-3">
+                <h5 class="text-white mb-1">Halo, John Doe 👋</h5>
+                <p class="text-muted small mb-0">Selamat datang kembali di dashboard Anda</p>
+            </div>
 
-<head>
-    <base href="/" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://via.placeholder.com/40">
-    <title>My Application</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        /* Mobile-First Design with Jhonson Investment Theme */
-        :root {
-            --primary-dark: #1a1d3f;
-            --secondary-dark: #252850;
-            --card-dark: #2d3158;
-            --gold-color: #f5a623;
-            --gold-hover: #e69500;
-            --blue-color: #3bb5e8;
-            --blue-dark: #2a8ab8;
-            --text-muted: #a5a8c4;
-            --border-color: #3d4170;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--primary-dark);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            color: #ffffff;
-        }
-
-        /* Mobile Container */
-        .mobile-container {
-            width: 425px;
-            height: 100vh;
-            background-color: var(--primary-dark);
-            position: relative;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Fixed Header */
-        .fixed-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: linear-gradient(135deg, #2d3158 0%, #252850 100%);
-            border-bottom: 2px solid var(--border-color);
-            padding: 15px 20px 12px 20px;
-        }
-
-        /* Header Layout - 2 kolom (left & right) */
-        .header-grid {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-right {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .app-logo {
-            height: 32px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .user-email {
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .btn-logout {
-            background: rgba(220, 53, 69, 0.1);
-            border: 1px solid rgba(220, 53, 69, 0.3);
-            border-radius: 8px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .btn-logout:hover {
-            background: rgba(220, 53, 69, 0.2);
-        }
-
-        .btn-logout i {
-            color: #dc3545;
-            font-size: 18px;
-        }
-
-        /* Scrollable Content */
-        .scrollable-content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        /* Hide scrollbar but keep functionality */
-        .scrollable-content::-webkit-scrollbar {
-            width: 0px;
-        }
-
-        /* Content Sections */
-        .content-section {
-            padding: 20px;
-        }
-
-        /* Cards */
-        .card-dark {
-            background-color: var(--card-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            transition: box-shadow 0.2s ease;
-        }
-
-        .card-dark:hover {
-            box-shadow: 0 4px 12px rgba(218, 165, 32, 0.15);
-        }
-
-        /* Gold Theme Colors */
-        .text-gold {
-            color: var(--gold-color) !important;
-        }
-
-        .bg-gold {
-            background-color: var(--gold-color) !important;
-        }
-
-        .btn-gold {
-            background-color: var(--gold-color);
-            border-color: var(--gold-color);
-            color: #000;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border-radius: 8px;
-        }
-
-        .btn-gold:hover {
-            background-color: var(--gold-hover);
-            border-color: var(--gold-hover);
-            color: #000;
-        }
-
-        /* Text Colors */
-        .text-muted {
-            color: var(--text-muted) !important;
-        }
-
-        .text-white {
-            color: #ffffff !important;
-        }
-
-        /* Fixed Bottom Navigation */
-        .bottom-nav {
-            position: sticky;
-            bottom: 0;
-            width: 100%;
-            background: linear-gradient(135deg, #2d3158, #252850);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0 12px 0;
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 11px;
-            text-align: center;
-            flex: 1;
-            transition: all 0.2s ease;
-            padding: 6px 2px;
-            border-radius: 4px;
-        }
-
-        .nav-item:hover {
-            color: var(--blue-color);
-            background-color: rgba(59, 181, 232, 0.1);
-        }
-
-        .nav-item.active {
-            color: var(--blue-color);
-            font-weight: 600;
-        }
-
-        .nav-item.active i {
-            color: var(--blue-color);
-        }
-
-        .nav-item span {
-            display: block;
-            margin-top: 2px;
-        }
-
-        /* Responsive for larger screens */
-        @media (min-width: 768px) {
-            body {
-                background: linear-gradient(135deg, #1a1d3f 0%, #252850 100%);
-            }
-
-            .mobile-container {
-                border-radius: 0;
-                overflow: hidden;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="mobile-container">
-        <!-- Fixed Header -->
-        <div class="fixed-header">
-            <div class="header-grid">
-                <!-- Left: App Logo -->
-                <div class="header-left">
-                    <img src="assets/media/logos/logo-ji.png" alt="App Logo" class="app-logo">
+            <!-- Card 1: Balance Card -->
+            <div class="card-dark shadow-sm p-3 mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Total Balance</p>
+                        <h3 class="text-gold mb-0 fw-bold">$ 15,250.00</h3>
+                        <div class="d-flex align-items-center gap-3 mt-2">
+                            <div>
+                                <small class="text-muted d-block" style="font-size: 11px;">Available</small>
+                                <small class="text-white fw-bold">$ 8,120.00</small>
+                            </div>
+                            <div style="width: 1px; height: 20px; background: var(--border-color);"></div>
+                            <div>
+                                <small class="text-muted d-block" style="font-size: 11px;">Locked</small>
+                                <small class="text-white fw-bold">$ 7,130.00</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="balance-icon-wrapper">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
                 </div>
 
-                <!-- Right: Logout -->
-                <div class="header-right">
-                    <a href="{{ route('login') }}" class="btn-logout" title="Logout">
-                        <i class="bi bi-box-arrow-right"></i>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button class="btn btn-gold w-100 btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Deposit
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-gold w-100 btn-sm">
+                            <i class="bi bi-arrow-up-circle me-1"></i>Withdraw
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Quick Stats (3 cards in row) -->
+            <div class="row g-2 mb-3">
+                <!-- Total Investment -->
+                <div class="col-4">
+                    <div class="card-dark shadow-sm p-2 text-center">
+                        <div class="mb-1"
+                            style="height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-graph-up-arrow text-gold" style="font-size: 24px;"></i>
+                        </div>
+                        <p class="text-muted mb-1" style="font-size: 10px;">Investment</p>
+                        <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">$ 7,130</h6>
+                    </div>
+                </div>
+
+                <!-- Monthly Profit -->
+                <div class="col-4">
+                    <div class="card-dark shadow-sm p-2 text-center">
+                        <div class="mb-1"
+                            style="height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-trophy text-gold" style="font-size: 24px;"></i>
+                        </div>
+                        <p class="text-muted mb-1" style="font-size: 10px;">Profit</p>
+                        <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">$ 2,450</h6>
+                    </div>
+                </div>
+
+                <!-- Team Earnings -->
+                <div class="col-4">
+                    <div class="card-dark shadow-sm p-2 text-center">
+                        <div class="mb-1"
+                            style="height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-people text-gold" style="font-size: 24px;"></i>
+                        </div>
+                        <p class="text-muted mb-1" style="font-size: 10px;">Team</p>
+                        <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">$ 1,820</h6>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Active Investments -->
+            <div class="card-dark shadow-sm p-0 mb-3">
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h6 class="text-white mb-0">Active Investments</h6>
+                        <span class="badge-count">3 Paket</span>
+                    </div>
+                </div>
+
+                <!-- Investment Item 1 -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">Bitcoin Package</div>
+                            <small class="text-muted">$ 3,000 • ROI 15% / bulan</small>
+                        </div>
+                        <span class="text-gold fw-bold" style="font-size: 14px;">$ 450</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="flex-grow-1"
+                            style="height: 6px; background: var(--secondary-dark); border-radius: 3px; overflow: hidden;">
+                            <div style="width: 65%; height: 100%; background: var(--gold-color);"></div>
+                        </div>
+                        <small class="text-muted" style="font-size: 11px;">65%</small>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                        <i class="bi bi-clock"></i> 10 hari lagi
+                    </small>
+                </div>
+
+                <!-- Investment Item 2 -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">Ethereum Package</div>
+                            <small class="text-muted">$ 2,500 • ROI 12% / bulan</small>
+                        </div>
+                        <span class="text-gold fw-bold" style="font-size: 14px;">$ 300</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="flex-grow-1"
+                            style="height: 6px; background: var(--secondary-dark); border-radius: 3px; overflow: hidden;">
+                            <div style="width: 40%; height: 100%; background: var(--gold-color);"></div>
+                        </div>
+                        <small class="text-muted" style="font-size: 11px;">40%</small>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                        <i class="bi bi-clock"></i> 18 hari lagi
+                    </small>
+                </div>
+
+                <!-- Investment Item 3 -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">USDT Package</div>
+                            <small class="text-muted">$ 1,630 • ROI 10% / bulan</small>
+                        </div>
+                        <span class="text-gold fw-bold" style="font-size: 14px;">$ 163</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="flex-grow-1"
+                            style="height: 6px; background: var(--secondary-dark); border-radius: 3px; overflow: hidden;">
+                            <div style="width: 85%; height: 100%; background: var(--gold-color);"></div>
+                        </div>
+                        <small class="text-muted" style="font-size: 11px;">85%</small>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                        <i class="bi bi-clock"></i> 5 hari lagi
+                    </small>
+                </div>
+
+                <div class="p-3">
+                    <a href="#" class="text-gold text-decoration-none small fw-bold">
+                        Lihat Semua Investment <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
-        </div>
 
-        <!-- Scrollable Content Area -->
-        <div class="scrollable-content">
-            <div class="content-section">
-                <h5 class="text-white mb-3">Halo, Jhon Doe</h5>
-
-                <!-- Example Card 1 -->
-                <div class="card-dark shadow-sm p-3 mb-3">
-                    <h6 class="text-white mb-2">Card Title</h6>
-                    <p class="small text-muted mb-0">
-                        Ini adalah contoh card dengan styling yang konsisten. Anda bisa menambahkan konten apapun di
-                        sini.
-                    </p>
-                </div>
-
-                <!-- Example Card 2 with Button -->
-                <div class="card-dark shadow-sm p-3 mb-3">
-                    <h6 class="text-white mb-2">Action Card</h6>
-                    <p class="small text-muted mb-3">
-                        Card ini memiliki tombol untuk aksi tertentu.
-                    </p>
-                    <button class="btn btn-gold w-100">
-                        <i class="bi bi-check-circle me-2"></i>Lakukan Aksi
-                    </button>
-                </div>
-
-                <!-- Example List -->
-                <div class="card-dark shadow-sm p-0 mb-3">
-                    <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
-                        <h6 class="text-white mb-0">Daftar Item</h6>
+            <!-- Card 4: Referral Card -->
+            <div class="card-dark shadow-sm p-3 mb-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div
+                        style="width: 50px; height: 50px; background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(245, 166, 35, 0.3); flex-shrink: 0;">
+                        <i class="bi bi-share text-gold" style="font-size: 24px;"></i>
                     </div>
-                    <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-white fw-bold" style="font-size: 14px;">Item 1</div>
-                                <small class="text-muted">Deskripsi item pertama</small>
+                    <div class="flex-grow-1">
+                        <h6 class="text-white mb-1">Referral Code</h6>
+                        <p class="text-muted small mb-2">Ajak teman dan dapatkan komisi!</p>
+                        <div class="d-flex gap-2">
+                            <div class="flex-grow-1"
+                                style="background: var(--secondary-dark); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px;">
+                                <code class="text-gold" style="font-size: 13px; letter-spacing: 1px;">JOHN2024XYZ</code>
                             </div>
-                            <span class="text-gold fw-bold">Rp 100.000</span>
+                            <button class="btn btn-gold btn-sm" style="padding: 8px 16px;">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
                         </div>
+                        <small class="text-muted d-block mt-2" style="font-size: 11px;">
+                            <i class="bi bi-person-check"></i> 24 referral aktif
+                        </small>
                     </div>
-                    <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-white fw-bold" style="font-size: 14px;">Item 2</div>
-                                <small class="text-muted">Deskripsi item kedua</small>
-                            </div>
-                            <span class="text-gold fw-bold">Rp 200.000</span>
-                        </div>
-                    </div>
-                    <div class="p-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-white fw-bold" style="font-size: 14px;">Item 3</div>
-                                <small class="text-muted">Deskripsi item ketiga</small>
-                            </div>
-                            <span class="text-gold fw-bold">Rp 300.000</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Extra content for scrolling demo -->
-                <div class="card-dark shadow-sm p-3 mb-3">
-                    <h6 class="text-white mb-2">More Content</h6>
-                    <p class="small text-muted mb-0">
-                        Scroll ke bawah untuk melihat lebih banyak konten. Header dan bottom nav akan tetap di tempat.
-                    </p>
                 </div>
             </div>
-        </div>
 
-        <!-- Fixed Bottom Navbar -->
-        <div class="bottom-nav">
-            <a href="#" class="nav-item active">
-                <i class="bi bi-house-door-fill d-block fs-5"></i>
-                <span>Home</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-graph-up d-block fs-5"></i>
-                <span>Investasi</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-people-fill d-block fs-5"></i>
-                <span>Team</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-wallet-fill d-block fs-5"></i>
-                <span>Dompetku</span>
-            </a>
+            <!-- Card 5: Recent Activities -->
+            <div class="card-dark shadow-sm p-0 mb-3">
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <h6 class="text-white mb-0">Recent Activities</h6>
+                </div>
+
+                <!-- Activity Item 1 -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div
+                            style="width: 36px; height: 36px; background: rgba(40, 167, 69, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-arrow-down-circle" style="color: #28a745; font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-1" style="font-size: 13px;">Deposit</div>
+                            <small class="text-muted" style="font-size: 11px;">2 jam yang lalu</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold" style="font-size: 14px;">+ $ 500</div>
+                            <small class="text-muted" style="font-size: 11px;">Success</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Item 2 -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div
+                            style="width: 36px; height: 36px; background: rgba(245, 166, 35, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-trophy" style="color: var(--gold-color); font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-1" style="font-size: 13px;">Profit Diterima</div>
+                            <small class="text-muted" style="font-size: 11px;">5 jam yang lalu</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold" style="font-size: 14px;">+ $ 120</div>
+                            <small class="text-muted" style="font-size: 11px;">BTC Package</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Item 3 -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div
+                            style="width: 36px; height: 36px; background: rgba(59, 181, 232, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-people" style="color: var(--blue-color); font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-1" style="font-size: 13px;">Komisi Referral</div>
+                            <small class="text-muted" style="font-size: 11px;">1 hari yang lalu</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold" style="font-size: 14px;">+ $ 50</div>
+                            <small class="text-muted" style="font-size: 11px;">From JaneDoe</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Item 4 -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div
+                            style="width: 36px; height: 36px; background: rgba(220, 53, 69, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-arrow-up-circle" style="color: #dc3545; font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-1" style="font-size: 13px;">Withdraw</div>
+                            <small class="text-muted" style="font-size: 11px;">2 hari yang lalu</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold" style="font-size: 14px;">- $ 200</div>
+                            <small class="text-muted" style="font-size: 11px;">Pending</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3">
+                    <a href="#" class="text-gold text-decoration-none small fw-bold">
+                        Lihat Semua Aktivitas <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 6: Market Overview (Mini Crypto Ticker) -->
+            <div class="card-dark shadow-sm p-0 mb-3">
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <h6 class="text-white mb-0">Market Overview</h6>
+                </div>
+
+                <!-- Crypto Item 1 - Bitcoin -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                style="width: 36px; height: 36px; background: rgba(247, 147, 26, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-currency-bitcoin" style="color: #f7931a; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold" style="font-size: 14px;">Bitcoin</div>
+                                <small class="text-muted">BTC</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold" style="font-size: 14px;">$ 43,250</div>
+                            <small style="color: #28a745; font-size: 11px;">
+                                <i class="bi bi-arrow-up"></i> +2.5%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crypto Item 2 - Ethereum -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                style="width: 36px; height: 36px; background: rgba(98, 126, 234, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-currency-exchange" style="color: #627eea; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold" style="font-size: 14px;">Ethereum</div>
+                                <small class="text-muted">ETH</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold" style="font-size: 14px;">$ 2,280</div>
+                            <small style="color: #dc3545; font-size: 11px;">
+                                <i class="bi bi-arrow-down"></i> -1.2%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crypto Item 3 - USDT -->
+                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                style="width: 36px; height: 36px; background: rgba(38, 161, 123, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-currency-dollar" style="color: #26a17b; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold" style="font-size: 14px;">Tether</div>
+                                <small class="text-muted">USDT</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold" style="font-size: 14px;">$ 1.00</div>
+                            <small style="color: #6c757d; font-size: 11px;">
+                                <i class="bi bi-dash"></i> 0.0%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3">
+                    <a href="#" class="text-gold text-decoration-none small fw-bold">
+                        Lihat Semua Market <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+@endsection

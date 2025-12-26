@@ -1,11 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// Admin Controllers
 use App\Http\Controllers\Auth\LoginController;
-// Member Controllers
+// Admin Controllers
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+// Member Controllers
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Member\InvestController as MemberInvestController;
+use App\Http\Controllers\Member\TeamController as MemberTeamController;
+use App\Http\Controllers\Member\ProfileController as MemberProfileController;
 
 
 // Route::get('/', function () {
@@ -33,5 +36,17 @@ Route::prefix('member')->name('member.')->group(function () {
     // Dashboard Routes
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [MemberDashboardController::class, 'index'])->name('index');
+    });
+    // Invest Routes
+    Route::prefix('invest')->name('invest.')->group(function () {
+        Route::get('/', [MemberInvestController::class, 'index'])->name('index');
+    });
+    // Team Routes
+    Route::prefix('team')->name('team.')->group(function () {
+        Route::get('/', [MemberTeamController::class, 'index'])->name('index');
+    });
+    // Profile Routes
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [MemberProfileController::class, 'index'])->name('index');
     });
 });
