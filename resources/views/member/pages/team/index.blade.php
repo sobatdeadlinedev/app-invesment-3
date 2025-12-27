@@ -17,7 +17,23 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Card 2: Referral Code -->
+            <div class="card-dark shadow-sm p-3 mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="referral-icon-small">
+                            <i class="bi bi-gift-fill"></i>
+                        </div>
+                        <p class="text-muted mb-0 small">Kode Referral</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="referral-code-display">JD2024XYZ</div>
+                    <button class="btn-copy-small" onclick="copyReferralCode()" title="Copy">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+            </div>
             <!-- Team Members List -->
             <div class="card-dark shadow-sm p-0 mb-3">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">

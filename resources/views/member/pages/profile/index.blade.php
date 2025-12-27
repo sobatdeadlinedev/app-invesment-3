@@ -40,14 +40,14 @@
 
                 <div class="row g-2">
                     <div class="col-6">
-                        <button class="btn btn-gold w-100">
+                        <a href="{{ route('member.deposit.index') }}" class="btn btn-gold w-100">
                             <i class="bi bi-plus-circle me-1"></i>Deposit
-                        </button>
+                        </a>
                     </div>
                     <div class="col-6">
-                        <button class="btn btn-outline-gold w-100">
+                        <a href="{{ route('member.withdraw.index') }}" class="btn btn-outline-gold w-100">
                             <i class="bi bi-arrow-up-circle me-1"></i>Withdraw
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

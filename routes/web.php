@@ -9,7 +9,8 @@ use App\Http\Controllers\Member\DashboardController as MemberDashboardController
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
 use App\Http\Controllers\Member\TeamController as MemberTeamController;
 use App\Http\Controllers\Member\ProfileController as MemberProfileController;
-
+use App\Http\Controllers\Member\DepositController as MemberDepositController;
+use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 
 // Route::get('/', function () {
 //     if (auth()->check()) {
@@ -40,6 +41,7 @@ Route::prefix('member')->name('member.')->group(function () {
     // Invest Routes
     Route::prefix('invest')->name('invest.')->group(function () {
         Route::get('/', [MemberInvestController::class, 'index'])->name('index');
+        Route::get('/detail', [MemberInvestController::class, 'detail'])->name('detail');
     });
     // Team Routes
     Route::prefix('team')->name('team.')->group(function () {
@@ -48,5 +50,13 @@ Route::prefix('member')->name('member.')->group(function () {
     // Profile Routes
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [MemberProfileController::class, 'index'])->name('index');
+    });
+    // Deposit Routes
+    Route::prefix('deposit')->name('deposit.')->group(function () {
+        Route::get('/', [MemberDepositController::class, 'index'])->name('index');
+    });
+    // Withdraw Routes
+    Route::prefix('withdraw')->name('withdraw.')->group(function () {
+        Route::get('/', [MemberWithdrawController::class, 'index'])->name('index');
     });
 });
