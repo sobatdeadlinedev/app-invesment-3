@@ -8,9 +8,12 @@
 
         <!-- Right: Logout -->
         <div class="header-right">
-            <a href="{{ route('login') }}" class="btn-logout" title="Logout">
-                <i class="bi bi-box-arrow-right"></i>
-            </a>
+            <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: inline;">
+                @csrf
+                <button type="submit" class="btn-logout" title="Logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
         </div>
     </div>
 </div>
