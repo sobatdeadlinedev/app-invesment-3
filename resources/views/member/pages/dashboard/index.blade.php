@@ -4,7 +4,19 @@
     <div class="scrollable-content">
         <div class="content-section">
             <h5 class="text-white mb-3">Halo, John Doe</h5>
-
+            <!-- Announcement Card -->
+            <div class="card-dark shadow-sm p-3 mb-3">
+                <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-megaphone-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 class="text-white mb-1" style="font-size: 13px;">Pengumuman (if exist)</h6>
+                        <p class="small text-muted mb-0" style="font-size: 12px;">
+                            Platform akan menjalani maintenance pada Minggu, 29 Desember 2024 pukul 01:00 - 03:00 WIB.
+                            Terima kasih atas pengertiannya.
+                        </p>
+                    </div>
+                </div>
+            </div>
             <!-- Card 1: Balance -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between">
@@ -143,19 +155,7 @@
                 </div>
             </div>
 
-            <!-- Announcement Card -->
-            <div class="card-dark shadow-sm p-3 mb-3">
-                <div class="d-flex align-items-start gap-2">
-                    <i class="bi bi-megaphone-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
-                    <div>
-                        <h6 class="text-white mb-1" style="font-size: 13px;">Pengumuman</h6>
-                        <p class="small text-muted mb-0" style="font-size: 12px;">
-                            Platform akan menjalani maintenance pada Minggu, 29 Desember 2024 pukul 01:00 - 03:00 WIB.
-                            Terima kasih atas pengertiannya.
-                        </p>
-                    </div>
-                </div>
-            </div>
+
 
         </div>
     </div>
