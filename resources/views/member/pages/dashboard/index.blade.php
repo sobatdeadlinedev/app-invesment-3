@@ -3,7 +3,7 @@
     <!-- Scrollable Content Area -->
     <div class="scrollable-content">
         <div class="content-section">
-            <h5 class="text-white mb-3">Halo, John Doe</h5>
+            <h5 class="text-white mb-3">Halo, {{ $user->username }}</h5>
             <!-- Announcement Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-start gap-2">
@@ -41,9 +41,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-between">
-                    <div class="referral-code-display">JD2024XYZ</div>
+                    <div class="referral-code-display" id="referralCode">{{ $user->refferal_code }}</div>
                     <button class="btn-copy-small" onclick="copyReferralCode()" title="Copy">
-                        <i class="bi bi-clipboard"></i>
+                        <i class="bi bi-clipboard" id="copyIcon"></i>
                     </button>
                 </div>
             </div>
@@ -154,17 +154,38 @@
                     </div>
                 </div>
             </div>
-
-
-
         </div>
     </div>
 
     <script>
         function copyReferralCode() {
-            const code = 'JD2024XYZ';
+            const codeElement = document.getElementById('referralCode');
+            const code = codeElement.textContent;
+            const icon = document.getElementById('copyIcon');
+
             navigator.clipboard.writeText(code).then(() => {
-                alert('Kode referral berhasil disalin!');
+                // Ubah icon jadi check
+                icon.classList.remove('bi-clipboard');
+                icon.classList.add('bi-check-lg');
+
+                // Tampilkan notifikasi
+                // Bisa pakai toast atau alert
+                const toast = document.createElement('div');
+                toast.style.cssText =
+                    'position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999; font-size: 14px;';
+                toast.textContent = 'Kode referral berhasil disalin!';
+                document.body.appendChild(toast);
+
+                // Hapus notifikasi setelah 2 detik
+                setTimeout(() => {
+                    toast.remove();
+                    // Kembalikan icon ke clipboard
+                    icon.classList.remove('bi-check-lg');
+                    icon.classList.add('bi-clipboard');
+                }, 2000);
+            }).catch(err => {
+                alert('Gagal menyalin kode referral');
+                console.error('Error copying:', err);
             });
         }
     </script>

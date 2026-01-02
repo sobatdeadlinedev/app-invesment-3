@@ -28,9 +28,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-between">
-                    <div class="referral-code-display">JD2024XYZ</div>
+                    <div class="referral-code-display" id="referralCode">{{ $user->refferal_code }}</div>
                     <button class="btn-copy-small" onclick="copyReferralCode()" title="Copy">
-                        <i class="bi bi-clipboard"></i>
+                        <i class="bi bi-clipboard" id="copyIcon"></i>
                     </button>
                 </div>
             </div>
@@ -58,97 +58,40 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Member Item 2 -->
-                <div class="team-member-item">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="team-avatar">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">JaneSmith456</div>
-                            <div class="d-flex align-items-center gap-1">
-                                <i class="bi bi-telephone-fill text-muted" style="font-size: 11px;"></i>
-                                <small class="text-muted">+62 813-9876-5432</small>
-                            </div>
-                        </div>
-                        <div class="team-status active">
-                            <i class="bi bi-circle-fill"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member Item 3 -->
-                <div class="team-member-item">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="team-avatar">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">MikeJohnson</div>
-                            <div class="d-flex align-items-center gap-1">
-                                <i class="bi bi-telephone-fill text-muted" style="font-size: 11px;"></i>
-                                <small class="text-muted">+62 814-5555-1234</small>
-                            </div>
-                        </div>
-                        <div class="team-status active">
-                            <i class="bi bi-circle-fill"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member Item 4 -->
-                <div class="team-member-item">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="team-avatar">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">SarahWilliams</div>
-                            <div class="d-flex align-items-center gap-1">
-                                <i class="bi bi-telephone-fill text-muted" style="font-size: 11px;"></i>
-                                <small class="text-muted">+62 815-7777-8888</small>
-                            </div>
-                        </div>
-                        <div class="team-status active">
-                            <i class="bi bi-circle-fill"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member Item 5 -->
-                <div class="team-member-item" style="border-bottom: none;">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="team-avatar">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">DavidBrown</div>
-                            <div class="d-flex align-items-center gap-1">
-                                <i class="bi bi-telephone-fill text-muted" style="font-size: 11px;"></i>
-                                <small class="text-muted">+62 816-4444-9999</small>
-                            </div>
-                        </div>
-                        <div class="team-status active">
-                            <i class="bi bi-circle-fill"></i>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Info Card -->
-            {{-- <div class="card-dark shadow-sm p-3 mb-3">
-                <div class="d-flex align-items-start gap-2">
-                    <i class="bi bi-info-circle-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
-                    <div>
-                        <h6 class="text-white mb-1" style="font-size: 13px;">Informasi Team</h6>
-                        <p class="small text-muted mb-0" style="font-size: 12px;">
-                            Daftar ini menampilkan semua member yang tergabung dalam team Anda. Status aktif ditandai dengan
-                            indikator hijau.
-                        </p>
-                    </div>
-                </div>
-            </div> --}}
         </div>
     </div>
+
+    <script>
+        function copyReferralCode() {
+            const codeElement = document.getElementById('referralCode');
+            const code = codeElement.textContent;
+            const icon = document.getElementById('copyIcon');
+
+            navigator.clipboard.writeText(code).then(() => {
+                // Ubah icon jadi check
+                icon.classList.remove('bi-clipboard');
+                icon.classList.add('bi-check-lg');
+
+                // Tampilkan notifikasi
+                const toast = document.createElement('div');
+                toast.style.cssText =
+                    'position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999; font-size: 14px;';
+                toast.textContent = 'Kode referral berhasil disalin!';
+                document.body.appendChild(toast);
+
+                // Hapus notifikasi setelah 2 detik
+                setTimeout(() => {
+                    toast.remove();
+                    // Kembalikan icon ke clipboard
+                    icon.classList.remove('bi-check-lg');
+                    icon.classList.add('bi-clipboard');
+                }, 2000);
+            }).catch(err => {
+                alert('Gagal menyalin kode referral');
+                console.error('Error copying:', err);
+            });
+        }
+    </script>
 @endsection

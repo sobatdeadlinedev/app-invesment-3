@@ -16,10 +16,10 @@
                             <i class="bi bi-person-circle"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="text-white fw-bold mb-1" style="font-size: 16px;">JohnDoe123</div>
+                            <div class="text-white fw-bold mb-1" style="font-size: 16px;">{{ $user->name }}</div>
                             <div class="d-flex align-items-center gap-1">
                                 <i class="bi bi-telephone-fill text-gold" style="font-size: 12px;"></i>
-                                <small class="text-muted">+62 812-3456-7890</small>
+                                <small class="text-muted">{{ $user->phone }}</small>
                             </div>
                         </div>
                     </div>

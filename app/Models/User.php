@@ -62,4 +62,10 @@ class User extends Authenticatable
 
         return $code;
     }
+
+    // get current user
+    public static function current()
+    {
+        return auth()->user();
+    }
 }
