@@ -23,7 +23,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 small">Total Balance</p>
-                        <h3 class="text-gold mb-0 fw-bold">$ 15,250.00</h3>
+                        <h3 class="text-gold mb-0 fw-bold">{{ number_format($userBalance, 2) }} USDT</h3>
                     </div>
                     <div class="balance-icon-wrapper">
                         <i class="bi bi-wallet2"></i>

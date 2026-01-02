@@ -28,11 +28,12 @@
             <!-- Step 1: Amount -->
             <div id="step-1" class="step-content active">
                 <!-- Current Balance Info -->
+                <!-- Current Balance Info -->
                 <div class="card-dark shadow-sm p-3 mb-3">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <p class="text-muted mb-1 small">Current Balance</p>
-                            <h5 class="text-gold mb-0 fw-bold">$ 15,250.00</h5>
+                            <h5 class="text-gold mb-0 fw-bold">{{ number_format($userBalance, 2) }} USDT</h5>
                         </div>
                         <div class="balance-icon-wrapper">
                             <i class="bi bi-wallet2"></i>
@@ -44,149 +45,167 @@
                 <div class="card-dark shadow-sm p-3 mb-3">
                     <h6 class="text-white mb-3">Deposit Amount</h6>
                     <div class="mb-3">
-                        <label class="text-muted small mb-2 d-block">Amount (USD)</label>
+                        <label class="text-muted small mb-2 d-block">Enter Amount (USDT)</label>
                         <div class="input-with-icon">
-                            <span class="input-icon">$</span>
+                            <span class="input-icon">₮</span>
                             <input type="number" id="deposit-amount" class="form-control-dark with-icon"
-                                placeholder="Enter amount" value="100">
+                                placeholder="Enter amount manually" value="" step="0.01" min="10">
                         </div>
+                        <small class="text-muted d-block mt-1">Minimum deposit: 10 USDT</small>
+                    </div>
+                    <div class="mb-2">
+                        <label class="text-muted small mb-2 d-block">Or choose quick amount:</label>
                     </div>
                     <div class="amount-quick-select">
-                        <button class="quick-amount-btn" onclick="setAmount(50)">$50</button>
-                        <button class="quick-amount-btn" onclick="setAmount(100)">$100</button>
-                        <button class="quick-amount-btn" onclick="setAmount(250)">$250</button>
-                        <button class="quick-amount-btn" onclick="setAmount(500)">$500</button>
+                        <button class="quick-amount-btn" type="button" onclick="setAmount(50)">50 USDT</button>
+                        <button class="quick-amount-btn" type="button" onclick="setAmount(100)">100 USDT</button>
+                        <button class="quick-amount-btn" type="button" onclick="setAmount(250)">250 USDT</button>
+                        <button class="quick-amount-btn" type="button" onclick="setAmount(500)">500 USDT</button>
                     </div>
                 </div>
 
                 <!-- Continue Button -->
-                <button class="btn btn-gold w-100" onclick="goToStep2()">
+                <button class="btn btn-gold w-100" type="button" onclick="goToStep2()">
                     Continue <i class="bi bi-arrow-right ms-2"></i>
                 </button>
             </div>
 
             <!-- Step 2: Payment Method -->
             <div id="step-2" class="step-content">
-                <!-- Amount Summary -->
-                <div class="card-dark shadow-sm p-3 mb-3">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <p class="text-muted mb-0">Deposit Amount</p>
-                        <h5 class="text-gold mb-0 fw-bold" id="summary-amount">$ 100.00</h5>
-                    </div>
-                </div>
+                <form id="deposit-form" action="{{ route('member.deposit.store') }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="amount" id="form-amount">
+                    <input type="hidden" name="payment_method" id="form-payment-method" value="ewallet">
 
-                <!-- Payment Methods -->
-                <div class="card-dark shadow-sm p-3 mb-3">
-                    <h6 class="text-white mb-3">Choose Payment Method</h6>
-
-                    <!-- E-Wallet Option -->
-                    <div class="payment-method-option" onclick="selectMethod('ewallet')">
-                        <input type="radio" name="payment-method" id="method-ewallet" class="payment-radio" checked>
-                        <label for="method-ewallet" class="payment-label">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="payment-icon ewallet">
-                                    <i class="bi bi-wallet2"></i>
-                                </div>
-                                <div>
-                                    <div class="text-white fw-bold mb-1" style="font-size: 14px;">E-Wallet (OVO)</div>
-                                    <small class="text-muted">Transfer to OVO number</small>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- QR Code Option -->
-                    <div class="payment-method-option" onclick="selectMethod('qrcode')">
-                        <input type="radio" name="payment-method" id="method-qrcode" class="payment-radio">
-                        <label for="method-qrcode" class="payment-label">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="payment-icon qrcode">
-                                    <i class="bi bi-qr-code"></i>
-                                </div>
-                                <div>
-                                    <div class="text-white fw-bold mb-1" style="font-size: 14px;">QR Code</div>
-                                    <small class="text-muted">Scan QR to pay</small>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Payment Details: E-Wallet -->
-                <div id="payment-details-ewallet" class="payment-details active">
+                    <!-- Amount Summary -->
                     <div class="card-dark shadow-sm p-3 mb-3">
-                        <h6 class="text-white mb-3">Payment Details</h6>
-                        <div class="payment-info-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="text-muted small">OVO Number</span>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="text-white fw-bold">0812-3456-7890</span>
-                                    <button class="btn-copy-mini" onclick="copyText('0812-3456-7890')" title="Copy">
-                                        <i class="bi bi-clipboard"></i>
-                                    </button>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <p class="text-muted mb-0">Deposit Amount</p>
+                            <h5 class="text-gold mb-0 fw-bold" id="summary-amount">100.00 USDT</h5>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="card-dark shadow-sm p-3 mb-3">
+                        <h6 class="text-white mb-3">Choose Payment Method</h6>
+
+                        <!-- E-Wallet Option -->
+                        <div class="payment-method-option" onclick="selectMethod('ewallet')">
+                            <input type="radio" name="payment_method_display" id="method-ewallet" class="payment-radio"
+                                checked>
+                            <label for="method-ewallet" class="payment-label">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="payment-icon ewallet">
+                                        <i class="bi bi-wallet2"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-bold mb-1" style="font-size: 14px;">E-Wallet</div>
+                                        <small class="text-muted">Transfer USDT via E-Wallet</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- QR Code Option -->
+                        <div class="payment-method-option" onclick="selectMethod('qrcode')">
+                            <input type="radio" name="payment_method_display" id="method-qrcode" class="payment-radio">
+                            <label for="method-qrcode" class="payment-label">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="payment-icon qrcode">
+                                        <i class="bi bi-qr-code"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-bold mb-1" style="font-size: 14px;">QR Code</div>
+                                        <small class="text-muted">Scan QR to pay with USDT</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details: E-Wallet -->
+                    <div id="payment-details-ewallet" class="payment-details active">
+                        <div class="card-dark shadow-sm p-3 mb-3">
+                            <h6 class="text-white mb-3">Payment Details</h6>
+                            <div class="payment-info-item">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-muted small">Wallet Number</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-white fw-bold">{{ $walletNumber }}</span>
+                                        <button type="button" class="btn-copy-mini"
+                                            onclick="copyText('{{ $walletNumber }}')" title="Copy">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="payment-info-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="text-muted small">Account Name</span>
-                                <span class="text-white fw-bold">Jhonson Investment</span>
+                            <div class="payment-info-item">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-muted small">Account Name</span>
+                                    <span class="text-white fw-bold">{{ $walletName }}</span>
+                                </div>
+                            </div>
+                            <div class="alert-info-box mt-3">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network TRC20
+                                    dan
+                                    upload bukti transfer</span>
                             </div>
                         </div>
-                        <div class="alert-info-box mt-3">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <span class="small">Transfer sesuai nominal yang tertera dan upload bukti transfer</span>
+                    </div>
+
+                    <!-- Payment Details: QR Code -->
+                    <div id="payment-details-qrcode" class="payment-details">
+                        <div class="card-dark shadow-sm p-3 mb-3">
+                            <h6 class="text-white mb-3 text-center">Scan QR Code</h6>
+                            <div class="qr-code-container">
+                                <img src="{{ $qrCode }}" alt="QR Code" class="qr-code-image">
+                            </div>
+                            <div class="alert-info-box mt-3">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <span class="small">Scan QR code dengan aplikasi crypto wallet Anda (TRC20 Network) dan
+                                    upload
+                                    bukti transfer</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Payment Details: QR Code -->
-                <div id="payment-details-qrcode" class="payment-details">
+                    <!-- Upload Proof -->
                     <div class="card-dark shadow-sm p-3 mb-3">
-                        <h6 class="text-white mb-3 text-center">Scan QR Code</h6>
-                        <div class="qr-code-container">
-                            <img src="https://via.placeholder.com/200x200/2d3158/f5a623?text=QR+CODE" alt="QR Code"
-                                class="qr-code-image">
+                        <h6 class="text-white mb-3">Upload Proof of Transfer</h6>
+                        <div class="upload-area" onclick="document.getElementById('file-upload').click()">
+                            <input type="file" name="payment_proof" id="file-upload" accept="image/*"
+                                style="display: none;" onchange="handleFileUpload(event)" required>
+                            <div id="upload-placeholder">
+                                <i class="bi bi-cloud-upload upload-icon"></i>
+                                <p class="text-white mb-1">Click to upload</p>
+                                <small class="text-muted">PNG, JPG up to 5MB</small>
+                            </div>
+                            <div id="upload-preview" style="display: none;">
+                                <img id="preview-image" src="" alt="Preview" class="preview-image">
+                                <p class="text-white mb-0 mt-2" id="file-name"></p>
+                            </div>
                         </div>
-                        <div class="alert-info-box mt-3">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <span class="small">Scan QR code dengan aplikasi e-wallet Anda dan upload bukti
-                                transfer</span>
-                        </div>
+                        @error('payment_proof')
+                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                        @enderror
                     </div>
-                </div>
 
-                <!-- Upload Proof -->
-                <div class="card-dark shadow-sm p-3 mb-3">
-                    <h6 class="text-white mb-3">Upload Proof of Transfer</h6>
-                    <div class="upload-area" onclick="document.getElementById('file-upload').click()">
-                        <input type="file" id="file-upload" accept="image/*" style="display: none;"
-                            onchange="handleFileUpload(event)">
-                        <div id="upload-placeholder">
-                            <i class="bi bi-cloud-upload upload-icon"></i>
-                            <p class="text-white mb-1">Click to upload</p>
-                            <small class="text-muted">PNG, JPG up to 5MB</small>
+                    <!-- Action Buttons -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-gold w-100" onclick="goToStep1()">
+                                <i class="bi bi-arrow-left me-2"></i>Back
+                            </button>
                         </div>
-                        <div id="upload-preview" style="display: none;">
-                            <img id="preview-image" src="" alt="Preview" class="preview-image">
-                            <p class="text-white mb-0 mt-2" id="file-name"></p>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-gold w-100" onclick="submitDeposit()">
+                                Submit
+                            </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <button class="btn btn-outline-gold w-100" onclick="goToStep1()">
-                            <i class="bi bi-arrow-left me-2"></i>Back
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-gold w-100" onclick="submitDeposit()">
-                            Submit
-                        </button>
-                    </div>
-                </div>
+                </form>
             </div>
 
         </div>
@@ -194,6 +213,19 @@
 
     <script>
         let selectedFile = null;
+
+        // Show alert messages
+        @if (session('success'))
+            alert('{{ session('success') }}');
+        @endif
+
+        @if (session('error'))
+            alert('{{ session('error') }}');
+        @endif
+
+        @if ($errors->any())
+            alert('{{ $errors->first() }}');
+        @endif
 
         function setAmount(amount) {
             document.getElementById('deposit-amount').value = amount;
@@ -205,9 +237,14 @@
                 alert('Please enter a valid amount');
                 return;
             }
+            if (amount < 10) {
+                alert('Minimum deposit amount is 10 USDT');
+                return;
+            }
 
             // Update summary
-            document.getElementById('summary-amount').textContent = '$ ' + parseFloat(amount).toFixed(2);
+            document.getElementById('summary-amount').textContent = parseFloat(amount).toFixed(2) + ' USDT';
+            document.getElementById('form-amount').value = amount;
 
             // Switch steps
             document.getElementById('step-1').classList.remove('active');
@@ -234,6 +271,8 @@
         }
 
         function selectMethod(method) {
+            document.getElementById('form-payment-method').value = method;
+
             if (method === 'ewallet') {
                 document.getElementById('method-ewallet').checked = true;
                 document.getElementById('payment-details-ewallet').classList.add('active');
@@ -254,6 +293,21 @@
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file) {
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must not exceed 5MB');
+                    event.target.value = '';
+                    return;
+                }
+
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Only JPG, JPEG, and PNG files are allowed');
+                    event.target.value = '';
+                    return;
+                }
+
                 selectedFile = file;
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -268,16 +322,17 @@
 
         function submitDeposit() {
             const amount = document.getElementById('deposit-amount').value;
-            const method = document.querySelector('input[name="payment-method"]:checked').id;
+            const fileInput = document.getElementById('file-upload');
 
-            if (!selectedFile) {
+            if (!fileInput.files || !fileInput.files[0]) {
                 alert('Please upload proof of transfer');
                 return;
             }
 
-            alert('Deposit request submitted!\nAmount: $' + amount + '\nMethod: ' + (method === 'method-ewallet' ?
-                'E-Wallet' : 'QR Code'));
-            // Here you would normally send the data to the server
+            // Confirm before submit
+            if (confirm('Are you sure you want to submit this deposit request?')) {
+                document.getElementById('deposit-form').submit();
+            }
         }
     </script>
 @endsection

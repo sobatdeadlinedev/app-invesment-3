@@ -25,6 +25,25 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    // Relation
+    public function wallets()
+    {
+        return $this->hasMany(Wallet::class);
+    }
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function commissionSources()
+    {
+        return $this->hasMany(Transaction::class, 'source_user_id');
+    }
+
+    public function approvedTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'approved_by');
+    }
 
     protected function casts(): array
     {

@@ -25,6 +25,17 @@ class ConfigSeeder extends Seeder
                 'key' => 'app_announcement',
                 'value' => ['value' => ''],
             ],
+            [
+                'key' => 'app_wallet_address',
+                'value' => [
+                    'name' => 'wallet address here',
+                    'number' => '1234567890'
+                ],
+            ],
+            [
+                'key' => 'app_qr_code',
+                'value' => ['value' => 'QR code image here'],
+            ],
         ];
 
         foreach ($configs as $config) {

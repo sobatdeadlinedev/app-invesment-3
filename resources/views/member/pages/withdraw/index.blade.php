@@ -12,91 +12,280 @@
 
             <h5 class="text-white mb-3">Withdraw</h5>
 
-            <!-- Current Balance Info -->
-            <div class="card-dark shadow-sm p-3 mb-3">
-                <div class="d-flex align-items-center justify-content-between">
+            <form id="withdraw-form" action="{{ route('member.withdraw.store') }}" method="POST">
+                @csrf
+
+                <!-- Current Balance Info -->
+                <div class="card-dark shadow-sm p-3 mb-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted mb-1 small">Available Balance</p>
+                            <h5 class="text-gold mb-0 fw-bold">{{ number_format($userBalance, 2) }} USDT</h5>
+                        </div>
+                        <div class="balance-icon-wrapper">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Withdrawal Amount Card -->
+                <div class="card-dark shadow-sm p-3 mb-3">
+                    <h6 class="text-white mb-3">Withdrawal Amount</h6>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-2 d-block">Amount (USDT)</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">₮</span>
+                            <input type="number" name="amount" id="withdraw-amount" class="form-control-dark with-icon"
+                                placeholder="Enter amount" value="{{ old('amount') }}" step="0.01" min="10"
+                                required>
+                        </div>
+                        <small class="text-muted d-block mt-1">Minimum withdrawal: 10 USDT | Fee: 2%</small>
+                        @error('amount')
+                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-2">
+                        <label class="text-muted small mb-2 d-block">Or choose quick amount:</label>
+                    </div>
+                    <div class="amount-quick-select">
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(50)">50 USDT</button>
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(100)">100 USDT</button>
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(250)">250 USDT</button>
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(500)">500 USDT</button>
+                    </div>
+                </div>
+
+                <!-- Select Wallet Account Card -->
+                <div class="card-dark shadow-sm p-3 mb-3">
+                    <h6 class="text-white mb-3">Select Wallet Account</h6>
                     <div>
-                        <p class="text-muted mb-1 small">Available Balance</p>
-                        <h5 class="text-gold mb-0 fw-bold">$ 15,250.00</h5>
-                    </div>
-                    <div class="balance-icon-wrapper">
-                        <i class="bi bi-wallet2"></i>
-                    </div>
-                </div>
-            </div>
+                        <label class="text-muted small mb-2 d-block">Choose your wallet account</label>
+                        <select name="wallet_id" id="wallet-account" class="form-control-dark-select" required>
+                            <option value="">-- Select Wallet Account --</option>
+                            @forelse($wallets as $wallet)
+                                <option value="{{ $wallet->id }}" {{ old('wallet_id') == $wallet->id ? 'selected' : '' }}>
+                                    {{ $wallet->account_name }} - {{ $wallet->account_number }}
+                                </option>
+                            @empty
+                                <option value="" disabled>No wallet account available</option>
+                            @endforelse
+                        </select>
+                        @error('wallet_id')
+                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                        @enderror
 
-            <!-- Withdrawal Amount Card -->
-            <div class="card-dark shadow-sm p-3 mb-3">
-                <h6 class="text-white mb-3">Withdrawal Amount</h6>
-                <div class="mb-3">
-                    <label class="text-muted small mb-2 d-block">Amount (USD)</label>
-                    <div class="input-with-icon">
-                        <span class="input-icon">$</span>
-                        <input type="number" id="withdraw-amount" class="form-control-dark with-icon"
-                            placeholder="Enter amount" value="">
-                    </div>
-                </div>
-                <div class="amount-quick-select">
-                    <button class="quick-amount-btn" onclick="setWithdrawAmount(100)">$100</button>
-                    <button class="quick-amount-btn" onclick="setWithdrawAmount(500)">$500</button>
-                    <button class="quick-amount-btn" onclick="setWithdrawAmount(1000)">$1,000</button>
-                    <button class="quick-amount-btn" onclick="setWithdrawAmount(5000)">$5,000</button>
-                </div>
-            </div>
-
-            <!-- Select Bank Account Card -->
-            <div class="card-dark shadow-sm p-3 mb-3">
-                <h6 class="text-white mb-3">Select Bank Account</h6>
-                <div>
-                    <label class="text-muted small mb-2 d-block">Choose your bank account</label>
-                    <select id="bank-account" class="form-control-dark">
-                        <option value="">-- Select Bank Account --</option>
-                        <option value="1">Bank Central Asia - 1234567890 (John Doe)</option>
-                        <option value="2">Bank Mandiri - 9876543210 (John Doe)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Info Card -->
-            <div class="card-dark shadow-sm p-3 mb-3">
-                <div class="d-flex align-items-start gap-2">
-                    <i class="bi bi-info-circle-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
-                    <div>
-                        <h6 class="text-white mb-1" style="font-size: 13px;">Withdrawal Information</h6>
-                        <p class="small text-muted mb-0" style="font-size: 12px;">
-                            Withdrawal akan diproses dalam 1-3 hari kerja. Pastikan data bank Anda sudah benar.
-                        </p>
+                        @if ($wallets->isEmpty())
+                            <div class="alert-info-box mt-2">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <span class="small">You need to add a wallet account first. <a
+                                        href="{{ route('member.profile.index') }}" class="text-gold">Add Wallet</a></span>
+                            </div>
+                        @endif
                     </div>
                 </div>
-            </div>
 
-            <!-- Submit Button -->
-            <button class="btn btn-gold w-100" onclick="submitWithdraw()">
-                Submit Withdrawal
-            </button>
+                <!-- Fee Calculation -->
+                <div class="card-dark shadow-sm p-3 mb-3" id="fee-card" style="display: none;">
+                    <h6 class="text-white mb-3">Withdrawal Summary</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Withdrawal Amount</span>
+                        <span class="text-white fw-bold" id="display-amount">0.00 USDT</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Withdrawal Fee (2%)</span>
+                        <span class="text-white fw-bold" id="display-fee">0.00 USDT</span>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.1);">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-white fw-bold">You will receive</span>
+                        <span class="text-gold fw-bold" id="display-total">0.00 USDT</span>
+                    </div>
+                </div>
+
+                <!-- Info Card -->
+                <div class="card-dark shadow-sm p-3 mb-3">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-info-circle-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
+                        <div>
+                            <h6 class="text-white mb-1" style="font-size: 13px;">Withdrawal Information</h6>
+                            <p class="small text-muted mb-0" style="font-size: 12px;">
+                                Withdrawal akan diproses dalam 1-3 hari kerja. Pastikan data wallet Anda sudah benar.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" class="btn btn-gold w-100" onclick="submitWithdraw()"
+                    {{ $wallets->isEmpty() ? 'disabled' : '' }}>
+                    Submit Withdrawal
+                </button>
+            </form>
 
         </div>
     </div>
 
+    <style>
+        /* Improved Dropdown Styling */
+        .form-control-dark-select {
+            background: rgba(245, 166, 35, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23f5a623' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .form-control-dark-select:focus {
+            outline: none;
+            border-color: var(--gold-color);
+            background-color: rgba(245, 166, 35, 0.1);
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+
+        .form-control-dark-select option {
+            background-color: var(--card-dark);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .form-control-dark-select option:hover {
+            background-color: rgba(245, 166, 35, 0.2);
+        }
+
+        .form-control-dark-select option:checked {
+            background-color: var(--gold-color);
+            color: #000;
+        }
+
+        .form-control-dark-select option[value=""] {
+            color: var(--text-muted);
+        }
+
+        .form-control-dark-select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Better dropdown for mobile */
+        @media (max-width: 480px) {
+            .form-control-dark-select {
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+            }
+        }
+    </style>
+
     <script>
+        const userBalance = {{ $userBalance }};
+
+        // Show alert messages
+        @if (session('success'))
+            alert('{{ session('success') }}');
+        @endif
+
+        @if (session('error'))
+            alert('{{ session('error') }}');
+        @endif
+
+        @if ($errors->any())
+            alert('{{ $errors->first() }}');
+        @endif
+
         function setWithdrawAmount(amount) {
             document.getElementById('withdraw-amount').value = amount;
+            calculateFee();
+        }
+
+        // Calculate fee when amount changes
+        document.getElementById('withdraw-amount').addEventListener('input', function() {
+            calculateFee();
+        });
+
+        function calculateFee() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+
+            if (amount > 0) {
+                const fee = amount * 0.02; // 2% fee
+                const total = amount - fee;
+
+                document.getElementById('display-amount').textContent = amount.toFixed(2) + ' USDT';
+                document.getElementById('display-fee').textContent = fee.toFixed(2) + ' USDT';
+                document.getElementById('display-total').textContent = total.toFixed(2) + ' USDT';
+                document.getElementById('fee-card').style.display = 'block';
+            } else {
+                document.getElementById('fee-card').style.display = 'none';
+            }
         }
 
         function submitWithdraw() {
-            const amount = document.getElementById('withdraw-amount').value;
-            const bankSelect = document.getElementById('bank-account');
-            const selectedBank = bankSelect.options[bankSelect.selectedIndex].text;
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const walletSelect = document.getElementById('wallet-account');
 
             if (!amount || amount <= 0) {
                 alert('Please enter a valid amount');
                 return;
             }
 
-            if (!bankSelect.value) {
-                alert('Please select a bank account');
+            if (amount < 10) {
+                alert('Minimum withdrawal amount is 10 USDT');
                 return;
             }
+
+            if (amount > userBalance) {
+                alert('Insufficient balance. Your available balance is ' + userBalance.toFixed(2) + ' USDT');
+                return;
+            }
+
+            if (!walletSelect.value) {
+                alert('Please select a wallet account');
+                return;
+            }
+
+            const fee = amount * 0.02;
+            const total = amount - fee;
+
+            // Confirm before submit
+            if (confirm('Confirm withdrawal?\n\nAmount: ' + amount.toFixed(2) + ' USDT\nFee: ' + fee.toFixed(2) +
+                    ' USDT\nYou will receive: ' + total.toFixed(2) + ' USDT')) {
+                document.getElementById('withdraw-form').submit();
+            }
         }
+
+        // Enhanced dropdown behavior
+        document.getElementById('wallet-account').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+
+            // Visual feedback when wallet is selected
+            if (this.value) {
+                this.style.borderColor = 'var(--gold-color)';
+                this.style.backgroundColor = 'rgba(245, 166, 35, 0.1)';
+            } else {
+                this.style.borderColor = 'var(--border-color)';
+                this.style.backgroundColor = 'rgba(245, 166, 35, 0.05)';
+            }
+        });
+
+        // Auto-select first wallet if only one available and no previous selection
+        window.addEventListener('DOMContentLoaded', function() {
+            const walletSelect = document.getElementById('wallet-account');
+            const options = walletSelect.querySelectorAll('option[value]:not([value=""])');
+
+            // If only one wallet available and nothing selected, auto-select it
+            if (options.length === 1 && !walletSelect.value) {
+                walletSelect.value = options[0].value;
+                walletSelect.dispatchEvent(new Event('change'));
+            }
+        });
     </script>
 @endsection
