@@ -15,6 +15,10 @@ class DashboardController extends Controller
         $user = User::current();
         $announcement = Config::get('app_announcement')['value'] ?? null;
         $userBalance = Transaction::getUserBalance(auth()->id());
-        return view('member.pages.dashboard.index', compact('user', 'announcement', 'userBalance'));
+
+        // Generate referral link
+        $referralLink = route('register', ['ref' => $user->refferal_code]);
+
+        return view('member.pages.dashboard.index', compact('user', 'announcement', 'userBalance', 'referralLink'));
     }
 }

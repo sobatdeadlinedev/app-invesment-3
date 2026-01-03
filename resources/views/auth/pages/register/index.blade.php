@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <base href="../../../" />
+    <base href="{{ url('/') }}/" />
     <title>Register - MLM App</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -58,6 +58,18 @@
                                             <li>{{ $error }}</li>
                                         @endforeach
                                     </ul>
+                                </div>
+                            @endif
+
+                            <!-- Referral Code Info (if exists) -->
+                            @if ($referralCode && $referrer)
+                                <div class="alert alert-success d-flex align-items-center mb-8">
+                                    <i class="ki-outline ki-shield-tick fs-2hx text-success me-4"></i>
+                                    <div class="d-flex flex-column">
+                                        <h4 class="mb-1 text-dark">Kode Referral Terdeteksi</h4>
+                                        <span>Anda akan terdaftar sebagai referral dari
+                                            <strong>{{ $referrer->username }}</strong></span>
+                                    </div>
                                 </div>
                             @endif
 
@@ -124,6 +136,18 @@
                                             id="password-confirmation-icon-show"></i>
                                     </span>
                                 </div>
+                            </div>
+
+                            <!-- Referral Code Input (optional jika tidak dari link) -->
+                            <div class="fv-row mb-8">
+                                <input type="text" placeholder="Kode Referral (Opsional)" name="referral_code"
+                                    autocomplete="off" value="{{ old('referral_code', $referralCode ?? '') }}"
+                                    class="form-control bg-transparent @error('referral_code') is-invalid @enderror"
+                                    {{ $referralCode ? 'readonly' : '' }} />
+                                @error('referral_code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Masukkan kode referral jika Anda memilikinya</div>
                             </div>
 
                             <div class="d-grid mb-10">

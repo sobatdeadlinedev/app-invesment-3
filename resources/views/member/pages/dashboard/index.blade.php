@@ -10,7 +10,7 @@
                     <div class="d-flex align-items-start gap-2">
                         <i class="bi bi-megaphone-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
                         <div>
-                            <h6 class="text-white mb-1" style="font-size: 13px;">Pengumuman (if exist)</h6>
+                            <h6 class="text-white mb-1" style="font-size: 13px;">Pengumuman</h6>
                             <p class="small text-muted mb-0" style="font-size: 12px;">
                                 {{ $announcement }}
                             </p>
@@ -18,6 +18,7 @@
                     </div>
                 </div>
             @endif
+
             <!-- Card 1: Balance -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between">
@@ -31,9 +32,9 @@
                 </div>
             </div>
 
-            <!-- Card 2: Referral Code -->
+            <!-- Card 2: Referral Code & Link -->
             <div class="card-dark shadow-sm p-3 mb-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center gap-2">
                         <div class="referral-icon-small">
                             <i class="bi bi-gift-fill"></i>
@@ -41,11 +42,24 @@
                         <p class="text-muted mb-0 small">Kode Referral</p>
                     </div>
                 </div>
-                <div class="d-flex align-items-center justify-content-between">
+
+                <!-- Referral Code -->
+                <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="referral-code-display" id="referralCode">{{ $user->refferal_code }}</div>
-                    <button class="btn-copy-small" onclick="copyReferralCode()" title="Copy">
-                        <i class="bi bi-clipboard" id="copyIcon"></i>
+                    <button class="btn-copy-small" onclick="copyReferralCode()" title="Copy Kode">
+                        <i class="bi bi-clipboard" id="copyCodeIcon"></i>
                     </button>
+                </div>
+
+                <!-- Referral Link -->
+                <div>
+                    <p class="text-muted mb-2 small">Link Referral</p>
+                    <div class="d-flex align-items-center justify-content-between gap-2">
+                        <div class="referral-link-display" id="referralLink">{{ $referralLink }}</div>
+                        <button class="btn-copy-small" onclick="copyReferralLink()" title="Copy Link">
+                            <i class="bi bi-link-45deg" id="copyLinkIcon"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -158,34 +172,88 @@
         </div>
     </div>
 
+    <style>
+        .referral-link-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-family: monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+    </style>
+
     <script>
+        function showToast(message, type = 'success') {
+            const bgColor = type === 'success' ? '#28a745' : '#dc3545';
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; 
+                top: 20px; 
+                right: 20px; 
+                background: ${bgColor}; 
+                color: white; 
+                padding: 12px 20px; 
+                border-radius: 8px; 
+                z-index: 9999; 
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
         function copyReferralCode() {
             const codeElement = document.getElementById('referralCode');
             const code = codeElement.textContent;
-            const icon = document.getElementById('copyIcon');
+            const icon = document.getElementById('copyCodeIcon');
 
             navigator.clipboard.writeText(code).then(() => {
                 // Ubah icon jadi check
                 icon.classList.remove('bi-clipboard');
                 icon.classList.add('bi-check-lg');
 
-                // Tampilkan notifikasi
-                // Bisa pakai toast atau alert
-                const toast = document.createElement('div');
-                toast.style.cssText =
-                    'position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999; font-size: 14px;';
-                toast.textContent = 'Kode referral berhasil disalin!';
-                document.body.appendChild(toast);
+                showToast('Kode referral berhasil disalin!');
 
-                // Hapus notifikasi setelah 2 detik
+                // Kembalikan icon ke clipboard
                 setTimeout(() => {
-                    toast.remove();
-                    // Kembalikan icon ke clipboard
                     icon.classList.remove('bi-check-lg');
                     icon.classList.add('bi-clipboard');
                 }, 2000);
             }).catch(err => {
-                alert('Gagal menyalin kode referral');
+                showToast('Gagal menyalin kode referral', 'error');
+                console.error('Error copying:', err);
+            });
+        }
+
+        function copyReferralLink() {
+            const linkElement = document.getElementById('referralLink');
+            const link = linkElement.textContent;
+            const icon = document.getElementById('copyLinkIcon');
+
+            navigator.clipboard.writeText(link).then(() => {
+                // Ubah icon jadi check
+                icon.classList.remove('bi-link-45deg');
+                icon.classList.add('bi-check-lg');
+
+                showToast('Link referral berhasil disalin!');
+
+                // Kembalikan icon ke link
+                setTimeout(() => {
+                    icon.classList.remove('bi-check-lg');
+                    icon.classList.add('bi-link-45deg');
+                }, 2000);
+            }).catch(err => {
+                showToast('Gagal menyalin link referral', 'error');
                 console.error('Error copying:', err);
             });
         }

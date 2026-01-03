@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Models\ReferralUsage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,9 +12,18 @@ use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
 {
-    public function showRegistrationForm()
+    public function showRegistrationForm(Request $request)
     {
-        return view('auth.pages.register.index');
+        // Get referral code from URL parameter
+        $referralCode = $request->query('ref');
+
+        // Validate if referral code exists
+        $referrer = null;
+        if ($referralCode) {
+            $referrer = User::where('refferal_code', $referralCode)->first();
+        }
+
+        return view('auth.pages.register.index', compact('referralCode', 'referrer'));
     }
 
     public function register(Request $request)
@@ -23,6 +33,7 @@ class RegisterController extends Controller
             'username' => 'required|string|max:255|unique:users,username|alpha_dash',
             'phone' => 'required|string|max:20|unique:users,phone|regex:/^[0-9]+$/',
             'password' => ['required', 'confirmed', Password::min(8)],
+            'referral_code' => 'nullable|string|exists:users,refferal_code',
         ], [
             'name.required' => 'Nama lengkap harus diisi',
             'username.required' => 'Username harus diisi',
@@ -34,18 +45,41 @@ class RegisterController extends Controller
             'password.required' => 'Password harus diisi',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
             'password.min' => 'Password minimal 8 karakter',
+            'referral_code.exists' => 'Kode referral tidak valid',
         ]);
+
+        // Format phone number to start with 62
+        $phone = $request->phone;
+        if (substr($phone, 0, 1) === '0') {
+            $phone = '62' . substr($phone, 1);
+        } elseif (substr($phone, 0, 2) !== '62') {
+            $phone = '62' . $phone;
+        }
 
         // Create user
         $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
-            'phone' => $request->phone,
+            'phone' => $phone,
             'password' => Hash::make($request->password),
         ]);
 
         // Assign default role 'member'
         $user->assignRole('member');
+
+        // Save referral usage if referral code is provided
+        if ($request->referral_code) {
+            $referrer = User::where('refferal_code', $request->referral_code)->first();
+
+            if ($referrer) {
+                ReferralUsage::create([
+                    'referrer_id' => $referrer->id,
+                    'referred_id' => $user->id,
+                    'referral_code' => $request->referral_code,
+                    'used_at' => now(),
+                ]);
+            }
+        }
 
         // Auto login setelah register
         Auth::login($user);

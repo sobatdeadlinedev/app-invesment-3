@@ -87,4 +87,33 @@ class User extends Authenticatable
     {
         return auth()->user();
     }
+    public function referrals()
+    {
+        return $this->hasMany(ReferralUsage::class, 'referrer_id');
+    }
+
+    // Referral usage ketika user ini menggunakan kode referral orang lain
+    public function usedReferral()
+    {
+        return $this->hasOne(ReferralUsage::class, 'referred_id');
+    }
+
+    // Get users yang direferensikan (referred users)
+    public function referredUsers()
+    {
+        return $this->hasManyThrough(
+            User::class,
+            ReferralUsage::class,
+            'referrer_id',
+            'id',
+            'id',
+            'referred_id'
+        );
+    }
+
+    // Get total referral count
+    public function getTotalReferralsAttribute()
+    {
+        return $this->referrals()->count();
+    }
 }

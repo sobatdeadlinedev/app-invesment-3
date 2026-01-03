@@ -11,6 +11,18 @@ class TeamController extends Controller
     public function index()
     {
         $user = User::current();
-        return view('member.pages.team.index', compact('user'));
+
+        // Get team members (referred users)
+        $teamMembers = $user->referredUsers()
+            ->withCount('referrals as total_referrals')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalTeam = $teamMembers->count();
+
+        // Generate referral link
+        $referralLink = route('register', ['ref' => $user->refferal_code]);
+
+        return view('member.pages.team.index', compact('user', 'teamMembers', 'totalTeam', 'referralLink'));
     }
 }
