@@ -78,7 +78,7 @@ class DepositController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('member.deposit.index')
+                ->route('member.deposit.history')
                 ->with('success', 'Deposit request submitted successfully! Reference: ' . $reference);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -103,12 +103,24 @@ class DepositController extends Controller
      */
     public function history()
     {
-        $deposits = Transaction::forUser(auth()->id())
+        // Get all deposits with pagination
+        $transactions = Transaction::forUser(auth()->id())
             ->deposit()
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('member.pages.deposit.history', compact('deposits'));
+        // Count summary
+        $pendingCount = Transaction::forUser(auth()->id())
+            ->deposit()
+            ->pending()
+            ->count();
+
+        $completedCount = Transaction::forUser(auth()->id())
+            ->deposit()
+            ->whereIn('status', ['approved', 'completed'])
+            ->count();
+
+        return view('member.pages.deposit.history', compact('transactions', 'pendingCount', 'completedCount'));
     }
 
     /**

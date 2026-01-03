@@ -6,6 +6,7 @@ use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
 class WithdrawController extends Controller
@@ -95,13 +96,13 @@ class WithdrawController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('member.withdraw.index')
+                ->route('member.withdraw.history')
                 ->with('success', 'Withdrawal request submitted successfully! Reference: ' . $reference . '. You will receive: ' . number_format($netAmount, 2) . ' USDT');
         } catch (\Exception $e) {
             DB::rollBack();
 
             // Log error for debugging
-            \Log::error('Withdrawal failed: ' . $e->getMessage());
+            Log::error('Withdrawal failed: ' . $e->getMessage());
 
             return redirect()
                 ->back()
@@ -115,25 +116,65 @@ class WithdrawController extends Controller
      */
     public function history()
     {
-        $withdrawals = Transaction::forUser(auth()->id())
+        // Get all withdrawals with pagination
+        $transactions = Transaction::forUser(auth()->id())
             ->withdrawal()
             ->with('wallet')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('member.pages.withdraw.history', compact('withdrawals'));
+        // Count summary
+        $pendingCount = Transaction::forUser(auth()->id())
+            ->withdrawal()
+            ->pending()
+            ->count();
+
+        $completedCount = Transaction::forUser(auth()->id())
+            ->withdrawal()
+            ->whereIn('status', ['approved', 'completed'])
+            ->count();
+
+        return view('member.pages.withdraw.history', compact('transactions', 'pendingCount', 'completedCount'));
     }
 
     /**
-     * Get balance breakdown (optional - for AJAX request)
+     * Cancel withdrawal request (only for pending status)
      */
-    public function getBalance()
+    public function cancel($reference)
     {
-        $balanceBreakdown = Transaction::getUserBalanceBreakdown(auth()->id());
+        try {
+            $transaction = Transaction::where('reference', $reference)
+                ->where('user_id', auth()->id())
+                ->where('type', 'withdrawal')
+                ->where('status', 'pending')
+                ->first();
 
-        return response()->json([
-            'success' => true,
-            'data' => $balanceBreakdown,
-        ]);
+            if (!$transaction) {
+                return redirect()
+                    ->route('member.withdraw.history')
+                    ->with('error', 'Withdrawal request not found or cannot be cancelled');
+            }
+
+            DB::beginTransaction();
+
+            // Update status to cancelled
+            $transaction->update([
+                'status' => 'cancelled',
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('member.withdraw.history')
+                ->with('success', 'Withdrawal request cancelled successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Cancel withdrawal failed: ' . $e->getMessage());
+
+            return redirect()
+                ->route('member.withdraw.history')
+                ->with('error', 'Failed to cancel withdrawal request');
+        }
     }
 }

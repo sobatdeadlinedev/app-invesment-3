@@ -67,11 +67,14 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->g
     Route::prefix('deposit')->name('deposit.')->group(function () {
         Route::get('/', [MemberDepositController::class, 'index'])->name('index');
         Route::post('/store', [MemberDepositController::class, 'store'])->name('store');
+        Route::get('/history', [MemberDepositController::class, 'history'])->name('history');
     });
 
     Route::prefix('withdraw')->name('withdraw.')->group(function () {
         Route::get('/', [MemberWithdrawController::class, 'index'])->name('index');
         Route::post('/store', [MemberWithdrawController::class, 'store'])->name('store');
+        Route::get('/history', [MemberWithdrawController::class, 'history'])->name('history');
+        Route::delete('/cancel/{reference}', [MemberWithdrawController::class, 'cancel'])->name('cancel');
     });
 
     // Wallet Routes

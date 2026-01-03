@@ -17,9 +17,36 @@ class ProfileController extends Controller
         // Get real user balance using model helper
         $userBalance = Transaction::getUserBalance(auth()->id());
 
-        // Optional: Get balance breakdown for detailed info
+        // Get balance breakdown for detailed info
         $balanceBreakdown = Transaction::getUserBalanceBreakdown(auth()->id());
 
-        return view('member.pages.profile.index', compact('user', 'wallets', 'userBalance', 'balanceBreakdown'));
+        // Get recent transactions for each type (limit to 5 for preview)
+        $deposits = Transaction::forUser(auth()->id())
+            ->deposit()
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $withdrawals = Transaction::forUser(auth()->id())
+            ->withdrawal()
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $commissions = Transaction::forUser(auth()->id())
+            ->commission()
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        return view('member.pages.profile.index', compact(
+            'user',
+            'wallets',
+            'userBalance',
+            'balanceBreakdown',
+            'deposits',
+            'withdrawals',
+            'commissions'
+        ));
     }
 }

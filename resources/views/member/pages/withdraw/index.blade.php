@@ -3,10 +3,13 @@
     <!-- Scrollable Content Area -->
     <div class="scrollable-content">
         <div class="content-section">
-            <!-- Back Button -->
-            <div class="mb-3">
+            <!-- Header with Back & History Buttons -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <a href="{{ route('member.profile.index') }}" class="btn-back">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
+                </a>
+                <a href="{{ route('member.withdraw.history') }}" class="btn-history">
+                    <i class="bi bi-clock-history me-1"></i>History
                 </a>
             </div>
 
@@ -126,6 +129,32 @@
     </div>
 
     <style>
+        /* History Button Style */
+        .btn-history {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: rgba(245, 166, 35, 0.1);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            border-radius: 8px;
+            color: var(--gold-color);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-history:hover {
+            background: rgba(245, 166, 35, 0.2);
+            border-color: var(--gold-color);
+            color: var(--gold-color);
+            text-decoration: none;
+        }
+
+        .btn-history i {
+            font-size: 14px;
+        }
+
         /* Improved Dropdown Styling */
         .form-control-dark-select {
             background: rgba(245, 166, 35, 0.05);
