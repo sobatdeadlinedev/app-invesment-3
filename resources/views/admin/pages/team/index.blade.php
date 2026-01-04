@@ -95,62 +95,120 @@
     </div>
     <!--end::Content-->
 
-    <!--begin::Modals - OUTSIDE THE TABLE-->
+    <!--begin::Modals-->
     @foreach ($users as $user)
         <!--begin::Modal - Team Detail-->
         <div class="modal fade" id="kt_modal_team_detail_{{ $user->id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered mw-800px">
+            <!--begin::Modal dialog-->
+            <div class="modal-dialog modal-dialog-centered mw-850px">
+                <!--begin::Modal content-->
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <div>
-                            <h2 class="fw-bold">Team Members - {{ $user->name }}</h2>
-                            <span class="text-muted fs-7">Referral Code: {{ $user->refferal_code }}</span>
+                    <!--begin::Modal header-->
+                    <div class="modal-header" id="kt_modal_team_detail_header">
+                        <!--begin::Modal title-->
+                        <div class="d-flex flex-column">
+                            <h2 class="fw-bold mb-1">Team Members</h2>
+                            <div class="d-flex align-items-center">
+                                <span class="text-gray-600 fs-6 me-3">{{ $user->name }}</span>
+                                <span class="badge badge-light-primary">{{ $user->refferal_code }}</span>
+                            </div>
                         </div>
-                        <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <!--end::Modal title-->
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                            aria-label="Close">
                             <i class="ki-outline ki-cross fs-1"></i>
                         </div>
+                        <!--end::Close-->
                     </div>
-                    <div class="modal-body px-5 my-7">
+                    <!--end::Modal header-->
+
+                    <!--begin::Modal body-->
+                    <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
                         @if ($user->referrals->count() > 0)
+                            <!--begin::Table container-->
                             <div class="table-responsive">
+                                <!--begin::Table-->
                                 <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                    <!--begin::Table head-->
                                     <thead>
-                                        <tr class="fw-bold text-muted">
-                                            <th class="min-w-150px">Name</th>
+                                        <tr class="fw-bold text-muted bg-light">
+                                            <th class="ps-4 min-w-150px rounded-start">Name</th>
                                             <th class="min-w-150px">Email</th>
-                                            <th class="min-w-100px">Used At</th>
+                                            <th class="min-w-125px rounded-end">Joined Date</th>
                                         </tr>
                                     </thead>
+                                    <!--end::Table head-->
+                                    <!--begin::Table body-->
                                     <tbody>
                                         @foreach ($user->referrals as $referral)
                                             <tr>
-                                                <td>
-                                                    <span
-                                                        class="text-gray-800 fw-bold">{{ $referral->referred->name }}</span>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <!--begin::Avatar-->
+                                                        <div class="symbol symbol-circle symbol-35px me-3">
+                                                            <div
+                                                                class="symbol-label bg-light-primary text-primary fw-bold fs-6">
+                                                                {{ substr($referral->referred->name, 0, 1) }}
+                                                            </div>
+                                                        </div>
+                                                        <!--end::Avatar-->
+                                                        <!--begin::Name-->
+                                                        <div class="d-flex flex-column">
+                                                            <span
+                                                                class="text-gray-800 fw-bold text-hover-primary mb-1">{{ $referral->referred->name }}</span>
+                                                        </div>
+                                                        <!--end::Name-->
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <span class="text-gray-600">{{ $referral->referred->email }}</span>
+                                                    <span class="text-gray-600 fw-semibold d-block">
+                                                        {{ $referral->referred->email }}
+                                                    </span>
                                                 </td>
                                                 <td>
-                                                    <span
-                                                        class="text-gray-600">{{ $referral->used_at->format('d M Y, h:i a') }}</span>
+                                                    <div class="d-flex flex-column">
+                                                        <span class="text-gray-800 fw-bold mb-1">
+                                                            {{ $referral->used_at->format('d M Y') }}
+                                                        </span>
+                                                        <span class="text-muted fs-7">
+                                                            {{ $referral->used_at->format('h:i A') }}
+                                                        </span>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
+                                    <!--end::Table body-->
                                 </table>
+                                <!--end::Table-->
                             </div>
+                            <!--end::Table container-->
                         @else
+                            <!--begin::Empty state-->
                             <div class="text-center py-10">
-                                <div class="text-gray-600">No team members yet</div>
+                                <div class="mb-5">
+                                    <i class="ki-outline ki-information-2 fs-3x text-gray-400"></i>
+                                </div>
+                                <div class="text-gray-600 fw-semibold fs-6">No team members yet</div>
+                                <div class="text-muted fs-7 mt-2">Team members will appear here once they join</div>
                             </div>
+                            <!--end::Empty state-->
                         @endif
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <!--end::Modal body-->
+
+                    <!--begin::Modal footer-->
+                    <div class="modal-footer flex-center">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                            Close
+                        </button>
                     </div>
+                    <!--end::Modal footer-->
                 </div>
+                <!--end::Modal content-->
             </div>
+            <!--end::Modal dialog-->
         </div>
         <!--end::Modal - Team Detail-->
     @endforeach
