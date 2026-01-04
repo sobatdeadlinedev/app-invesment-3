@@ -5,10 +5,11 @@
     <div class="app-sidebar-logo flex-shrink-0 d-none d-md-flex align-items-center justify-content-center px-8"
         id="kt_app_sidebar_logo">
         <!--begin::Logo-->
-        <a href="#">
-            <img alt="Logo" src="assets/media/logos/logo-ji.png"
+        <a href="{{ route('admin.dashboard.index') }}">
+            <img alt="Logo" src="{{ asset('assets/media/logos/logo-ji.png') }}"
                 class="h-50px d-none d-sm-inline app-sidebar-logo-default theme-light-show" />
-            <img alt="Logo" src="assets/media/logos/logo-ji.png" class="h-50px h-lg-50px theme-dark-show" />
+            <img alt="Logo" src="{{ asset('assets/media/logos/logo-ji.png') }}"
+                class="h-50px h-lg-50px theme-dark-show" />
         </a>
         <!--end::Logo-->
         <!--begin::Aside toggle-->
@@ -34,7 +35,8 @@
                 <!--begin:Menu item - Dashboard-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link active" href="#">
+                    <a class="menu-link {{ request()->routeIs('admin.dashboard.*') ? 'active' : '' }}"
+                        href="{{ route('admin.dashboard.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-element-11 fs-2"></i>
                         </span>
@@ -57,7 +59,8 @@
                 <!--begin:Menu item - Users-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="{{ route('admin.user.index') }}">
+                    <a class="menu-link {{ request()->routeIs('admin.user.*') ? 'active' : '' }}"
+                        href="{{ route('admin.user.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-user fs-2"></i>
                         </span>
@@ -67,12 +70,13 @@
                 </div>
                 <!--end:Menu item-->
 
-                <!--begin:Menu item - Products-->
+                <!--begin:Menu item - Wallet-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="{{ route('admin.wallet.index') }}">
+                    <a class="menu-link {{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}"
+                        href="{{ route('admin.wallet.index') }}">
                         <span class="menu-icon">
-                            <i class="ki-outline ki-basket fs-2"></i>
+                            <i class="ki-outline ki-wallet fs-2"></i>
                         </span>
                         <span class="menu-title">Wallet List</span>
                     </a>
@@ -83,7 +87,8 @@
                 <!--begin:Menu item - Team-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="{{ route('admin.team.index') }}">
+                    <a class="menu-link {{ request()->routeIs('admin.team.*') ? 'active' : '' }}"
+                        href="{{ route('admin.team.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-people fs-2"></i>
                         </span>
@@ -96,7 +101,8 @@
                 <!--begin:Menu item - Referral Usage-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="{{ route('admin.refferal.index') }}">
+                    <a class="menu-link {{ request()->routeIs('admin.refferal.*') ? 'active' : '' }}"
+                        href="{{ route('admin.refferal.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-share fs-2"></i>
                         </span>
@@ -119,7 +125,8 @@
                 <!--begin:Menu item - Commission-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
+                    <a class="menu-link {{ request()->routeIs('admin.commission.*') ? 'active' : '' }}"
+                        href="{{ route('admin.commission.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-percentage fs-2"></i>
                         </span>
@@ -129,40 +136,15 @@
                 </div>
                 <!--end:Menu item-->
 
-                <!--begin:Menu item - Revenue-->
+                <!--begin:Menu item - Deposit-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
+                    <a class="menu-link {{ request()->routeIs('admin.deposit.*') ? 'active' : '' }}"
+                        href="{{ route('admin.deposit.index') }}">
                         <span class="menu-icon">
-                            <i class="ki-outline ki-chart-line-up fs-2"></i>
+                            <i class="ki-outline ki-entrance-left fs-2"></i>
                         </span>
-                        <span class="menu-title">Revenue</span>
-                    </a>
-                    <!--end:Menu link-->
-                </div>
-                <!--end:Menu item-->
-
-                <!--begin:Menu item - Rabat-->
-                <div class="menu-item">
-                    <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
-                        <span class="menu-icon">
-                            <i class="ki-outline ki-discount fs-2"></i>
-                        </span>
-                        <span class="menu-title">Rabat</span>
-                    </a>
-                    <!--end:Menu link-->
-                </div>
-                <!--end:Menu item-->
-
-                <!--begin:Menu item - Recharge-->
-                <div class="menu-item">
-                    <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
-                        <span class="menu-icon">
-                            <i class="ki-outline ki-wallet fs-2"></i>
-                        </span>
-                        <span class="menu-title">Recharge</span>
+                        <span class="menu-title">Deposit</span>
                     </a>
                     <!--end:Menu link-->
                 </div>
@@ -171,9 +153,10 @@
                 <!--begin:Menu item - Withdrawal-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
+                    <a class="menu-link {{ request()->routeIs('admin.withdrawal.*') ? 'active' : '' }}"
+                        href="{{ route('admin.withdrawal.index') }}">
                         <span class="menu-icon">
-                            <i class="ki-outline ki-send fs-2"></i>
+                            <i class="ki-outline ki-exit-up fs-2"></i>
                         </span>
                         <span class="menu-title">Withdrawal</span>
                     </a>
@@ -196,12 +179,13 @@
             <div class="d-flex align-items-center" data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
                 data-kt-menu-overflow="true" data-kt-menu-placement="top-start">
                 <div class="d-flex flex-center cursor-pointer symbol symbol-circle symbol-40px">
-                    <img src="assets/media/avatars/blank.png" alt="image" />
+                    <img src="{{ asset('assets/media/avatars/blank.png') }}" alt="image" />
                 </div>
                 <!--begin::Name-->
                 <div class="d-flex flex-column align-items-start justify-content-center ms-3">
                     <span class="text-gray-500 fs-8 fw-semibold">Admin</span>
-                    <a href="#" class="text-gray-800 fs-7 fw-bold text-hover-primary">John Doe</a>
+                    <a href="#"
+                        class="text-gray-800 fs-7 fw-bold text-hover-primary">{{ auth()->user()->name }}</a>
                 </div>
                 <!--end::Name-->
             </div>
@@ -215,16 +199,16 @@
                     <div class="menu-content d-flex align-items-center px-3">
                         <!--begin::Avatar-->
                         <div class="symbol symbol-50px me-5">
-                            <img alt="Logo" src="assets/media/avatars/blank.png" />
+                            <img alt="Logo" src="{{ asset('assets/media/avatars/blank.png') }}" />
                         </div>
                         <!--end::Avatar-->
                         <!--begin::Username-->
                         <div class="d-flex flex-column">
-                            <div class="fw-bold d-flex align-items-center fs-5">John Doe
+                            <div class="fw-bold d-flex align-items-center fs-5">{{ auth()->user()->name }}
                                 <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Admin</span>
                             </div>
                             <a href="#"
-                                class="fw-semibold text-muted text-hover-primary fs-7">admin@example.com</a>
+                                class="fw-semibold text-muted text-hover-primary fs-7">{{ auth()->user()->email }}</a>
                         </div>
                         <!--end::Username-->
                     </div>
