@@ -61,9 +61,23 @@
                     <a class="menu-link {{ request()->routeIs('admin.user.*') ? 'active' : '' }}"
                         href="{{ route('admin.user.index') }}">
                         <span class="menu-icon">
-                            <i class="ki-outline ki-user fs-2"></i>
+                            <i class="ki-outline ki-profile-user fs-2"></i>
                         </span>
                         <span class="menu-title">Member List</span>
+                    </a>
+                    <!--end:Menu link-->
+                </div>
+                <!--end:Menu item-->
+
+                <!--begin:Menu item - Verification-->
+                <div class="menu-item">
+                    <!--begin:Menu link-->
+                    <a class="menu-link {{ request()->routeIs('admin.verification.*') ? 'active' : '' }}"
+                        href="{{ route('admin.verification.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-outline ki-shield-tick fs-2"></i>
+                        </span>
+                        <span class="menu-title">Verification</span>
                     </a>
                     <!--end:Menu link-->
                 </div>
@@ -110,12 +124,13 @@
                     <!--end:Menu link-->
                 </div>
                 <!--end:Menu item-->
+
                 <!--begin:Menu item - Balance-->
                 <div class="menu-item">
                     <a class="menu-link {{ request()->routeIs('admin.balance.*') ? 'active' : '' }}"
                         href="{{ route('admin.balance.index') }}">
                         <span class="menu-icon">
-                            <i class="ki-outline ki-dollar fs-2"></i>
+                            <i class="ki-outline ki-bill fs-2"></i>
                         </span>
                         <span class="menu-title">User Balance</span>
                     </a>
@@ -184,13 +199,13 @@
                 </div>
                 <!--end:Menu item-->
 
-                <!--begin:Menu item - Withdrawal-->
+                <!--begin:Menu item - Configuration-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
                     <a class="menu-link {{ request()->routeIs('admin.config.*') ? 'active' : '' }}"
                         href="{{ route('admin.config.index') }}">
                         <span class="menu-icon">
-                            <i class="ki-outline ki-exit-up fs-2"></i>
+                            <i class="ki-outline ki-setting-2 fs-2"></i>
                         </span>
                         <span class="menu-title">Configuration</span>
                     </a>

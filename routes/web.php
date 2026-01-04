@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\DepositController as AdminDepositController;
 use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController;
 use App\Http\Controllers\Admin\BalanceController as AdminBalanceController;
 use App\Http\Controllers\Admin\ConfigController as AdminConfigController;
+use App\Http\Controllers\Admin\VerificationController as AdminVerificationController;
 // Member Controllers
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
@@ -94,6 +95,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::prefix('config')->name('config.')->group(function () {
         Route::get('/', [AdminConfigController::class, 'index'])->name('index');
         Route::post('/update', [AdminConfigController::class, 'update'])->name('update');
+    });
+    Route::prefix('verification')->name('verification.')->group(function () {
+        Route::get('/', [AdminVerificationController::class, 'index'])->name('index');
+        Route::get('/{verification}', [AdminVerificationController::class, 'show'])->name('show');
+        Route::post('/{verification}/verify', [AdminVerificationController::class, 'verify'])->name('verify');
+        Route::post('/{verification}/reject', [AdminVerificationController::class, 'reject'])->name('reject');
     });
 });
 // Member Routes
