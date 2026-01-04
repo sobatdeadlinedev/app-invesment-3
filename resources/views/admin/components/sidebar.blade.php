@@ -6,10 +6,9 @@
         id="kt_app_sidebar_logo">
         <!--begin::Logo-->
         <a href="{{ route('admin.dashboard.index') }}">
-            <img alt="Logo" src="{{ asset('assets/media/logos/logo-ji.png') }}"
+            <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}"
                 class="h-50px d-none d-sm-inline app-sidebar-logo-default theme-light-show" />
-            <img alt="Logo" src="{{ asset('assets/media/logos/logo-ji.png') }}"
-                class="h-50px h-lg-50px theme-dark-show" />
+            <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}" class="h-50px h-lg-50px theme-dark-show" />
         </a>
         <!--end::Logo-->
         <!--begin::Aside toggle-->
@@ -170,6 +169,30 @@
                             <i class="ki-outline ki-exit-up fs-2"></i>
                         </span>
                         <span class="menu-title">Withdrawal</span>
+                    </a>
+                    <!--end:Menu link-->
+                </div>
+                <!--end:Menu item-->
+
+                <!--begin:Menu item - Section Header-->
+                <div class="menu-item pt-5">
+                    <!--begin:Menu content-->
+                    <div class="menu-content">
+                        <span class="menu-heading fw-bold text-uppercase fs-7">Configuration</span>
+                    </div>
+                    <!--end:Menu content-->
+                </div>
+                <!--end:Menu item-->
+
+                <!--begin:Menu item - Withdrawal-->
+                <div class="menu-item">
+                    <!--begin:Menu link-->
+                    <a class="menu-link {{ request()->routeIs('admin.config.*') ? 'active' : '' }}"
+                        href="{{ route('admin.config.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-outline ki-exit-up fs-2"></i>
+                        </span>
+                        <span class="menu-title">Configuration</span>
                     </a>
                     <!--end:Menu link-->
                 </div>

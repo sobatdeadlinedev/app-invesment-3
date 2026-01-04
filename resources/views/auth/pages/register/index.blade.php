@@ -178,7 +178,8 @@
                 style="background-image: url(assets/media/misc/auth-bg.png)">
                 <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100">
                     <a href="{{ route('login') }}" class="mb-12 mb-lg-12">
-                        <img alt="Logo" src="assets/media/logos/logo-ji.png" class="h-150px h-lg-180px" />
+                        <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}"
+                            class="h-150px h-lg-180px" />
                     </a>
                 </div>
             </div>

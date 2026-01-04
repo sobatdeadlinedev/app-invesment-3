@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\CommissionController as AdminCommissionController
 use App\Http\Controllers\Admin\DepositController as AdminDepositController;
 use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController;
 use App\Http\Controllers\Admin\BalanceController as AdminBalanceController;
+use App\Http\Controllers\Admin\ConfigController as AdminConfigController;
 // Member Controllers
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
@@ -88,6 +89,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     });
     Route::prefix('balance')->name('balance.')->group(function () {
         Route::get('/', [AdminBalanceController::class, 'index'])->name('index');
+    });
+    Route::prefix('config')->name('config.')->group(function () {
+        Route::get('/', [AdminConfigController::class, 'index'])->name('index');
+        Route::post('/update', [AdminConfigController::class, 'update'])->name('update');
     });
 });
 // Member Routes

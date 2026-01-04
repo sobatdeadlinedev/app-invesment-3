@@ -3,7 +3,7 @@
     <div class="header-grid">
         <!-- Left: App Logo -->
         <div class="header-left">
-            <img src="assets/media/logos/logo-ji.png" alt="App Logo" class="app-logo">
+            <img src="{{ $appConfig['app_logo']['value'] }}" alt="App Logo" class="app-logo">
         </div>
 
         <!-- Right: Logout -->
