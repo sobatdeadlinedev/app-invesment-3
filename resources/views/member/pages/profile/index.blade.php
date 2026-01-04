@@ -22,7 +22,13 @@
             <!-- Card 1: Data Diri -->
             <div class="card-dark shadow-sm p-0 mb-3">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
-                    <h6 class="text-white mb-0">Data Diri</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="text-white mb-0">Data Diri</h6>
+                        <a href="{{ route('member.verification.index') }}" class="btn-verification-link">
+                            {{-- <i class="bi bi-shield-check"></i> --}}
+                            <span>Verifikasi Akun</span>
+                        </a>
+                    </div>
                 </div>
                 <div class="p-3">
                     <div class="d-flex align-items-center gap-3 mb-3">
@@ -39,7 +45,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Card 2: Balance -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-3">

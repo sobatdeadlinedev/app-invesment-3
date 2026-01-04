@@ -49,6 +49,14 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'approved_by');
     }
 
+    /**
+     * Relasi ke UserVerification
+     */
+    public function verification()
+    {
+        return $this->hasOne(UserVerification::class);
+    }
+
     protected function casts(): array
     {
         return [
@@ -148,5 +156,50 @@ class User extends Authenticatable
     public function scopeUnverified($query)
     {
         return $query->where('is_verified', false);
+    }
+
+    /**
+     * Check apakah user sudah punya data verifikasi
+     */
+    public function hasVerificationData(): bool
+    {
+        return !is_null($this->verification);
+    }
+
+    /**
+     * Check apakah verifikasi basic sudah lengkap
+     */
+    public function hasBasicVerification(): bool
+    {
+        return $this->verification &&
+            $this->verification->isBasicComplete();
+    }
+
+    /**
+     * Check apakah verifikasi advanced sudah lengkap
+     */
+    public function hasAdvancedVerification(): bool
+    {
+        return $this->verification &&
+            $this->verification->isAdvancedComplete();
+    }
+
+    /**
+     * Check apakah verifikasi dokumen sudah diapprove
+     */
+    public function isDocumentVerified(): bool
+    {
+        return $this->verification &&
+            $this->verification->isVerified();
+    }
+
+    /**
+     * Check apakah verifikasi dokumen pending
+     */
+    public function isDocumentPending(): bool
+    {
+        return $this->verification &&
+            $this->verification->isSubmitted() &&
+            !$this->verification->isVerified();
     }
 }

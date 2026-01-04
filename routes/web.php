@@ -22,6 +22,7 @@ use App\Http\Controllers\Member\ProfileController as MemberProfileController;
 use App\Http\Controllers\Member\DepositController as MemberDepositController;
 use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 use App\Http\Controllers\Member\WalletController as MemberWalletController;
+use App\Http\Controllers\Member\VerificationController as MemberVerificationController;
 
 // Root Route - Auto redirect based on auth status
 Route::get('/', function () {
@@ -126,7 +127,11 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->g
         Route::get('/history', [MemberWithdrawController::class, 'history'])->name('history');
         Route::delete('/cancel/{reference}', [MemberWithdrawController::class, 'cancel'])->name('cancel');
     });
-
+    // Verification Routes
+    Route::prefix('verification')->name('verification.')->group(function () {
+        Route::get('/', [MemberVerificationController::class, 'index'])->name('index');
+        Route::post('/store', [MemberVerificationController::class, 'store'])->name('store');
+    });
     // Wallet Routes
     Route::prefix('wallet')->name('wallet.')->group(function () {
         Route::post('/', [MemberWalletController::class, 'store'])->name('store');

@@ -1536,6 +1536,144 @@
                 font-size: 12px;
             }
         }
+
+        .verification-icon-small {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            flex-shrink: 0;
+        }
+
+        .verification-icon-small i {
+            font-size: 16px;
+            color: var(--gold-color);
+        }
+
+        .form-control-dark.is-invalid {
+            border-color: #dc3545;
+        }
+
+        /* Improved Dropdown Styling */
+        .form-control-dark-select {
+            background: rgba(245, 166, 35, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23f5a623' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .form-control-dark-select:focus {
+            outline: none;
+            border-color: var(--gold-color);
+            background-color: rgba(245, 166, 35, 0.1);
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+
+        .form-control-dark-select.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .form-control-dark-select option {
+            background-color: #2d3158 !important;
+            color: #ffffff !important;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .form-control-dark-select option:hover {
+            background-color: rgba(245, 166, 35, 0.2) !important;
+        }
+
+        .form-control-dark-select option:checked {
+            background: linear-gradient(135deg, var(--gold-color) 0%, var(--gold-hover) 100%) !important;
+            color: #000 !important;
+            font-weight: 700;
+        }
+
+        .form-control-dark-select option[value=""] {
+            color: var(--text-muted) !important;
+        }
+
+        .form-control-dark-select option:disabled {
+            color: var(--text-muted) !important;
+            opacity: 0.5;
+        }
+
+        /* Better dropdown for mobile */
+        @media (max-width: 480px) {
+            .form-control-dark-select {
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+            }
+        }
+
+        .preview-container {
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .verification-data-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .verification-data-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .btn-verification-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(245, 166, 35, 0.1);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            border-radius: 6px;
+            color: var(--gold-color);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-verification-link:hover {
+            background: rgba(245, 166, 35, 0.2);
+            border-color: var(--gold-color);
+            color: var(--gold-color);
+            text-decoration: none;
+        }
+
+        .btn-verification-link i {
+            font-size: 14px;
+        }
     </style>
 </head>
 
