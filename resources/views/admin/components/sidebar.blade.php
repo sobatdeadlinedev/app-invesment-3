@@ -48,7 +48,7 @@
                 <div class="menu-item pt-5">
                     <!--begin:Menu content-->
                     <div class="menu-content">
-                        <span class="menu-heading fw-bold text-uppercase fs-7">Management</span>
+                        <span class="menu-heading fw-bold text-uppercase fs-7">User Management</span>
                     </div>
                     <!--end:Menu content-->
                 </div>
@@ -61,7 +61,7 @@
                         <span class="menu-icon">
                             <i class="ki-outline ki-user fs-2"></i>
                         </span>
-                        <span class="menu-title">Users</span>
+                        <span class="menu-title">Member List</span>
                     </a>
                     <!--end:Menu link-->
                 </div>
@@ -70,11 +70,11 @@
                 <!--begin:Menu item - Products-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
+                    <a class="menu-link" href="{{ route('admin.wallet.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-basket fs-2"></i>
                         </span>
-                        <span class="menu-title">Products</span>
+                        <span class="menu-title">Wallet List</span>
                     </a>
                     <!--end:Menu link-->
                 </div>
@@ -87,7 +87,7 @@
                         <span class="menu-icon">
                             <i class="ki-outline ki-people fs-2"></i>
                         </span>
-                        <span class="menu-title">Team</span>
+                        <span class="menu-title">Team List</span>
                     </a>
                     <!--end:Menu link-->
                 </div>
