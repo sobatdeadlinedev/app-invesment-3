@@ -40,6 +40,7 @@
                                 <th class="min-w-100px">Amount</th>
                                 <th class="min-w-100px">Status</th>
                                 <th class="min-w-125px">Date</th>
+                                <th class="text-end min-w-125px">Action</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 fw-semibold">
@@ -55,7 +56,8 @@
                                         <span class="badge badge-light-primary">{{ $deposit->reference }}</span>
                                     </td>
                                     <td>
-                                        <span class="text-success fw-bold">{{ number_format($deposit->amount, 2) }}</span>
+                                        <span class="text-success fw-bold">{{ number_format($deposit->amount, 2) }}
+                                            USDT</span>
                                     </td>
                                     <td>
                                         <span class="badge badge-light-{{ $deposit->status_color }}">
@@ -63,10 +65,16 @@
                                         </span>
                                     </td>
                                     <td>{{ $deposit->created_at->format('d M Y, h:i a') }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ route('admin.deposit.show', $deposit->id) }}"
+                                            class="btn btn-light btn-active-light-primary btn-sm">
+                                            <i class="ki-outline ki-eye fs-5"></i> Detail
+                                        </a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-10">
+                                    <td colspan="6" class="text-center py-10">
                                         <div class="text-gray-600">No deposit transactions found</div>
                                     </td>
                                 </tr>

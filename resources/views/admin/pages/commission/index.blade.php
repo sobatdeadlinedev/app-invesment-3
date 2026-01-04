@@ -28,6 +28,13 @@
 
             <!--begin::Card-->
             <div class="card">
+                <!--begin::Card header-->
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <h3 class="fw-bold m-0">All Commission Transactions</h3>
+                    </div>
+                </div>
+                <!--end::Card header-->
 
                 <!--begin::Card body-->
                 <div class="card-body py-4">
@@ -66,8 +73,8 @@
                                         <span class="badge badge-light-primary">{{ $commission->reference }}</span>
                                     </td>
                                     <td>
-                                        <span
-                                            class="text-success fw-bold">{{ number_format($commission->amount, 2) }}</span>
+                                        <span class="text-success fw-bold">{{ number_format($commission->amount, 2) }}
+                                            USDT</span>
                                     </td>
                                     <td>
                                         <span class="badge badge-light-{{ $commission->status_color }}">

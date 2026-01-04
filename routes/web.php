@@ -74,6 +74,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::prefix('deposit')->name('deposit.')->group(function () {
         Route::get('/', [AdminDepositController::class, 'index'])->name('index');
+        Route::get('/{deposit}', [AdminDepositController::class, 'show'])->name('show');
+        Route::post('/{deposit}/approve', [AdminDepositController::class, 'approve'])->name('approve');
+        Route::post('/{deposit}/reject', [AdminDepositController::class, 'reject'])->name('reject');
     });
 
     Route::prefix('withdrawal')->name('withdrawal.')->group(function () {

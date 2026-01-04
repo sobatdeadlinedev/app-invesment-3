@@ -28,6 +28,13 @@
 
             <!--begin::Card-->
             <div class="card">
+                <!--begin::Card header-->
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <h3 class="fw-bold m-0">All Withdrawal Transactions</h3>
+                    </div>
+                </div>
+                <!--end::Card header-->
 
                 <!--begin::Card body-->
                 <div class="card-body py-4">
@@ -67,11 +74,13 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="text-danger fw-bold">{{ number_format($withdrawal->amount, 2) }}</span>
+                                        <span class="text-danger fw-bold">{{ number_format($withdrawal->amount, 2) }}
+                                            USDT</span>
                                     </td>
                                     <td>
                                         <span
-                                            class="text-warning fw-bold">{{ number_format($withdrawal->withdrawal_fee, 2) }}</span>
+                                            class="text-warning fw-bold">{{ number_format($withdrawal->withdrawal_fee, 2) }}
+                                            USDT</span>
                                     </td>
                                     <td>
                                         <span class="badge badge-light-{{ $withdrawal->status_color }}">
