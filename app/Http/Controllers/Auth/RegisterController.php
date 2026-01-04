@@ -31,6 +31,7 @@ class RegisterController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username|alpha_dash',
+            'email' => 'required|email|max:255|unique:users,email',
             'phone' => 'required|string|max:20|unique:users,phone|regex:/^[0-9]+$/',
             'password' => ['required', 'confirmed', Password::min(8)],
             'referral_code' => 'nullable|string|exists:users,refferal_code',
@@ -39,6 +40,9 @@ class RegisterController extends Controller
             'username.required' => 'Username harus diisi',
             'username.unique' => 'Username sudah digunakan',
             'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, dash dan underscore',
+            'email.required' => 'Email harus diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah terdaftar',
             'phone.required' => 'Nomor telepon harus diisi',
             'phone.unique' => 'Nomor telepon sudah terdaftar',
             'phone.regex' => 'Nomor telepon hanya boleh berisi angka',
@@ -60,6 +64,7 @@ class RegisterController extends Controller
         $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
+            'email' => $request->email,
             'phone' => $phone,
             'password' => Hash::make($request->password),
         ]);

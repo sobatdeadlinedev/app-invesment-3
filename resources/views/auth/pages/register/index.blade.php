@@ -93,6 +93,15 @@
                             </div>
 
                             <div class="fv-row mb-8">
+                                <input type="email" placeholder="Email" name="email" autocomplete="off"
+                                    value="{{ old('email') }}"
+                                    class="form-control bg-transparent @error('email') is-invalid @enderror" required />
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="fv-row mb-8">
                                 <input type="text" placeholder="Nomor Telepon (08xxx)" name="phone"
                                     autocomplete="off" value="{{ old('phone') }}"
                                     class="form-control bg-transparent @error('phone') is-invalid @enderror" required />
