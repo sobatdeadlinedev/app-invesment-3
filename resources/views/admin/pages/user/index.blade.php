@@ -27,12 +27,13 @@
         <div id="kt_app_content_container" class="app-container container-xxl">
 
             @if (session('success'))
-                <div class="alert alert-success d-flex align-items-center p-5 mb-10">
+                <div class="alert alert-success alert-dismissible d-flex align-items-center p-5 mb-10">
                     <i class="ki-outline ki-shield-tick fs-2hx text-success me-4"></i>
                     <div class="d-flex flex-column">
                         <h4 class="mb-1 text-dark">Success</h4>
                         <span>{{ session('success') }}</span>
                     </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
