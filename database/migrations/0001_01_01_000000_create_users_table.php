@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('username')->unique();
             $table->string('phone')->unique();
+            $table->string('email')->unique();
             $table->string('password');
+            $table->boolean('is_verified')->default(false);
             $table->string('refferal_code')->unique();
             $table->rememberToken();
             $table->timestamps();

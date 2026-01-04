@@ -57,7 +57,7 @@
                 <!--begin:Menu item - Users-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
+                    <a class="menu-link" href="{{ route('admin.user.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-user fs-2"></i>
                         </span>

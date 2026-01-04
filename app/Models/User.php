@@ -17,19 +17,23 @@ class User extends Authenticatable
         'name',
         'username',
         'phone',
+        'email',
         'password',
         'refferal_code',
+        'is_verified',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
     // Relation
     public function wallets()
     {
         return $this->hasMany(Wallet::class);
     }
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
@@ -49,6 +53,7 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'is_verified' => 'boolean',
         ];
     }
 
@@ -87,6 +92,7 @@ class User extends Authenticatable
     {
         return auth()->user();
     }
+
     public function referrals()
     {
         return $this->hasMany(ReferralUsage::class, 'referrer_id');
@@ -115,5 +121,32 @@ class User extends Authenticatable
     public function getTotalReferralsAttribute()
     {
         return $this->referrals()->count();
+    }
+
+    // Helper methods untuk verifikasi dokumen
+    public function verify()
+    {
+        $this->update(['is_verified' => true]);
+    }
+
+    public function unverify()
+    {
+        $this->update(['is_verified' => false]);
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->is_verified;
+    }
+
+    // Scope untuk query
+    public function scopeVerified($query)
+    {
+        return $query->where('is_verified', true);
+    }
+
+    public function scopeUnverified($query)
+    {
+        return $query->where('is_verified', false);
     }
 }
