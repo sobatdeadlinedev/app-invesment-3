@@ -49,6 +49,7 @@
                                 <th class="min-w-100px">Withdrawal Fee</th>
                                 <th class="min-w-100px">Status</th>
                                 <th class="min-w-125px">Date</th>
+                                <th class="text-end min-w-100px">Action</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 fw-semibold">
@@ -88,10 +89,16 @@
                                         </span>
                                     </td>
                                     <td>{{ $withdrawal->created_at->format('d M Y, h:i a') }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ route('admin.withdrawal.show', $withdrawal->id) }}"
+                                            class="btn btn-light btn-active-light-primary btn-sm">
+                                            <i class="ki-outline ki-eye fs-5"></i> Detail
+                                        </a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-10">
+                                    <td colspan="8" class="text-center py-10">
                                         <div class="text-gray-600">No withdrawal transactions found</div>
                                     </td>
                                 </tr>

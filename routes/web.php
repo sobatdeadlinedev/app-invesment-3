@@ -81,6 +81,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::prefix('withdrawal')->name('withdrawal.')->group(function () {
         Route::get('/', [AdminWithdrawalController::class, 'index'])->name('index');
+        Route::get('/{withdrawal}', [AdminWithdrawalController::class, 'show'])->name('show');
+        Route::post('/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('approve');
+        Route::post('/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('reject');
     });
 });
 // Member Routes
