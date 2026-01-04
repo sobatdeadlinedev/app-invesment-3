@@ -111,6 +111,17 @@
                     <!--end:Menu link-->
                 </div>
                 <!--end:Menu item-->
+                <!--begin:Menu item - Balance-->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('admin.balance.*') ? 'active' : '' }}"
+                        href="{{ route('admin.balance.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-outline ki-dollar fs-2"></i>
+                        </span>
+                        <span class="menu-title">User Balance</span>
+                    </a>
+                </div>
+                <!--end:Menu item-->
 
                 <!--begin:Menu item - Section Header-->
                 <div class="menu-item pt-5">

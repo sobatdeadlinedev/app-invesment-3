@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
 use App\Http\Controllers\Admin\DepositController as AdminDepositController;
 use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController;
+use App\Http\Controllers\Admin\BalanceController as AdminBalanceController;
 // Member Controllers
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
@@ -84,6 +85,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/{withdrawal}', [AdminWithdrawalController::class, 'show'])->name('show');
         Route::post('/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('approve');
         Route::post('/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('reject');
+    });
+    Route::prefix('balance')->name('balance.')->group(function () {
+        Route::get('/', [AdminBalanceController::class, 'index'])->name('index');
     });
 });
 // Member Routes
