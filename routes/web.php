@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Http\Controllers\Admin\TeamController as AdminTeamController;
+use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
 // Member Controllers
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
@@ -58,6 +59,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::prefix('team')->name('team.')->group(function () {
         Route::get('/', [AdminTeamController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('refferal')->name('refferal.')->group(function () {
+        Route::get('/', [AdminReferralController::class, 'index'])->name('index');
     });
 });
 

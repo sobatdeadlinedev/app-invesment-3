@@ -96,7 +96,7 @@
                 <!--begin:Menu item - Referral Usage-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
+                    <a class="menu-link" href="{{ route('admin.refferal.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-share fs-2"></i>
                         </span>
