@@ -42,110 +42,50 @@
                 <!--begin::Card body-->
                 <div class="card-body py-4">
                     <!--begin::Table-->
-                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_teams">
-                        <thead>
-                            <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-150px">User</th>
-                                <th class="min-w-125px">Referral Code</th>
-                                <th class="min-w-100px">Team Count</th>
-                                <th class="text-end min-w-100px">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-600 fw-semibold">
-                            @forelse($users as $user)
-                                <tr>
-                                    <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="text-gray-800 mb-1">{{ $user->name }}</span>
-                                            <span class="text-muted fs-7">{{ $user->email }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-light-primary">{{ $user->refferal_code }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-light-success">{{ $user->referrals_count }}</span>
-                                    </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-light btn-active-light-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#kt_modal_team_detail_{{ $user->id }}"
-                                            @if ($user->referrals_count == 0) disabled @endif>
-                                            <i class="ki-outline ki-eye fs-5"></i> Detail
-                                        </button>
-                                    </td>
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_teams">
+                            <thead>
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="min-w-150px">User</th>
+                                    <th class="min-w-125px">Referral Code</th>
+                                    <th class="min-w-100px">Team Count</th>
+                                    <th class="text-end min-w-100px">Actions</th>
                                 </tr>
-
-                                <!--begin::Modal - Team Detail-->
-                                <div class="modal fade" id="kt_modal_team_detail_{{ $user->id }}" tabindex="-1"
-                                    aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered mw-800px">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <div>
-                                                    <h2 class="fw-bold">Team Members - {{ $user->name }}</h2>
-                                                    <span class="text-muted fs-7">Referral Code:
-                                                        {{ $user->refferal_code }}</span>
-                                                </div>
-                                                <div class="btn btn-icon btn-sm btn-active-icon-primary"
-                                                    data-bs-dismiss="modal">
-                                                    <i class="ki-outline ki-cross fs-1"></i>
-                                                </div>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                                @forelse($users as $user)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="text-gray-800 mb-1">{{ $user->name }}</span>
+                                                <span class="text-muted fs-7">{{ $user->email }}</span>
                                             </div>
-                                            <div class="modal-body px-5 my-7">
-                                                @if ($user->referrals->count() > 0)
-                                                    <div class="table-responsive">
-                                                        <table
-                                                            class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
-                                                            <thead>
-                                                                <tr class="fw-bold text-muted">
-                                                                    <th class="min-w-150px">Name</th>
-                                                                    <th class="min-w-150px">Email</th>
-                                                                    <th class="min-w-100px">Used At</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($user->referrals as $referral)
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span
-                                                                                class="text-gray-800 fw-bold">{{ $referral->referred->name }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span
-                                                                                class="text-gray-600">{{ $referral->referred->email }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span
-                                                                                class="text-gray-600">{{ $referral->used_at->format('d M Y, h:i a') }}</span>
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                @else
-                                                    <div class="text-center py-10">
-                                                        <div class="text-gray-600">No team members yet</div>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-light"
-                                                    data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end::Modal - Team Detail-->
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center py-10">
-                                        <div class="text-gray-600">No users found</div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light-primary">{{ $user->refferal_code }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light-success">{{ $user->referrals_count }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-light btn-active-light-primary btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#kt_modal_team_detail_{{ $user->id }}"
+                                                @if ($user->referrals_count == 0) disabled @endif>
+                                                <i class="ki-outline ki-eye fs-5"></i> Detail
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-10">
+                                            <div class="text-gray-600">No users found</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                     <!--end::Table-->
                 </div>
                 <!--end::Card body-->
@@ -154,6 +94,67 @@
         </div>
     </div>
     <!--end::Content-->
+
+    <!--begin::Modals - OUTSIDE THE TABLE-->
+    @foreach ($users as $user)
+        <!--begin::Modal - Team Detail-->
+        <div class="modal fade" id="kt_modal_team_detail_{{ $user->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mw-800px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <h2 class="fw-bold">Team Members - {{ $user->name }}</h2>
+                            <span class="text-muted fs-7">Referral Code: {{ $user->refferal_code }}</span>
+                        </div>
+                        <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                            <i class="ki-outline ki-cross fs-1"></i>
+                        </div>
+                    </div>
+                    <div class="modal-body px-5 my-7">
+                        @if ($user->referrals->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                    <thead>
+                                        <tr class="fw-bold text-muted">
+                                            <th class="min-w-150px">Name</th>
+                                            <th class="min-w-150px">Email</th>
+                                            <th class="min-w-100px">Used At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($user->referrals as $referral)
+                                            <tr>
+                                                <td>
+                                                    <span
+                                                        class="text-gray-800 fw-bold">{{ $referral->referred->name }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-gray-600">{{ $referral->referred->email }}</span>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="text-gray-600">{{ $referral->used_at->format('d M Y, h:i a') }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center py-10">
+                                <div class="text-gray-600">No team members yet</div>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::Modal - Team Detail-->
+    @endforeach
+    <!--end::Modals-->
 
     @push('scripts')
         <script>
