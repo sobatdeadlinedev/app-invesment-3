@@ -83,7 +83,7 @@
                 <!--begin:Menu item - Team-->
                 <div class="menu-item">
                     <!--begin:Menu link-->
-                    <a class="menu-link" href="#">
+                    <a class="menu-link" href="{{ route('admin.team.index') }}">
                         <span class="menu-icon">
                             <i class="ki-outline ki-people fs-2"></i>
                         </span>

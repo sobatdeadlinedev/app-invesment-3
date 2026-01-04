@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Admin\TeamController as AdminTeamController;
 // Member Controllers
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
@@ -53,6 +54,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::prefix('wallet')->name('wallet.')->group(function () {
         Route::get('/', [AdminWalletController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('team')->name('team.')->group(function () {
+        Route::get('/', [AdminTeamController::class, 'index'])->name('index');
     });
 });
 
