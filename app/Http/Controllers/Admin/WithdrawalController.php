@@ -1,84 +1,194 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Member;
 
-use App\Http\Controllers\Controller;
+use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
-class WithdrawalController extends Controller
+class WithdrawController extends Controller
 {
+    /**
+     * Display the withdrawal form
+     */
     public function index()
     {
-        $withdrawals = Transaction::with(['user', 'wallet'])
+        // Check if user is verified
+        if (!auth()->user()->is_verified) {
+            return redirect()
+                ->route('member.profile.index')
+                ->with('error', 'Akun Anda belum terverifikasi. Silakan hubungi admin untuk verifikasi akun.');
+        }
+
+        $wallets = Wallet::where('user_id', auth()->id())->get();
+        $userBalance = Transaction::getUserBalance(auth()->id());
+
+        return view('member.pages.withdraw.index', compact('wallets', 'userBalance'));
+    }
+
+    /**
+     * Process withdrawal request
+     */
+    public function store(Request $request)
+    {
+        // Check if user is verified
+        if (!auth()->user()->is_verified) {
+            return redirect()
+                ->route('member.profile.index')
+                ->with('error', 'Akun Anda belum terverifikasi. Withdrawal tidak dapat diproses.');
+        }
+
+        $request->validate([
+            'amount' => 'required|numeric|min:10',
+            'wallet_id' => 'required|exists:wallets,id',
+        ], [
+            'amount.required' => 'Jumlah withdrawal harus diisi',
+            'amount.min' => 'Minimal withdrawal adalah 10 USDT',
+            'wallet_id.required' => 'Wallet account harus dipilih',
+            'wallet_id.exists' => 'Wallet account tidak valid',
+        ]);
+
+        try {
+            // Verify wallet belongs to user
+            $wallet = Wallet::where('id', $request->wallet_id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$wallet) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'Wallet account tidak ditemukan');
+            }
+
+            // User input adalah amount yang ingin ditarik (gross/total)
+            $requestedAmount = $request->amount; // Misal: 250
+
+            // Calculate withdrawal fee (2%)
+            $withdrawalFee = $requestedAmount * 0.02; // 250 * 0.02 = 5
+
+            // Net amount yang akan diterima user
+            $netAmount = $requestedAmount - $withdrawalFee; // 250 - 5 = 245
+
+            // Total yang keluar dari balance (sama dengan requested)
+            $totalAmount = $requestedAmount; // 250
+
+            // Check user balance - cek apakah balance cukup untuk total_amount
+            if (!Transaction::hasSufficientBalance(auth()->id(), $totalAmount)) {
+                $currentBalance = Transaction::getUserBalance(auth()->id());
+
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'Saldo tidak mencukupi. Saldo Anda: ' . number_format($currentBalance, 2) . ' USDT');
+            }
+
+            DB::beginTransaction();
+
+            // Generate unique reference using model helper
+            $reference = Transaction::generateReference('WD');
+
+            // Create transaction
+            $transaction = Transaction::create([
+                'user_id' => auth()->id(),
+                'reference' => $reference,
+                'amount' => $netAmount,              // 245 (yang user terima)
+                'total_amount' => $totalAmount,      // 250 (yang keluar dari balance)
+                'type' => 'withdrawal',
+                'wallet_id' => $request->wallet_id,
+                'withdrawal_fee' => $withdrawalFee,  // 5 (fee)
+                'source_user_id' => null,
+                'status' => 'pending',
+                'payment_method' => 'wallet_transfer',
+                'payment_proof' => null,
+                'approved_by' => null,
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('member.withdraw.history')
+                ->with('success', 'Withdrawal request submitted successfully! Reference: ' . $reference . '. You will receive: ' . number_format($netAmount, 2) . ' USDT');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Log error for debugging
+            Log::error('Withdrawal failed: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Failed to submit withdrawal request. Please try again.');
+        }
+    }
+
+    /**
+     * Show withdrawal history
+     */
+    public function history()
+    {
+        // Get all withdrawals with pagination
+        $transactions = Transaction::forUser(auth()->id())
             ->withdrawal()
-            ->latest()
+            ->with('wallet')
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('admin.pages.withdrawal.index', compact('withdrawals'));
-    }
-
-    public function show($id)
-    {
-        $withdrawal = Transaction::with(['user', 'wallet', 'approver'])
+        // Count summary
+        $pendingCount = Transaction::forUser(auth()->id())
             ->withdrawal()
-            ->findOrFail($id);
+            ->pending()
+            ->count();
 
-        return view('admin.pages.withdrawal.detail', compact('withdrawal'));
+        $completedCount = Transaction::forUser(auth()->id())
+            ->withdrawal()
+            ->whereIn('status', ['approved', 'completed'])
+            ->count();
+
+        return view('member.pages.withdraw.history', compact('transactions', 'pendingCount', 'completedCount'));
     }
 
-    public function approve(Request $request, $id)
+    /**
+     * Cancel withdrawal request (only for pending status)
+     */
+    public function cancel($reference)
     {
-        $withdrawal = Transaction::withdrawal()->findOrFail($id);
+        try {
+            $transaction = Transaction::where('reference', $reference)
+                ->where('user_id', auth()->id())
+                ->where('type', 'withdrawal')
+                ->where('status', 'pending')
+                ->first();
 
-        // Check if already processed
-        if ($withdrawal->status !== 'pending') {
-            return redirect()->route('admin.withdrawal.index')
-                ->with('error', 'This withdrawal has already been processed.');
+            if (!$transaction) {
+                return redirect()
+                    ->route('member.withdraw.history')
+                    ->with('error', 'Withdrawal request not found or cannot be cancelled');
+            }
+
+            DB::beginTransaction();
+
+            // Update status to cancelled
+            $transaction->update([
+                'status' => 'cancelled',
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('member.withdraw.history')
+                ->with('success', 'Withdrawal request cancelled successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Cancel withdrawal failed: ' . $e->getMessage());
+
+            return redirect()
+                ->route('member.withdraw.history')
+                ->with('error', 'Failed to cancel withdrawal request');
         }
-
-        // Validate payment proof upload
-        $request->validate([
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB
-        ], [
-            'payment_proof.required' => 'Payment proof is required to approve withdrawal.',
-            'payment_proof.image' => 'Payment proof must be an image.',
-            'payment_proof.mimes' => 'Payment proof must be a file of type: jpeg, png, jpg.',
-            'payment_proof.max' => 'Payment proof must not be greater than 5MB.',
-        ]);
-
-        // Store payment proof
-        $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
-
-        // Update withdrawal status
-        $withdrawal->update([
-            'status' => 'completed',
-            'payment_proof' => $paymentProofPath,
-            'approved_by' => auth()->id(),
-        ]);
-
-        return redirect()->route('admin.withdrawal.index')
-            ->with('success', 'Withdrawal has been approved and completed successfully.');
-    }
-
-    public function reject($id)
-    {
-        $withdrawal = Transaction::withdrawal()->findOrFail($id);
-
-        // Check if already processed
-        if ($withdrawal->status !== 'pending') {
-            return redirect()->route('admin.withdrawal.index')
-                ->with('error', 'This withdrawal has already been processed.');
-        }
-
-        // Update withdrawal status
-        $withdrawal->update([
-            'status' => 'rejected',
-            'approved_by' => auth()->id(),
-        ]);
-
-        return redirect()->route('admin.withdrawal.index')
-            ->with('success', 'Withdrawal has been rejected.');
     }
 }

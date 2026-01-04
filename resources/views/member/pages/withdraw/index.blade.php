@@ -15,6 +15,25 @@
 
             <h5 class="text-white mb-3">Withdraw</h5>
 
+            <!-- Verification Alert (if not verified) -->
+            @if (!auth()->user()->is_verified)
+                <div class="alert alert-warning mb-3"
+                    style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 12px;">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-exclamation-triangle-fill text-warning"
+                            style="font-size: 20px; margin-top: 2px;"></i>
+                        <div>
+                            <h6 class="text-warning mb-1" style="font-size: 14px; font-weight: 600;">Akun Belum
+                                Terverifikasi</h6>
+                            <p class="small text-white mb-0" style="font-size: 13px;">
+                                Akun Anda belum terverifikasi. Untuk melakukan verifikasi akun kunjungi profile dan klik
+                                verifikasi akun.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <form id="withdraw-form" action="{{ route('member.withdraw.store') }}" method="POST">
                 @csrf
 
@@ -40,7 +59,7 @@
                             <span class="input-icon">₮</span>
                             <input type="number" name="amount" id="withdraw-amount" class="form-control-dark with-icon"
                                 placeholder="Enter amount" value="{{ old('amount') }}" step="0.01" min="10"
-                                required>
+                                {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
                         </div>
                         <small class="text-muted d-block mt-1">Minimum withdrawal: 10 USDT | Fee: 2%</small>
                         @error('amount')
@@ -51,10 +70,14 @@
                         <label class="text-muted small mb-2 d-block">Or choose quick amount:</label>
                     </div>
                     <div class="amount-quick-select">
-                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(50)">50 USDT</button>
-                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(100)">100 USDT</button>
-                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(250)">250 USDT</button>
-                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(500)">500 USDT</button>
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(50)"
+                            {{ !auth()->user()->is_verified ? 'disabled' : '' }}>50 USDT</button>
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(100)"
+                            {{ !auth()->user()->is_verified ? 'disabled' : '' }}>100 USDT</button>
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(250)"
+                            {{ !auth()->user()->is_verified ? 'disabled' : '' }}>250 USDT</button>
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(500)"
+                            {{ !auth()->user()->is_verified ? 'disabled' : '' }}>500 USDT</button>
                     </div>
                 </div>
 
@@ -63,10 +86,12 @@
                     <h6 class="text-white mb-3">Select Wallet Account</h6>
                     <div>
                         <label class="text-muted small mb-2 d-block">Choose your wallet account</label>
-                        <select name="wallet_id" id="wallet-account" class="form-control-dark-select" required>
+                        <select name="wallet_id" id="wallet-account" class="form-control-dark-select"
+                            {{ !auth()->user()->is_verified || $wallets->isEmpty() ? 'disabled' : 'required' }}>
                             <option value="">-- Select Wallet Account --</option>
                             @forelse($wallets as $wallet)
-                                <option value="{{ $wallet->id }}" {{ old('wallet_id') == $wallet->id ? 'selected' : '' }}>
+                                <option value="{{ $wallet->id }}"
+                                    {{ old('wallet_id') == $wallet->id ? 'selected' : '' }}>
                                     {{ $wallet->account_name }} - {{ $wallet->account_number }}
                                 </option>
                             @empty
@@ -120,7 +145,7 @@
 
                 <!-- Submit Button -->
                 <button type="button" class="btn btn-gold w-100" onclick="submitWithdraw()"
-                    {{ $wallets->isEmpty() ? 'disabled' : '' }}>
+                    {{ !auth()->user()->is_verified || $wallets->isEmpty() ? 'disabled' : '' }}>
                     Submit Withdrawal
                 </button>
             </form>
@@ -213,10 +238,17 @@
                 /* Prevents zoom on iOS */
             }
         }
+
+        /* Disabled state for quick amount buttons */
+        .quick-amount-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 
     <script>
         const userBalance = {{ $userBalance }};
+        const isVerified = {{ auth()->user()->is_verified ? 'true' : 'false' }};
 
         // Show alert messages
         @if (session('success'))
@@ -232,6 +264,10 @@
         @endif
 
         function setWithdrawAmount(amount) {
+            if (!isVerified) {
+                alert('Akun Anda belum terverifikasi. Silakan hubungi admin untuk verifikasi akun.');
+                return;
+            }
             document.getElementById('withdraw-amount').value = amount;
             calculateFee();
         }
@@ -258,6 +294,11 @@
         }
 
         function submitWithdraw() {
+            if (!isVerified) {
+                alert('Akun Anda belum terverifikasi. Withdrawal tidak dapat diproses. Silakan hubungi admin.');
+                return;
+            }
+
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
             const walletSelect = document.getElementById('wallet-account');
 
@@ -307,6 +348,8 @@
 
         // Auto-select first wallet if only one available and no previous selection
         window.addEventListener('DOMContentLoaded', function() {
+            if (!isVerified) return; // Skip auto-select if not verified
+
             const walletSelect = document.getElementById('wallet-account');
             const options = walletSelect.querySelectorAll('option[value]:not([value=""])');
 
