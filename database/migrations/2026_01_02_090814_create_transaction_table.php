@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('reference')->unique();
             $table->decimal('amount', 15, 2);
             $table->enum('type', ['deposit', 'withdrawal', 'commission']);
+            $table->enum('balance_type', ['exchange', 'trade'])->default('exchange');
             $table->foreignId('wallet_id')->nullable()->constrained('wallets')->onDelete('set null');
             $table->decimal('withdrawal_fee', 15, 2)->nullable()->default(0);
             $table->foreignId('source_user_id')->nullable()->constrained('users')->onDelete('set null');

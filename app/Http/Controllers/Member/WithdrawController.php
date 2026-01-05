@@ -16,10 +16,19 @@ class WithdrawController extends Controller
      */
     public function index()
     {
-        $wallets = Wallet::where('user_id', auth()->id())->get();
-        $userBalance = Transaction::getUserBalance(auth()->id());
+        if (!auth()->user()->is_verified) {
+            return redirect()
+                ->route('member.profile.index')
+                ->with('error', 'Akun Anda belum terverifikasi. Silakan hubungi admin untuk verifikasi akun.');
+        }
 
-        return view('member.pages.withdraw.index', compact('wallets', 'userBalance'));
+        $wallets = Wallet::where('user_id', auth()->id())->get();
+
+        // UPDATED - gunakan exchange_balance
+        $user = auth()->user();
+        $exchangeBalance = $user->exchange_balance;
+
+        return view('member.pages.withdraw.index', compact('wallets', 'exchangeBalance'));
     }
 
     /**
@@ -27,6 +36,12 @@ class WithdrawController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->user()->is_verified) {
+            return redirect()
+                ->route('member.profile.index')
+                ->with('error', 'Akun Anda belum terverifikasi. Withdrawal tidak dapat diproses.');
+        }
+
         $request->validate([
             'amount' => 'required|numeric|min:10',
             'wallet_id' => 'required|exists:wallets,id',
@@ -38,7 +53,6 @@ class WithdrawController extends Controller
         ]);
 
         try {
-            // Verify wallet belongs to user
             $wallet = Wallet::where('id', $request->wallet_id)
                 ->where('user_id', auth()->id())
                 ->first();
@@ -50,48 +64,45 @@ class WithdrawController extends Controller
                     ->with('error', 'Wallet account tidak ditemukan');
             }
 
-            // User input adalah amount yang ingin ditarik (gross/total)
-            $requestedAmount = $request->amount; // Misal: 250
+            $user = auth()->user();
+            $requestedAmount = $request->amount;
 
             // Calculate withdrawal fee (2%)
-            $withdrawalFee = $requestedAmount * 0.02; // 250 * 0.02 = 5
+            $withdrawalFee = $requestedAmount * 0.02;
+            $netAmount = $requestedAmount - $withdrawalFee;
+            $totalAmount = $requestedAmount;
 
-            // Net amount yang akan diterima user
-            $netAmount = $requestedAmount - $withdrawalFee; // 250 - 5 = 245
-
-            // Total yang keluar dari balance (sama dengan requested)
-            $totalAmount = $requestedAmount; // 250
-
-            // Check user balance - cek apakah balance cukup untuk total_amount
-            if (!Transaction::hasSufficientBalance(auth()->id(), $totalAmount)) {
-                $currentBalance = Transaction::getUserBalance(auth()->id());
-
+            // UPDATED - Check exchange balance
+            if ($user->exchange_balance < $totalAmount) {
                 return redirect()
                     ->back()
                     ->withInput()
-                    ->with('error', 'Saldo tidak mencukupi. Saldo Anda: ' . number_format($currentBalance, 2) . ' USDT');
+                    ->with('error', 'Saldo Exchange tidak mencukupi. Saldo Anda: ' . number_format($user->exchange_balance, 2) . ' USDT. Silakan transfer dari Trade Balance terlebih dahulu.');
             }
 
             DB::beginTransaction();
 
-            // Generate unique reference using model helper
             $reference = Transaction::generateReference('WD');
 
-            // Create transaction
+            // Create transaction - UPDATED: balance_type = 'exchange'
             $transaction = Transaction::create([
                 'user_id' => auth()->id(),
                 'reference' => $reference,
-                'amount' => $netAmount,              // 245 (yang user terima)
-                'total_amount' => $totalAmount,      // 250 (yang keluar dari balance)
+                'amount' => $netAmount,
+                'total_amount' => $totalAmount,
                 'type' => 'withdrawal',
+                'balance_type' => 'exchange', // NEW - withdrawal dari exchange
                 'wallet_id' => $request->wallet_id,
-                'withdrawal_fee' => $withdrawalFee,  // 5 (fee)
+                'withdrawal_fee' => $withdrawalFee,
                 'source_user_id' => null,
                 'status' => 'pending',
                 'payment_method' => 'wallet_transfer',
                 'payment_proof' => null,
                 'approved_by' => null,
             ]);
+
+            // UPDATED - Deduct exchange balance immediately (pending state)
+            $user->deductExchangeBalance($totalAmount);
 
             DB::commit();
 
@@ -101,7 +112,6 @@ class WithdrawController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Log error for debugging
             Log::error('Withdrawal failed: ' . $e->getMessage());
 
             return redirect()
@@ -116,14 +126,12 @@ class WithdrawController extends Controller
      */
     public function history()
     {
-        // Get all withdrawals with pagination
         $transactions = Transaction::forUser(auth()->id())
             ->withdrawal()
             ->with('wallet')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Count summary
         $pendingCount = Transaction::forUser(auth()->id())
             ->withdrawal()
             ->pending()
@@ -138,7 +146,7 @@ class WithdrawController extends Controller
     }
 
     /**
-     * Cancel withdrawal request (only for pending status)
+     * Cancel withdrawal request
      */
     public function cancel($reference)
     {
@@ -157,7 +165,10 @@ class WithdrawController extends Controller
 
             DB::beginTransaction();
 
-            // Update status to cancelled
+            // UPDATED - Return balance to exchange
+            $user = auth()->user();
+            $user->addExchangeBalance($transaction->total_amount);
+
             $transaction->update([
                 'status' => 'cancelled',
             ]);

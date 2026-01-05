@@ -15,6 +15,7 @@ class Transaction extends Model
         'amount',
         'total_amount',
         'type',
+        'balance_type', // NEW
         'wallet_id',
         'withdrawal_fee',
         'source_user_id',
@@ -32,33 +33,21 @@ class Transaction extends Model
 
     // ==================== RELATIONSHIPS ====================
 
-    /**
-     * Relasi ke user pemilik transaksi
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Relasi ke wallet
-     */
     public function wallet()
     {
         return $this->belongsTo(Wallet::class);
     }
 
-    /**
-     * Relasi ke user sumber (untuk commission dari referral)
-     */
     public function sourceUser()
     {
         return $this->belongsTo(User::class, 'source_user_id');
     }
 
-    /**
-     * Relasi ke admin yang approve transaksi
-     */
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
@@ -66,57 +55,47 @@ class Transaction extends Model
 
     // ==================== SCOPES ====================
 
-    /**
-     * Scope untuk filter transaksi deposit
-     */
     public function scopeDeposit($query)
     {
         return $query->where('type', 'deposit');
     }
 
-    /**
-     * Scope untuk filter transaksi withdrawal
-     */
     public function scopeWithdrawal($query)
     {
         return $query->where('type', 'withdrawal');
     }
 
-    /**
-     * Scope untuk filter transaksi commission
-     */
     public function scopeCommission($query)
     {
         return $query->where('type', 'commission');
     }
 
-    /**
-     * Scope untuk filter status pending
-     */
+    // NEW SCOPES
+    public function scopeExchange($query)
+    {
+        return $query->where('balance_type', 'exchange');
+    }
+
+    public function scopeTrade($query)
+    {
+        return $query->where('balance_type', 'trade');
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
     }
 
-    /**
-     * Scope untuk filter status approved
-     */
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved');
     }
 
-    /**
-     * Scope untuk filter status completed
-     */
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
     }
 
-    /**
-     * Scope untuk filter berdasarkan user
-     */
     public function scopeForUser($query, $userId)
     {
         return $query->where('user_id', $userId);
@@ -125,51 +104,35 @@ class Transaction extends Model
     // ==================== HELPER METHODS ====================
 
     /**
-     * Calculate user balance
-     * 
-     * Logic dengan total_amount:
-     * - Untuk deposit & commission: total_amount = amount (tidak ada fee)
-     * - Untuk withdrawal: 
-     *   - total_amount = yang keluar dari balance (gross)
-     *   - amount = yang user terima (net)
-     *   - withdrawal_fee = biaya admin
-     *   - total_amount = amount + withdrawal_fee
-     * 
-     * @param int $userId
-     * @return float
+     * DEPRECATED - Gunakan User->exchange_balance atau User->trade_balance
+     * Kept for backward compatibility
      */
     public static function getUserBalance($userId)
     {
-        // Calculate total deposits (approved only)
-        $totalDeposits = self::forUser($userId)
-            ->deposit()
-            ->approved()
-            ->sum('total_amount');
-
-        // Calculate total withdrawals (approved and pending)
-        // Gunakan total_amount karena itu yang keluar dari balance
-        $totalWithdrawals = self::forUser($userId)
-            ->withdrawal()
-            ->whereIn('status', ['approved', 'pending'])
-            ->sum('total_amount');
-
-        // Calculate total commissions
-        $totalCommissions = self::forUser($userId)
-            ->commission()
-            ->approved()
-            ->sum('total_amount');
-
-        return $totalDeposits + $totalCommissions - $totalWithdrawals;
+        $user = \App\Models\User::find($userId);
+        return $user ? $user->exchange_balance : 0;
     }
 
-    /**
-     * Get user balance breakdown
-     * 
-     * @param int $userId
-     * @return array
-     */
     public static function getUserBalanceBreakdown($userId)
     {
+        $user = \App\Models\User::find($userId);
+
+        if (!$user) {
+            return [
+                'exchange_balance' => 0,
+                'trade_balance' => 0,
+                'locked_balance' => 0,
+                'available_trade_balance' => 0,
+                'total_balance' => 0,
+                'total_deposits' => 0,
+                'total_withdrawals' => 0,
+                'total_withdrawals_net' => 0,
+                'total_withdrawal_fees' => 0,
+                'total_commissions' => 0,
+            ];
+        }
+
+        // Calculate totals from transactions (for history/audit)
         $totalDeposits = self::forUser($userId)
             ->deposit()
             ->approved()
@@ -180,7 +143,6 @@ class Transaction extends Model
             ->whereIn('status', ['approved', 'pending'])
             ->sum('total_amount');
 
-        // Net amount yang diterima user (amount, bukan total_amount)
         $totalWithdrawalsNet = self::forUser($userId)
             ->withdrawal()
             ->whereIn('status', ['approved', 'pending'])
@@ -196,37 +158,33 @@ class Transaction extends Model
             ->approved()
             ->sum('total_amount');
 
-        $balance = $totalDeposits + $totalCommissions - $totalWithdrawals;
-
         return [
+            // Current balances from user table
+            'exchange_balance' => $user->exchange_balance,
+            'trade_balance' => $user->trade_balance,
+            'locked_balance' => $user->locked_balance,
+            'available_trade_balance' => $user->getAvailableTradeBalance(),
+            'total_balance' => $user->exchange_balance + $user->trade_balance,
+
+            // Transaction history totals
             'total_deposits' => $totalDeposits,
-            'total_withdrawals' => $totalWithdrawals, // Gross (keluar dari balance)
-            'total_withdrawals_net' => $totalWithdrawalsNet, // Net (yang user terima)
+            'total_withdrawals' => $totalWithdrawals,
+            'total_withdrawals_net' => $totalWithdrawalsNet,
             'total_withdrawal_fees' => $totalWithdrawalFees,
             'total_commissions' => $totalCommissions,
-            'balance' => $balance,
+
+            // Trading volume
+            'target_volume' => $user->target_volume,
+            'achieved_volume' => $user->achieved_volume,
+            'remaining_volume' => $user->getRemainingVolume(),
         ];
     }
-
-    /**
-     * Check if user has sufficient balance
-     * 
-     * @param int $userId
-     * @param float $totalAmount (gross amount yang akan keluar dari balance)
-     * @return bool
-     */
     public static function hasSufficientBalance($userId, $totalAmount)
     {
-        $balance = self::getUserBalance($userId);
-        return $balance >= $totalAmount;
+        $user = \App\Models\User::find($userId);
+        return $user && $user->exchange_balance >= $totalAmount;
     }
 
-    /**
-     * Generate unique transaction reference
-     * 
-     * @param string $prefix (WD, DP, CM)
-     * @return string
-     */
     public static function generateReference($prefix = 'TXN')
     {
         do {
@@ -236,11 +194,8 @@ class Transaction extends Model
         return $reference;
     }
 
-    /**
-     * Get transaction status badge color
-     * 
-     * @return string
-     */
+    // ==================== ATTRIBUTES ====================
+
     public function getStatusColorAttribute()
     {
         return match ($this->status) {
@@ -253,11 +208,6 @@ class Transaction extends Model
         };
     }
 
-    /**
-     * Get transaction type badge color
-     * 
-     * @return string
-     */
     public function getTypeColorAttribute()
     {
         return match ($this->type) {
@@ -268,22 +218,12 @@ class Transaction extends Model
         };
     }
 
-    /**
-     * Get formatted amount with sign
-     * 
-     * @return string
-     */
     public function getFormattedAmountAttribute()
     {
         $sign = $this->type === 'withdrawal' ? '-' : '+';
         return $sign . ' ' . number_format($this->amount, 2);
     }
 
-    /**
-     * Get formatted total amount with sign
-     * 
-     * @return string
-     */
     public function getFormattedTotalAmountAttribute()
     {
         $sign = $this->type === 'withdrawal' ? '-' : '+';

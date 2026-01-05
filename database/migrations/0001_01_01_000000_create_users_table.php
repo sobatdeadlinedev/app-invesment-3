@@ -20,6 +20,11 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('is_verified')->default(false);
             $table->string('refferal_code')->unique();
+            $table->decimal('exchange_balance', 15, 2)->default(0);
+            $table->decimal('trade_balance', 15, 2)->default(0);
+            $table->decimal('locked_balance', 15, 2)->default(0);
+            $table->decimal('target_volume', 15, 2)->default(0);
+            $table->decimal('achieved_volume', 15, 2)->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

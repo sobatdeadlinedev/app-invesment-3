@@ -33,7 +33,6 @@ class DepositController extends Controller
     {
         $deposit = Transaction::deposit()->findOrFail($id);
 
-        // Check if already processed
         if ($deposit->status !== 'pending') {
             return redirect()->route('admin.deposit.index')
                 ->with('error', 'This deposit has already been processed.');
@@ -47,13 +46,17 @@ class DepositController extends Controller
                 'approved_by' => auth()->id(),
             ]);
 
+            // UPDATED - Add to exchange balance
+            $user = $deposit->user;
+            $user->addExchangeBalance($deposit->total_amount);
+
             // Process referral commissions ONLY for first deposit
             $this->processReferralCommissions($deposit);
 
             DB::commit();
 
             return redirect()->route('admin.deposit.index')
-                ->with('success', 'Deposit has been approved successfully and referral commissions have been processed.');
+                ->with('success', 'Deposit has been approved successfully and added to Exchange Balance.');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -66,13 +69,11 @@ class DepositController extends Controller
     {
         $deposit = Transaction::deposit()->findOrFail($id);
 
-        // Check if already processed
         if ($deposit->status !== 'pending') {
             return redirect()->route('admin.deposit.index')
                 ->with('error', 'This deposit has already been processed.');
         }
 
-        // Update deposit status
         $deposit->update([
             'status' => 'rejected',
             'approved_by' => auth()->id(),
@@ -83,37 +84,29 @@ class DepositController extends Controller
     }
 
     /**
-     * Process referral commissions for approved deposit
-     * ONLY for FIRST approved deposit
-     * 
-     * @param Transaction $deposit
-     * @return void
+     * Process referral commissions - UPDATED to add to exchange balance
      */
     private function processReferralCommissions(Transaction $deposit)
     {
-        // Check if this is the FIRST approved deposit for this user
         $previousApprovedDeposits = Transaction::where('user_id', $deposit->user_id)
             ->where('type', 'deposit')
             ->where('status', 'approved')
-            ->where('id', '!=', $deposit->id) // Exclude current deposit
+            ->where('id', '!=', $deposit->id)
             ->count();
 
-        // If user already has approved deposits before, skip commission
         if ($previousApprovedDeposits > 0) {
             return;
         }
 
-        // Get referral usage for the user who deposited
         $referralUsage = ReferralUsage::where('referred_id', $deposit->user_id)->first();
 
         if (!$referralUsage) {
-            // User tidak menggunakan referral code, skip commission
             return;
         }
 
         $depositAmount = $deposit->total_amount;
 
-        // Level 1: Direct referrer gets 5%
+        // Level 1: 5%
         $level1Commission = $depositAmount * 0.05;
         $this->createCommissionTransaction(
             $referralUsage->referrer_id,
@@ -122,11 +115,10 @@ class DepositController extends Controller
             'Level 1 Commission - First Deposit'
         );
 
-        // Level 2: Check if level 1 referrer was also referred by someone
+        // Level 2: 2%
         $level2ReferralUsage = ReferralUsage::where('referred_id', $referralUsage->referrer_id)->first();
 
         if ($level2ReferralUsage) {
-            // Level 2 referrer gets 2%
             $level2Commission = $depositAmount * 0.02;
             $this->createCommissionTransaction(
                 $level2ReferralUsage->referrer_id,
@@ -138,16 +130,14 @@ class DepositController extends Controller
     }
 
     /**
-     * Create commission transaction
-     * 
-     * @param int $userId - User who receives commission
-     * @param int $sourceUserId - User who made the deposit
-     * @param float $amount - Commission amount
-     * @param string $note - Optional note
-     * @return Transaction
+     * Create commission transaction - UPDATED to add to exchange balance
      */
     private function createCommissionTransaction($userId, $sourceUserId, $amount, $note = '')
     {
+        // Add commission to exchange balance
+        $user = \App\Models\User::find($userId);
+        $user->addExchangeBalance($amount);
+
         return Transaction::create([
             'user_id' => $userId,
             'source_user_id' => $sourceUserId,
@@ -155,7 +145,8 @@ class DepositController extends Controller
             'amount' => $amount,
             'total_amount' => $amount,
             'type' => 'commission',
-            'status' => 'approved', // Commission langsung approved
+            'balance_type' => 'exchange', // Commission masuk ke exchange
+            'status' => 'approved',
             'approved_by' => auth()->id(),
         ]);
     }

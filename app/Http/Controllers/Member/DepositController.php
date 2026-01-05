@@ -22,10 +22,20 @@ class DepositController extends Controller
         $walletNumber = $wallet['number'];
         $qrCode = Config::get('app_qr_code')['value'] ?? null;
 
-        // Get user balance using model helper
-        $userBalance = Transaction::getUserBalance(auth()->id());
+        // Get user balance - UPDATED
+        $user = auth()->user();
+        $exchangeBalance = $user->exchange_balance;
+        $tradeBalance = $user->trade_balance;
+        $userBalance = $user->exchange_balance + $user->trade_balance; // Total balance untuk display
 
-        return view('member.pages.deposit.index', compact('walletNumber', 'walletName', 'qrCode', 'userBalance'));
+        return view('member.pages.deposit.index', compact(
+            'walletNumber',
+            'walletName',
+            'qrCode',
+            'exchangeBalance',
+            'tradeBalance',
+            'userBalance'
+        ));
     }
 
     /**
@@ -36,7 +46,7 @@ class DepositController extends Controller
         $request->validate([
             'amount' => 'required|numeric|min:10',
             'payment_method' => 'required|in:ewallet,qrcode',
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ], [
             'amount.required' => 'Jumlah deposit harus diisi',
             'amount.min' => 'Minimal deposit adalah 10 USDT',
@@ -53,19 +63,19 @@ class DepositController extends Controller
             // Upload payment proof
             $proofPath = $this->uploadPaymentProof($request->file('payment_proof'));
 
-            // Generate unique reference using model helper
+            // Generate unique reference
             $reference = Transaction::generateReference('DEP');
 
             $depositAmount = $request->amount;
 
-            // Create transaction
-            // Untuk deposit, tidak ada fee jadi amount = total_amount
+            // Create transaction - UPDATED: balance_type = 'exchange'
             $transaction = Transaction::create([
                 'user_id' => auth()->id(),
                 'reference' => $reference,
                 'amount' => $depositAmount,
-                'total_amount' => $depositAmount, // Sama dengan amount karena tidak ada fee
+                'total_amount' => $depositAmount,
                 'type' => 'deposit',
+                'balance_type' => 'exchange', // NEW - deposit masuk ke exchange
                 'wallet_id' => null,
                 'withdrawal_fee' => null,
                 'source_user_id' => null,
@@ -83,12 +93,10 @@ class DepositController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Delete uploaded file if transaction failed
             if (isset($proofPath) && Storage::disk('public')->exists($proofPath)) {
                 Storage::disk('public')->delete($proofPath);
             }
 
-            // Log error for debugging
             Log::error('Deposit failed: ' . $e->getMessage());
 
             return redirect()
@@ -103,13 +111,11 @@ class DepositController extends Controller
      */
     public function history()
     {
-        // Get all deposits with pagination
         $transactions = Transaction::forUser(auth()->id())
             ->deposit()
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Count summary
         $pendingCount = Transaction::forUser(auth()->id())
             ->deposit()
             ->pending()
@@ -123,12 +129,6 @@ class DepositController extends Controller
         return view('member.pages.deposit.history', compact('transactions', 'pendingCount', 'completedCount'));
     }
 
-    /**
-     * Upload payment proof file
-     * 
-     * @param \Illuminate\Http\UploadedFile $file
-     * @return string
-     */
     private function uploadPaymentProof($file)
     {
         if (!$file) {
@@ -139,9 +139,6 @@ class DepositController extends Controller
         return $file->storeAs('payment_proofs', $fileName, 'public');
     }
 
-    /**
-     * Get pending deposits count (optional - for notifications)
-     */
     public function getPendingCount()
     {
         $count = Transaction::forUser(auth()->id())

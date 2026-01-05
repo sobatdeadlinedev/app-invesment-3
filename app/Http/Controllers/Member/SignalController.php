@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Http\Controllers\Member;
+
+use App\Http\Controllers\Controller;
+use App\Models\TradingSignal;
+use App\Models\SignalParticipant;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class SignalController extends Controller
+{
+    /**
+     * Join a trading signal
+     */
+    public function join($id)
+    {
+        $signal = TradingSignal::findOrFail($id);
+        $user = auth()->user();
+
+        // Validasi signal status
+        if ($signal->status !== 'open') {
+            return redirect()
+                ->back()
+                ->with('error', 'This signal is no longer available for joining.');
+        }
+
+        // Check if user already joined
+        $alreadyJoined = SignalParticipant::where('signal_id', $signal->id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($alreadyJoined) {
+            return redirect()
+                ->back()
+                ->with('error', 'You have already joined this signal.');
+        }
+
+        // Check minimum balance (100 USDT available trade balance)
+        if (!$user->canJoinSignal()) {
+            return redirect()
+                ->back()
+                ->with('error', 'Minimum available Trade Balance to join signal is 100 USDT. Your available balance: ' . number_format($user->getAvailableTradeBalance(), 2) . ' USDT.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Calculate bet amount (1% dari trade balance)
+            $betAmount = $user->calculateBetAmount();
+
+            // Lock the bet amount
+            $user->lockBalance($betAmount);
+
+            // Create participant record
+            $participant = SignalParticipant::create([
+                'signal_id' => $signal->id,
+                'user_id' => $user->id,
+                'bet_amount' => $betAmount,
+                'status' => 'joined',
+                'joined_at' => now(),
+            ]);
+
+            DB::commit();
+
+            Log::info('User joined signal', [
+                'user_id' => $user->id,
+                'signal_id' => $signal->id,
+                'bet_amount' => $betAmount,
+                'locked_balance' => $user->locked_balance,
+            ]);
+
+            return redirect()
+                ->route('member.invest.detail', ['signal_id' => $signal->id])
+                ->with('success', 'Successfully joined signal: ' . $signal->title . '. Bet amount: ' . number_format($betAmount, 2) . ' USDT has been locked.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Join signal failed: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'signal_id' => $signal->id,
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to join signal: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show user's signal history
+     */
+    public function history()
+    {
+        $user = auth()->user();
+
+        $participants = SignalParticipant::with('signal')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->paginate(15);
+
+        // Statistics
+        $totalJoined = SignalParticipant::where('user_id', $user->id)->count();
+        $totalSettled = SignalParticipant::where('user_id', $user->id)->settled()->count();
+        $totalProfitLoss = SignalParticipant::where('user_id', $user->id)->settled()->sum('profit_loss');
+        $totalFees = SignalParticipant::where('user_id', $user->id)->settled()->sum('fee_amount');
+        $totalWins = SignalParticipant::where('user_id', $user->id)
+            ->settled()
+            ->where('profit_loss', '>', 0)
+            ->count();
+
+        return view('member.pages.invest.history', [
+            'participants' => $participants,
+            'totalJoined' => $totalJoined,
+            'totalSettled' => $totalSettled,
+            'totalProfitLoss' => $totalProfitLoss,
+            'totalFees' => $totalFees,
+            'totalWins' => $totalWins,
+            'winRate' => $totalSettled > 0 ? ($totalWins / $totalSettled) * 100 : 0,
+        ]);
+    }
+}

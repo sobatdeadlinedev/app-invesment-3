@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+
 // Admin Controllers
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController
 use App\Http\Controllers\Admin\BalanceController as AdminBalanceController;
 use App\Http\Controllers\Admin\ConfigController as AdminConfigController;
 use App\Http\Controllers\Admin\VerificationController as AdminVerificationController;
+use App\Http\Controllers\Admin\TradingSignalController;
+
 // Member Controllers
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
@@ -24,6 +27,8 @@ use App\Http\Controllers\Member\DepositController as MemberDepositController;
 use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 use App\Http\Controllers\Member\WalletController as MemberWalletController;
 use App\Http\Controllers\Member\VerificationController as MemberVerificationController;
+use App\Http\Controllers\Member\BalanceTransferController;
+use App\Http\Controllers\Member\SignalController as MemberSignalController;
 
 // Root Route - Auto redirect based on auth status
 Route::get('/', function () {
@@ -89,30 +94,52 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::post('/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('approve');
         Route::post('/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('reject');
     });
+
     Route::prefix('balance')->name('balance.')->group(function () {
         Route::get('/', [AdminBalanceController::class, 'index'])->name('index');
     });
+
     Route::prefix('config')->name('config.')->group(function () {
         Route::get('/', [AdminConfigController::class, 'index'])->name('index');
         Route::post('/update', [AdminConfigController::class, 'update'])->name('update');
     });
+
     Route::prefix('verification')->name('verification.')->group(function () {
         Route::get('/', [AdminVerificationController::class, 'index'])->name('index');
         Route::get('/{verification}', [AdminVerificationController::class, 'show'])->name('show');
         Route::post('/{verification}/verify', [AdminVerificationController::class, 'verify'])->name('verify');
         Route::post('/{verification}/reject', [AdminVerificationController::class, 'reject'])->name('reject');
     });
+
+    // Trading Signals Management
+    Route::prefix('signals')->name('signals.')->group(function () {
+        Route::get('/', [TradingSignalController::class, 'index'])->name('index');
+        Route::get('/create', [TradingSignalController::class, 'create'])->name('create');
+        Route::post('/', [TradingSignalController::class, 'store'])->name('store');
+        Route::get('/{id}', [TradingSignalController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [TradingSignalController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [TradingSignalController::class, 'update'])->name('update');
+        Route::post('/{id}/close', [TradingSignalController::class, 'close'])->name('close');
+        Route::post('/{id}/settle', [TradingSignalController::class, 'settle'])->name('settle');
+        Route::delete('/{id}', [TradingSignalController::class, 'destroy'])->name('destroy');
+    });
 });
+
 // Member Routes
 Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->group(function () {
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [MemberDashboardController::class, 'index'])->name('index');
     });
 
+    // Trading Signals (di invest)
     Route::prefix('invest')->name('invest.')->group(function () {
-        Route::get('/', [MemberInvestController::class, 'index'])->name('index');
-        Route::get('/detail', [MemberInvestController::class, 'detail'])->name('detail');
+        Route::get('/', [MemberInvestController::class, 'index'])->name('index'); // List signals
+        Route::get('/detail', [MemberInvestController::class, 'detail'])->name('detail'); // Signal detail
+        Route::get('/history', [MemberSignalController::class, 'history'])->name('history'); // Trading history
     });
+
+    // Signal actions
+    Route::post('/signals/{id}/join', [MemberSignalController::class, 'join'])->name('signals.join');
 
     Route::prefix('team')->name('team.')->group(function () {
         Route::get('/', [MemberTeamController::class, 'index'])->name('index');
@@ -134,15 +161,24 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->g
         Route::get('/history', [MemberWithdrawController::class, 'history'])->name('history');
         Route::delete('/cancel/{reference}', [MemberWithdrawController::class, 'cancel'])->name('cancel');
     });
+
     // Verification Routes
     Route::prefix('verification')->name('verification.')->group(function () {
         Route::get('/', [MemberVerificationController::class, 'index'])->name('index');
         Route::post('/store', [MemberVerificationController::class, 'store'])->name('store');
     });
+
     // Wallet Routes
     Route::prefix('wallet')->name('wallet.')->group(function () {
         Route::post('/', [MemberWalletController::class, 'store'])->name('store');
         Route::put('/{wallet}', [MemberWalletController::class, 'update'])->name('update');
         Route::delete('/{wallet}', [MemberWalletController::class, 'destroy'])->name('destroy');
+    });
+
+    // Balance Transfer
+    Route::prefix('balance')->name('balance.')->group(function () {
+        Route::get('/transfer', [BalanceTransferController::class, 'index'])->name('transfer');
+        Route::post('/transfer/to-trade', [BalanceTransferController::class, 'exchangeToTrade'])->name('transfer.to-trade');
+        Route::post('/transfer/to-exchange', [BalanceTransferController::class, 'tradeToExchange'])->name('transfer.to-exchange');
     });
 });

@@ -141,6 +141,30 @@
                 <div class="menu-item pt-5">
                     <!--begin:Menu content-->
                     <div class="menu-content">
+                        <span class="menu-heading fw-bold text-uppercase fs-7">Trading</span>
+                    </div>
+                    <!--end:Menu content-->
+                </div>
+                <!--end:Menu item-->
+
+                <!--begin:Menu item - Trading Signals - NEW-->
+                <div class="menu-item">
+                    <!--begin:Menu link-->
+                    <a class="menu-link {{ request()->routeIs('admin.signals.*') ? 'active' : '' }}"
+                        href="{{ route('admin.signals.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-outline ki-chart-line-up fs-2"></i>
+                        </span>
+                        <span class="menu-title">Trading Signals</span>
+                    </a>
+                    <!--end:Menu link-->
+                </div>
+                <!--end:Menu item-->
+
+                <!--begin:Menu item - Section Header-->
+                <div class="menu-item pt-5">
+                    <!--begin:Menu content-->
+                    <div class="menu-content">
                         <span class="menu-heading fw-bold text-uppercase fs-7">Transactions</span>
                     </div>
                     <!--end:Menu content-->

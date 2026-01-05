@@ -21,6 +21,11 @@ class User extends Authenticatable
         'password',
         'refferal_code',
         'is_verified',
+        'exchange_balance',
+        'trade_balance',
+        'locked_balance',
+        'target_volume',
+        'achieved_volume',
     ];
 
     protected $hidden = [
@@ -28,7 +33,18 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // Relation
+    protected $casts = [
+        'password' => 'hashed',
+        'is_verified' => 'boolean',
+        'exchange_balance' => 'decimal:2',
+        'trade_balance' => 'decimal:2',
+        'locked_balance' => 'decimal:2',
+        'target_volume' => 'decimal:2',
+        'achieved_volume' => 'decimal:2',
+    ];
+
+    // ==================== EXISTING RELATIONS ====================
+
     public function wallets()
     {
         return $this->hasMany(Wallet::class);
@@ -49,56 +65,9 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'approved_by');
     }
 
-    /**
-     * Relasi ke UserVerification
-     */
     public function verification()
     {
         return $this->hasOne(UserVerification::class);
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'password' => 'hashed',
-            'is_verified' => 'boolean',
-        ];
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($user) {
-            if (empty($user->refferal_code)) {
-                $user->refferal_code = self::generateUniqueReferralCode();
-            }
-        });
-    }
-
-    // Generate 6-char alphanumeric referral code
-    private static function generateUniqueReferralCode(): string
-    {
-        $exists = true;
-
-        while ($exists) {
-            $code = strtoupper(Str::random(6));
-
-            // Ensure at least 1 letter and 1 number
-            if (!preg_match('/[A-Z]/', $code) || !preg_match('/[0-9]/', $code)) {
-                continue;
-            }
-
-            $exists = self::where('refferal_code', $code)->exists();
-        }
-
-        return $code;
-    }
-
-    // get current user
-    public static function current()
-    {
-        return auth()->user();
     }
 
     public function referrals()
@@ -106,13 +75,11 @@ class User extends Authenticatable
         return $this->hasMany(ReferralUsage::class, 'referrer_id');
     }
 
-    // Referral usage ketika user ini menggunakan kode referral orang lain
     public function usedReferral()
     {
         return $this->hasOne(ReferralUsage::class, 'referred_id');
     }
 
-    // Get users yang direferensikan (referred users)
     public function referredUsers()
     {
         return $this->hasManyThrough(
@@ -125,13 +92,240 @@ class User extends Authenticatable
         );
     }
 
-    // Get total referral count
+    // ==================== NEW RELATIONS ====================
+
+    public function signalParticipants()
+    {
+        return $this->hasMany(SignalParticipant::class);
+    }
+
+    public function tradingSignals()
+    {
+        return $this->hasMany(TradingSignal::class, 'created_by');
+    }
+
+    // ==================== BALANCE METHODS ====================
+
+    /**
+     * Get exchange balance
+     */
+    public function getExchangeBalance()
+    {
+        return $this->exchange_balance;
+    }
+
+    /**
+     * Get trade balance (available = trade - locked)
+     */
+    public function getTradeBalance()
+    {
+        return $this->trade_balance;
+    }
+
+    /**
+     * Get available trade balance (tidak termasuk yang di-lock)
+     */
+    public function getAvailableTradeBalance()
+    {
+        return $this->trade_balance - $this->locked_balance;
+    }
+
+    /**
+     * Add to exchange balance
+     */
+    public function addExchangeBalance($amount)
+    {
+        $this->increment('exchange_balance', $amount);
+        return $this->fresh();
+    }
+
+    /**
+     * Deduct from exchange balance
+     */
+    public function deductExchangeBalance($amount)
+    {
+        if ($this->exchange_balance < $amount) {
+            throw new \Exception('Insufficient exchange balance');
+        }
+        $this->decrement('exchange_balance', $amount);
+        return $this->fresh();
+    }
+
+    /**
+     * Add to trade balance
+     */
+    public function addTradeBalance($amount)
+    {
+        $this->increment('trade_balance', $amount);
+        return $this->fresh();
+    }
+
+    /**
+     * Deduct from trade balance
+     */
+    public function deductTradeBalance($amount)
+    {
+        if ($this->trade_balance < $amount) {
+            throw new \Exception('Insufficient trade balance');
+        }
+        $this->decrement('trade_balance', $amount);
+        return $this->fresh();
+    }
+
+    /**
+     * Lock balance (untuk betting)
+     */
+    public function lockBalance($amount)
+    {
+        if ($this->getAvailableTradeBalance() < $amount) {
+            throw new \Exception('Insufficient available trade balance to lock');
+        }
+        $this->increment('locked_balance', $amount);
+        return $this->fresh();
+    }
+
+    /**
+     * Unlock balance (setelah settle)
+     */
+    public function unlockBalance($amount)
+    {
+        if ($this->locked_balance < $amount) {
+            throw new \Exception('Cannot unlock more than locked balance');
+        }
+        $this->decrement('locked_balance', $amount);
+        return $this->fresh();
+    }
+
+    // ==================== VOLUME METHODS ====================
+
+    /**
+     * Add target volume
+     */
+    public function addTargetVolume($amount)
+    {
+        $this->increment('target_volume', $amount);
+        return $this->fresh();
+    }
+
+    /**
+     * Add achieved volume
+     */
+    public function addAchievedVolume($amount)
+    {
+        $this->increment('achieved_volume', $amount);
+        return $this->fresh();
+    }
+
+    /**
+     * Get remaining volume
+     */
+    public function getRemainingVolume()
+    {
+        return max(0, $this->target_volume - $this->achieved_volume);
+    }
+
+    /**
+     * Check if volume is completed
+     */
+    public function isVolumeCompleted()
+    {
+        return $this->achieved_volume >= $this->target_volume;
+    }
+
+    /**
+     * Check if user needs penalty when transferring trade to exchange
+     */
+    public function needsPenalty()
+    {
+        return !$this->isVolumeCompleted() && $this->target_volume > 0;
+    }
+
+    /**
+     * Get volume completion percentage
+     */
+    public function getVolumeCompletionPercentage()
+    {
+        if ($this->target_volume == 0) {
+            return 100;
+        }
+        return min(100, ($this->achieved_volume / $this->target_volume) * 100);
+    }
+
+    /**
+     * Calculate penalty amount (20%)
+     */
+    public function calculatePenalty($amount)
+    {
+        if (!$this->needsPenalty()) {
+            return 0;
+        }
+        return $amount * 0.20;
+    }
+
+    /**
+     * Check if user can join signal (min 100 USDT available trade balance)
+     */
+    public function canJoinSignal()
+    {
+        return $this->getAvailableTradeBalance() >= 100;
+    }
+
+    /**
+     * Calculate bet amount (1% of current trade balance)
+     */
+    public function calculateBetAmount()
+    {
+        return $this->trade_balance * 0.01;
+    }
+
+    /**
+     * Calculate trading fee (1% of current trade balance)
+     */
+    public function calculateTradingFee()
+    {
+        return $this->trade_balance * 0.01;
+    }
+
+    // ==================== EXISTING METHODS ====================
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            if (empty($user->refferal_code)) {
+                $user->refferal_code = self::generateUniqueReferralCode();
+            }
+        });
+    }
+
+    private static function generateUniqueReferralCode(): string
+    {
+        $exists = true;
+
+        while ($exists) {
+            $code = strtoupper(Str::random(6));
+
+            if (!preg_match('/[A-Z]/', $code) || !preg_match('/[0-9]/', $code)) {
+                continue;
+            }
+
+            $exists = self::where('refferal_code', $code)->exists();
+        }
+
+        return $code;
+    }
+
+    public static function current()
+    {
+        return auth()->user();
+    }
+
     public function getTotalReferralsAttribute()
     {
         return $this->referrals()->count();
     }
 
-    // Helper methods untuk verifikasi dokumen
     public function verify()
     {
         $this->update(['is_verified' => true]);
@@ -147,7 +341,6 @@ class User extends Authenticatable
         return $this->is_verified;
     }
 
-    // Scope untuk query
     public function scopeVerified($query)
     {
         return $query->where('is_verified', true);
@@ -158,44 +351,29 @@ class User extends Authenticatable
         return $query->where('is_verified', false);
     }
 
-    /**
-     * Check apakah user sudah punya data verifikasi
-     */
     public function hasVerificationData(): bool
     {
         return !is_null($this->verification);
     }
 
-    /**
-     * Check apakah verifikasi basic sudah lengkap
-     */
     public function hasBasicVerification(): bool
     {
         return $this->verification &&
             $this->verification->isBasicComplete();
     }
 
-    /**
-     * Check apakah verifikasi advanced sudah lengkap
-     */
     public function hasAdvancedVerification(): bool
     {
         return $this->verification &&
             $this->verification->isAdvancedComplete();
     }
 
-    /**
-     * Check apakah verifikasi dokumen sudah diapprove
-     */
     public function isDocumentVerified(): bool
     {
         return $this->verification &&
             $this->verification->isVerified();
     }
 
-    /**
-     * Check apakah verifikasi dokumen pending
-     */
     public function isDocumentPending(): bool
     {
         return $this->verification &&

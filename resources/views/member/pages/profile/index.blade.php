@@ -50,23 +50,63 @@
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div>
                         <p class="text-muted mb-1 small">Total Balance</p>
-                        <h3 class="text-gold mb-0 fw-bold">{{ number_format($userBalance, 2) }} USDT</h3>
+                        <h3 class="text-gold mb-0 fw-bold">{{ number_format($balanceBreakdown['total_balance'], 2) }} USDT
+                        </h3>
+                        <small class="text-muted">Exchange + Trade Balance</small>
                     </div>
                     <div class="balance-icon-wrapper">
                         <i class="bi bi-wallet2"></i>
                     </div>
                 </div>
 
-                <!-- Balance Breakdown -->
+                <!-- Current Balance Breakdown -->
+                <div class="mb-3"
+                    style="padding: 12px; background: rgba(245, 166, 35, 0.05); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <small class="text-muted d-block mb-2"
+                        style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="bi bi-wallet me-1"></i>Current Balance
+                    </small>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small" style="padding-left: 8px;">Exchange Balance</span>
+                        <span class="text-white small fw-bold">
+                            {{ number_format($balanceBreakdown['exchange_balance'], 2) }} USDT
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small" style="padding-left: 8px;">Trade Balance</span>
+                        <span class="text-white small fw-bold">
+                            {{ number_format($balanceBreakdown['trade_balance'], 2) }} USDT
+                        </span>
+                    </div>
+
+                    @if ($balanceBreakdown['locked_balance'] > 0)
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small" style="padding-left: 8px;">└ Locked (Trading)</span>
+                            <span class="text-warning small fw-bold">
+                                -{{ number_format($balanceBreakdown['locked_balance'], 2) }} USDT
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small" style="padding-left: 8px;">└ Available</span>
+                            <span class="text-success small fw-bold">
+                                {{ number_format($balanceBreakdown['available_trade_balance'], 2) }} USDT
+                            </span>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Transaction History Summary -->
                 @if (isset($balanceBreakdown))
                     <div class="mb-3"
-                        style="padding: 12px; background: rgba(245, 166, 35, 0.05); border-radius: 8px; border: 1px solid var(--border-color);">
+                        style="padding: 12px; background: rgba(59, 181, 232, 0.05); border-radius: 8px; border: 1px solid var(--border-color);">
 
                         <!-- Income Section -->
                         <div class="mb-2 pb-2" style="border-bottom: 1px dashed rgba(255,255,255,0.1);">
                             <small class="text-muted d-block mb-2"
                                 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                <i class="bi bi-arrow-down-circle me-1"></i>Income
+                                <i class="bi bi-arrow-down-circle me-1"></i>Total Income
                             </small>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted small" style="padding-left: 8px;">Deposits</span>
@@ -86,7 +126,7 @@
                         <div class="mb-0">
                             <small class="text-muted d-block mb-2"
                                 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                <i class="bi bi-arrow-up-circle me-1"></i>Expenses
+                                <i class="bi bi-arrow-up-circle me-1"></i>Total Expenses
                             </small>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted small" style="padding-left: 8px;">Withdrawals (Net)</span>
@@ -94,37 +134,51 @@
                                     -{{ number_format($balanceBreakdown['total_withdrawals_net'], 2) }} USDT
                                 </span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
+                            <div class="d-flex justify-content-between">
                                 <span class="text-muted small" style="padding-left: 8px;">Withdrawal Fees</span>
                                 <span class="text-danger small fw-bold">
                                     -{{ number_format($balanceBreakdown['total_withdrawal_fees'], 2) }} USDT
                                 </span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center pt-2"
-                                style="border-top: 1px dashed rgba(255,255,255,0.1);">
-                                <span class="text-muted small" style="padding-left: 8px;">
-                                    <i class="bi bi-calculator me-1"></i>Total Withdrawn
-                                </span>
-                                <span class="text-white small fw-bold">
-                                    {{ number_format($balanceBreakdown['total_withdrawals'], 2) }} USDT
-                                </span>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Trading Volume Progress (if any) -->
+                @if ($balanceBreakdown['target_volume'] > 0)
+                    <div class="mb-3"
+                        style="padding: 12px; background: rgba(138, 43, 226, 0.05); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <small class="text-muted d-block mb-2"
+                            style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="bi bi-graph-up me-1"></i>Trading Volume
+                        </small>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Target</span>
+                            <span
+                                class="text-white small fw-bold">{{ number_format($balanceBreakdown['target_volume'], 2) }}
+                                USDT</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Achieved</span>
+                            <span
+                                class="text-success small fw-bold">{{ number_format($balanceBreakdown['achieved_volume'], 2) }}
+                                USDT</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted small">Remaining</span>
+                            <span
+                                class="text-warning small fw-bold">{{ number_format($balanceBreakdown['remaining_volume'], 2) }}
+                                USDT</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background-color: rgba(255,255,255,0.1);">
+                            <div class="progress-bar" role="progressbar"
+                                style="width: {{ $balanceBreakdown['target_volume'] > 0 ? ($balanceBreakdown['achieved_volume'] / $balanceBreakdown['target_volume']) * 100 : 0 }}%; background: linear-gradient(90deg, #8a2be2, #da70d6);">
                             </div>
                         </div>
-
-                        <!-- Verification Note -->
-                        <div class="mt-2 pt-2" style="border-top: 1px solid rgba(255,255,255,0.1);">
-                            <small class="text-muted d-block" style="font-size: 11px;">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Balance = Deposits + Commissions - Total Withdrawn
-                                <br>
-                                <span style="padding-left: 16px;">
-                                    = {{ number_format($balanceBreakdown['total_deposits'], 2) }}
-                                    + {{ number_format($balanceBreakdown['total_commissions'], 2) }}
-                                    - {{ number_format($balanceBreakdown['total_withdrawals'], 2) }}
-                                    = {{ number_format($userBalance, 2) }} USDT
-                                </span>
-                            </small>
-                        </div>
+                        <small class="text-muted d-block text-center mt-2" style="font-size: 10px;">
+                            {{ number_format($balanceBreakdown['target_volume'] > 0 ? ($balanceBreakdown['achieved_volume'] / $balanceBreakdown['target_volume']) * 100 : 0, 1) }}%
+                            Completed
+                        </small>
                     </div>
                 @endif
 
@@ -139,6 +193,13 @@
                             <i class="bi bi-arrow-up-circle me-1"></i>Withdraw
                         </a>
                     </div>
+                </div>
+
+                <!-- Quick Link to Transfer -->
+                <div class="mt-2">
+                    <a href="{{ route('member.balance.transfer') }}" class="btn btn-outline-light w-100 btn-sm">
+                        <i class="bi bi-arrow-left-right me-1"></i>Transfer Balance
+                    </a>
                 </div>
             </div>
 
