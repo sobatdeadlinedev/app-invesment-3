@@ -37,48 +37,57 @@
                 </div>
             </div>
 
-            <!-- Trading Signals List Card -->
+            <!-- Quick Actions -->
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <a href="{{ route('member.invest.history') }}" class="btn btn-outline-light w-100 btn-sm">
+                        <i class="bi bi-clock-history me-1"></i>Trading History
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="{{ route('member.balance.transfer') }}" class="btn btn-outline-light w-100 btn-sm">
+                        <i class="bi bi-arrow-left-right me-1"></i>Transfer Balance
+                    </a>
+                </div>
+            </div>
+
+            <!-- Coins List Card -->
             <div class="card-dark shadow-sm p-0 mb-3">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
-                    <h6 class="text-white mb-0">Available Trading Signals</h6>
+                    <h6 class="text-white mb-0">Select Coin for Trading Signals</h6>
                 </div>
 
-                @forelse($openSignals as $signal)
-                    <a href="{{ route('member.invest.detail', ['signal_id' => $signal->id]) }}" class="coin-list-item">
+                @foreach ($coins as $symbol => $info)
+                    <!-- Coin Item -->
+                    <a href="{{ route('member.invest.detail', ['coin' => strtolower($symbol)]) }}" class="coin-list-item">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-3 flex-grow-1">
                                 <div class="coin-icon"
-                                    style="background: linear-gradient(135deg, #f5a623 0%, #f7b733 100%);">
-                                    <i class="bi bi-broadcast"></i>
+                                    style="background: linear-gradient(135deg, {{ $info['color'] }} 0%, {{ $info['color'] }}dd 100%);">
+                                    <i class="{{ $info['icon'] }}"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="text-white fw-bold mb-1" style="font-size: 14px;">{{ $signal->title }}</div>
-                                    <small class="text-muted">
-                                        <i class="bi bi-people me-1"></i>{{ $signal->participants_count }} Participants
-                                        @if (in_array($signal->id, $joinedSignalIds))
-                                            <span class="badge badge-primary ms-2" style="font-size: 9px;">JOINED</span>
-                                        @endif
-                                    </small>
+                                    <div class="text-white fw-bold mb-1" style="font-size: 14px;">{{ $info['symbol'] }}
+                                    </div>
+                                    <small class="text-muted">{{ $info['name'] }}</small>
                                 </div>
                             </div>
                             <div class="text-end">
-                                @if ($signal->entry_price)
-                                    <div class="text-white fw-bold mb-1" style="font-size: 14px;">$
-                                        {{ number_format($signal->entry_price, 2) }}</div>
+                                @if ($signalCounts[$symbol] > 0)
+                                    <div class="mb-1">
+                                        <span class="badge badge-success" style="font-size: 11px;">
+                                            <i class="bi bi-broadcast me-1"></i>{{ $signalCounts[$symbol] }}
+                                            Signal{{ $signalCounts[$symbol] > 1 ? 's' : '' }}
+                                        </span>
+                                    </div>
+                                @else
+                                    <small class="text-muted">No signals</small>
                                 @endif
-                                <span class="badge badge-success" style="font-size: 10px;">
-                                    <i class="bi bi-circle-fill" style="font-size: 6px;"></i> OPEN
-                                </span>
+                                <i class="bi bi-chevron-right text-muted"></i>
                             </div>
                         </div>
                     </a>
-                @empty
-                    <div class="p-5 text-center">
-                        <i class="bi bi-broadcast-pin text-muted" style="font-size: 48px;"></i>
-                        <p class="text-muted mt-3 mb-0">No signals available</p>
-                        <small class="text-muted">Check back later for new trading signals</small>
-                    </div>
-                @endforelse
+                @endforeach
             </div>
 
             <!-- Info Card -->
@@ -88,7 +97,8 @@
                     <div>
                         <h6 class="text-white mb-1" style="font-size: 13px;">How to Trade</h6>
                         <p class="small text-muted mb-0" style="font-size: 12px;">
-                            Click on any signal to view details and join. Minimum $100.00 available Trade Balance required.
+                            Select a coin to view available trading signals. Minimum $100.00 available Trade Balance
+                            required to join signals.
                             Your bet is calculated as 1% of your Trade Balance.
                         </p>
                     </div>

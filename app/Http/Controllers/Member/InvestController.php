@@ -10,55 +10,63 @@ use Illuminate\Http\Request;
 class InvestController extends Controller
 {
     /**
-     * Show trading signals list
+     * Show coins list with signal count
      */
     public function index()
     {
         $user = auth()->user();
+        $coins = TradingSignal::getAvailableCoins();
 
-        // Get open signals
-        $openSignals = TradingSignal::open()
-            ->with('creator')
-            ->withCount('participants')
-            ->latest()
-            ->get();
+        // Count open signals per coin
+        $signalCounts = [];
+        foreach (array_keys($coins) as $coinSymbol) {
+            $signalCounts[$coinSymbol] = TradingSignal::forCoin($coinSymbol)
+                ->open()
+                ->count();
+        }
 
-        // Get signal IDs that user has joined
-        $joinedSignalIds = SignalParticipant::where('user_id', $user->id)
-            ->pluck('signal_id')
-            ->toArray();
-
-        return view('member.pages.invest.index', compact('openSignals', 'joinedSignalIds'));
+        return view('member.pages.invest.index', compact('coins', 'signalCounts'));
     }
 
     /**
-     * Show trading signal detail
+     * Show signals for specific coin
      */
     public function detail(Request $request)
     {
         $user = auth()->user();
 
-        // Get signal_id from query parameter
-        $signalId = $request->query('signal_id');
+        // Get coin from query parameter OR signal_id
+        if ($request->has('signal_id')) {
+            // Direct signal access
+            $signalId = $request->query('signal_id');
+            $signal = TradingSignal::with('creator')
+                ->withCount('participants')
+                ->findOrFail($signalId);
 
-        if (!$signalId) {
-            return redirect()
-                ->route('member.invest.index')
-                ->with('error', 'Signal not found');
+            $participant = SignalParticipant::where('signal_id', $signal->id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            $hasJoined = !is_null($participant);
+
+            return view('member.pages.invest.detail', compact('signal', 'participant', 'hasJoined'));
         }
 
-        // Get signal with relations
-        $signal = TradingSignal::with('creator')
+        // Coin signals list
+        $coin = strtoupper($request->query('coin', 'BTC'));
+        $coinInfo = TradingSignal::getAvailableCoins()[$coin] ?? TradingSignal::getAvailableCoins()['BTC'];
+
+        $openSignals = TradingSignal::forCoin($coin)
+            ->open()
+            ->with('creator')
             ->withCount('participants')
-            ->findOrFail($signalId);
+            ->latest()
+            ->get();
 
-        // Check if user has joined this signal
-        $participant = SignalParticipant::where('signal_id', $signal->id)
-            ->where('user_id', $user->id)
-            ->first();
+        $joinedSignalIds = SignalParticipant::where('user_id', $user->id)
+            ->pluck('signal_id')
+            ->toArray();
 
-        $hasJoined = !is_null($participant);
-
-        return view('member.pages.invest.detail', compact('signal', 'participant', 'hasJoined'));
+        return view('member.pages.invest.coin-signals', compact('coin', 'coinInfo', 'openSignals', 'joinedSignalIds'));
     }
 }

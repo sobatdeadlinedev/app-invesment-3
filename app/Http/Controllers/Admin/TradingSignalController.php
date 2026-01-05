@@ -29,7 +29,8 @@ class TradingSignalController extends Controller
      */
     public function create()
     {
-        return view('admin.pages.signals.create');
+        $coins = TradingSignal::getAvailableCoins();
+        return view('admin.pages.signals.create', compact('coins'));
     }
 
     /**
@@ -39,6 +40,7 @@ class TradingSignalController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'coin' => 'required|string|in:' . implode(',', array_keys(TradingSignal::getAvailableCoins())), // NEW
             'description' => 'nullable|string',
             'entry_price' => 'nullable|numeric|min:0',
             'target_price' => 'nullable|numeric|min:0',
@@ -50,6 +52,7 @@ class TradingSignalController extends Controller
 
             $signal = TradingSignal::create([
                 'title' => $request->title,
+                'coin' => strtoupper($request->coin), // NEW
                 'description' => $request->description,
                 'entry_price' => $request->entry_price,
                 'target_price' => $request->target_price,
@@ -63,16 +66,11 @@ class TradingSignalController extends Controller
 
             return redirect()
                 ->route('admin.signals.index')
-                ->with('success', 'Trading signal created successfully! Users can now join this signal.');
+                ->with('success', 'Trading signal created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Create signal failed: ' . $e->getMessage());
-
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', 'Failed to create signal: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Failed to create signal: ' . $e->getMessage());
         }
     }
 
@@ -97,14 +95,12 @@ class TradingSignalController extends Controller
     {
         $signal = TradingSignal::findOrFail($id);
 
-        // Only allow edit if status is 'open'
         if ($signal->status !== 'open') {
-            return redirect()
-                ->route('admin.signals.index')
-                ->with('error', 'Cannot edit signal that is already closed or settled.');
+            return redirect()->route('admin.signals.index')->with('error', 'Cannot edit signal that is already closed or settled.');
         }
 
-        return view('admin.pages.signals.edit', compact('signal'));
+        $coins = TradingSignal::getAvailableCoins(); // NEW
+        return view('admin.pages.signals.edit', compact('signal', 'coins'));
     }
 
     /**
@@ -115,13 +111,12 @@ class TradingSignalController extends Controller
         $signal = TradingSignal::findOrFail($id);
 
         if ($signal->status !== 'open') {
-            return redirect()
-                ->route('admin.signals.index')
-                ->with('error', 'Cannot update signal that is already closed or settled.');
+            return redirect()->route('admin.signals.index')->with('error', 'Cannot update signal.');
         }
 
         $request->validate([
             'title' => 'required|string|max:255',
+            'coin' => 'required|string|in:' . implode(',', array_keys(TradingSignal::getAvailableCoins())), // NEW
             'description' => 'nullable|string',
             'entry_price' => 'nullable|numeric|min:0',
             'target_price' => 'nullable|numeric|min:0',
@@ -133,6 +128,7 @@ class TradingSignalController extends Controller
 
             $signal->update([
                 'title' => $request->title,
+                'coin' => strtoupper($request->coin), // NEW
                 'description' => $request->description,
                 'entry_price' => $request->entry_price,
                 'target_price' => $request->target_price,
@@ -141,18 +137,11 @@ class TradingSignalController extends Controller
 
             DB::commit();
 
-            return redirect()
-                ->route('admin.signals.show', $signal->id)
-                ->with('success', 'Signal updated successfully.');
+            return redirect()->route('admin.signals.show', $signal->id)->with('success', 'Signal updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Update signal failed: ' . $e->getMessage());
-
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', 'Failed to update signal: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Failed to update signal.');
         }
     }
 

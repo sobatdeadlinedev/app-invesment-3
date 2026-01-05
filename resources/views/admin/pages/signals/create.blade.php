@@ -50,11 +50,29 @@
                     <form action="{{ route('admin.signals.store') }}" method="POST">
                         @csrf
 
+                        <!--begin::Input group - Coin Selection-->
+                        <div class="mb-10">
+                            <label class="form-label required">Select Coin</label>
+                            <select name="coin" class="form-select @error('coin') is-invalid @enderror" required>
+                                <option value="">Choose a coin...</option>
+                                @foreach ($coins as $symbol => $info)
+                                    <option value="{{ $symbol }}" {{ old('coin') == $symbol ? 'selected' : '' }}>
+                                        {{ $info['symbol'] }} - {{ $info['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('coin')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">Select the cryptocurrency for this trading signal</div>
+                        </div>
+
                         <!--begin::Input group - Title-->
                         <div class="mb-10">
                             <label class="form-label required">Signal Title</label>
                             <input type="text" name="title" class="form-control @error('title') is-invalid @enderror"
-                                placeholder="e.g., BTC/USDT Long Signal" value="{{ old('title') }}" required>
+                                placeholder="e.g., BTC Long Position - Breakout Signal" value="{{ old('title') }}"
+                                required>
                             @error('title')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

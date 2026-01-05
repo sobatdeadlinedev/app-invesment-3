@@ -11,6 +11,7 @@ class TradingSignal extends Model
 
     protected $fillable = [
         'title',
+        'coin', // NEW
         'description',
         'entry_price',
         'target_price',
@@ -33,6 +34,62 @@ class TradingSignal extends Model
         'closed_at' => 'datetime',
         'settled_at' => 'datetime',
     ];
+
+    // ==================== COIN CONFIGURATION ====================
+
+    /**
+     * Available coins for trading signals
+     */
+    public static function getAvailableCoins()
+    {
+        return [
+            'BTC' => [
+                'name' => 'Bitcoin',
+                'symbol' => 'BTC/USDT',
+                'icon' => 'bi-currency-bitcoin',
+                'color' => '#f7931a',
+            ],
+            'ETH' => [
+                'name' => 'Ethereum',
+                'symbol' => 'ETH/USDT',
+                'icon' => 'bi-currency-exchange',
+                'color' => '#627eea',
+            ],
+            'DOGE' => [
+                'name' => 'Dogecoin',
+                'symbol' => 'DOGE/USDT',
+                'icon' => 'bi-coin',
+                'color' => '#c2a633',
+            ],
+            'BNB' => [
+                'name' => 'Binance Coin',
+                'symbol' => 'BNB/USDT',
+                'icon' => 'bi-triangle-fill',
+                'color' => '#f3ba2f',
+            ],
+            'SOL' => [
+                'name' => 'Solana',
+                'symbol' => 'SOL/USDT',
+                'icon' => 'bi-sun-fill',
+                'color' => '#14f195',
+            ],
+            'XRP' => [
+                'name' => 'Ripple',
+                'symbol' => 'XRP/USDT',
+                'icon' => 'bi-water',
+                'color' => '#23292f',
+            ],
+        ];
+    }
+
+    /**
+     * Get coin info
+     */
+    public function getCoinInfo()
+    {
+        $coins = self::getAvailableCoins();
+        return $coins[$this->coin] ?? $coins['BTC'];
+    }
 
     // ==================== RELATIONSHIPS ====================
 
@@ -63,51 +120,39 @@ class TradingSignal extends Model
         return $query->where('status', 'settled');
     }
 
+    // NEW: Filter by coin
+    public function scopeForCoin($query, $coin)
+    {
+        return $query->where('coin', strtoupper($coin));
+    }
+
     // ==================== HELPER METHODS ====================
 
-    /**
-     * Check if signal is open for joining
-     */
     public function isOpen()
     {
         return $this->status === 'open';
     }
 
-    /**
-     * Check if signal is closed
-     */
     public function isClosed()
     {
         return $this->status === 'closed';
     }
 
-    /**
-     * Check if signal is settled
-     */
     public function isSettled()
     {
         return $this->status === 'settled';
     }
 
-    /**
-     * Get total participants count
-     */
     public function getTotalParticipantsAttribute()
     {
         return $this->participants()->count();
     }
 
-    /**
-     * Get total bet amount
-     */
     public function getTotalBetAmountAttribute()
     {
         return $this->participants()->sum('bet_amount');
     }
 
-    /**
-     * Close signal (admin action)
-     */
     public function closeSignal($result, $rateOfReturn)
     {
         $this->update([
@@ -118,9 +163,6 @@ class TradingSignal extends Model
         ]);
     }
 
-    /**
-     * Mark as settled (setelah semua participant di-settle)
-     */
     public function markAsSettled()
     {
         $this->update([
