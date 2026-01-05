@@ -92,7 +92,7 @@
                             @forelse($wallets as $wallet)
                                 <option value="{{ $wallet->id }}"
                                     {{ old('wallet_id') == $wallet->id ? 'selected' : '' }}>
-                                    {{ $wallet->account_name }} - {{ $wallet->account_number }}
+                                    {{ $wallet->account_name }} - {{ $wallet->account_number }} - {{ $wallet->type }}
                                 </option>
                             @empty
                                 <option value="" disabled>No wallet account available</option>

@@ -403,21 +403,29 @@
                 </div>
 
                 @forelse($wallets as $wallet)
-                    <!-- Bank Item -->
+                    <!-- Wallet Item -->
                     <div class="bank-list-item">
                         <div class="d-flex align-items-start justify-content-between">
                             <div class="d-flex align-items-start gap-3 flex-grow-1">
-                                <div class="bank-icon-circle">
+                                <div class="bank-icon-circle {{ $wallet->type }}">
                                     <i class="bi bi-wallet-fill"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="text-white fw-bold mb-1">{{ $wallet->account_name }}</div>
-                                    <div class="text-muted small">{{ $wallet->account_number }}</div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <div class="text-white fw-bold">{{ $wallet->account_name }}</div>
+                                        <span class="wallet-type-badge {{ $wallet->type }}">
+                                            {{ strtoupper($wallet->type) }}
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mb-1">{{ $wallet->account_number }}</div>
+                                    <small class="text-gold" style="font-size: 11px;">
+                                        <i class="bi bi-info-circle me-1"></i>{{ $wallet->getTypeLabel() }}
+                                    </small>
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
                                 <button class="btn-bank-action btn-bank-edit"
-                                    onclick="openEditModal({{ $wallet->id }}, '{{ $wallet->account_name }}', '{{ $wallet->account_number }}')">
+                                    onclick="openEditModal({{ $wallet->id }}, '{{ $wallet->type }}', '{{ $wallet->account_name }}', '{{ $wallet->account_number }}')">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <form action="{{ route('member.wallet.destroy', $wallet->id) }}" method="POST"
@@ -438,11 +446,11 @@
                     </div>
                 @endforelse
 
-                <!-- Add Bank Button -->
+                <!-- Add Wallet Button -->
                 <div class="p-3">
                     <button class="btn btn-outline-gold w-100" data-bs-toggle="modal" data-bs-target="#addWalletModal"
                         @if ($wallets->count() >= 3) disabled @endif>
-                        <i class="bi bi-plus-circle me-2"></i>Tambah Bank
+                        <i class="bi bi-plus-circle me-2"></i>Tambah Wallet
                     </button>
                 </div>
             </div>
@@ -461,18 +469,61 @@
                 <form action="{{ route('member.wallet.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
+                        <!-- Type Selection -->
                         <div class="mb-3">
-                            <label class="form-label text-white">Nama Rekening</label>
+                            <label class="form-label text-white">Network Type</label>
+                            <div class="network-type-selector">
+                                <label class="network-type-option">
+                                    <input type="radio" name="type" value="trc20" checked>
+                                    <div class="network-type-card">
+                                        <div class="network-icon trc20">
+                                            <i class="bi bi-circle-fill"></i>
+                                        </div>
+                                        <div class="network-info">
+                                            <div class="network-name">TRC20</div>
+                                            <small class="network-desc">TRON Network</small>
+                                        </div>
+                                        <div class="network-check">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="network-type-option">
+                                    <input type="radio" name="type" value="bep20">
+                                    <div class="network-type-card">
+                                        <div class="network-icon bep20">
+                                            <i class="bi bi-circle-fill"></i>
+                                        </div>
+                                        <div class="network-info">
+                                            <div class="network-name">BEP20</div>
+                                            <small class="network-desc">Binance Smart Chain</small>
+                                        </div>
+                                        <div class="network-check">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            @error('type')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-white">Nama Wallet</label>
                             <input type="text" name="account_name" class="form-control-dark"
-                                placeholder="Masukkan nama pemilik rekening" required value="{{ old('account_name') }}">
+                                placeholder="Contoh: My Main Wallet" required value="{{ old('account_name') }}">
                             @error('account_name')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-white">Nomor Rekening</label>
+                            <label class="form-label text-white">Wallet Address</label>
                             <input type="text" name="account_number" class="form-control-dark"
-                                placeholder="Masukkan nomor rekening" required value="{{ old('account_number') }}">
+                                placeholder="Masukkan wallet address" required value="{{ old('account_number') }}">
+                            <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                                <i class="bi bi-info-circle me-1"></i>Pastikan address sesuai dengan network yang dipilih
+                            </small>
                             @error('account_number')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -499,18 +550,61 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
+                        <!-- Type Selection -->
                         <div class="mb-3">
-                            <label class="form-label text-white">Nama Rekening</label>
+                            <label class="form-label text-white">Network Type</label>
+                            <div class="network-type-selector">
+                                <label class="network-type-option">
+                                    <input type="radio" name="type" value="trc20" id="edit_type_trc20">
+                                    <div class="network-type-card">
+                                        <div class="network-icon trc20">
+                                            <i class="bi bi-circle-fill"></i>
+                                        </div>
+                                        <div class="network-info">
+                                            <div class="network-name">TRC20</div>
+                                            <small class="network-desc">TRON Network</small>
+                                        </div>
+                                        <div class="network-check">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="network-type-option">
+                                    <input type="radio" name="type" value="bep20" id="edit_type_bep20">
+                                    <div class="network-type-card">
+                                        <div class="network-icon bep20">
+                                            <i class="bi bi-circle-fill"></i>
+                                        </div>
+                                        <div class="network-info">
+                                            <div class="network-name">BEP20</div>
+                                            <small class="network-desc">Binance Smart Chain</small>
+                                        </div>
+                                        <div class="network-check">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            @error('type')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-white">Nama Wallet</label>
                             <input type="text" name="account_name" id="edit_account_name" class="form-control-dark"
-                                placeholder="Masukkan nama pemilik rekening" required>
+                                placeholder="Contoh: My Main Wallet" required>
                             @error('account_name')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-white">Nomor Rekening</label>
+                            <label class="form-label text-white">Wallet Address</label>
                             <input type="text" name="account_number" id="edit_account_number"
-                                class="form-control-dark" placeholder="Masukkan nomor rekening" required>
+                                class="form-control-dark" placeholder="Masukkan wallet address" required>
+                            <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                                <i class="bi bi-info-circle me-1"></i>Pastikan address sesuai dengan network yang dipilih
+                            </small>
                             @error('account_number')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -524,7 +618,6 @@
             </div>
         </div>
     </div>
-
     <style>
         /* Transaction Tabs */
         .transaction-tabs {
@@ -729,6 +822,147 @@
             .transaction-icon-wrapper i {
                 font-size: 18px;
             }
+        }
+
+        /* Wallet Type Badge */
+        .wallet-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .wallet-type-badge.trc20 {
+            background: rgba(255, 0, 0, 0.15);
+            color: #ff4444;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .wallet-type-badge.bep20 {
+            background: rgba(243, 186, 47, 0.15);
+            color: #f3ba2f;
+            border: 1px solid rgba(243, 186, 47, 0.3);
+        }
+
+        /* Bank Icon dengan Color Type */
+        .bank-icon-circle.trc20 {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+
+        .bank-icon-circle.trc20 i {
+            color: #ff4444;
+        }
+
+        .bank-icon-circle.bep20 {
+            background: rgba(243, 186, 47, 0.1);
+            border-color: rgba(243, 186, 47, 0.3);
+        }
+
+        .bank-icon-circle.bep20 i {
+            color: #f3ba2f;
+        }
+
+        /* Network Type Selector */
+        .network-type-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .network-type-option {
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .network-type-option input[type="radio"] {
+            display: none;
+        }
+
+        .network-type-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .network-type-option:hover .network-type-card {
+            background: rgba(245, 166, 35, 0.05);
+            border-color: rgba(245, 166, 35, 0.3);
+        }
+
+        .network-type-option input[type="radio"]:checked~.network-type-card {
+            background: rgba(245, 166, 35, 0.1);
+            border-color: var(--gold-color);
+        }
+
+        .network-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .network-icon i {
+            font-size: 20px;
+        }
+
+        .network-icon.trc20 {
+            background: rgba(255, 0, 0, 0.15);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .network-icon.trc20 i {
+            color: #ff4444;
+        }
+
+        .network-icon.bep20 {
+            background: rgba(243, 186, 47, 0.15);
+            border: 1px solid rgba(243, 186, 47, 0.3);
+        }
+
+        .network-icon.bep20 i {
+            color: #f3ba2f;
+        }
+
+        .network-info {
+            flex-grow: 1;
+        }
+
+        .network-name {
+            color: var(--text-white);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .network-desc {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .network-check {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .network-check i {
+            font-size: 20px;
+            color: var(--gold-color);
+        }
+
+        .network-type-option input[type="radio"]:checked~.network-type-card .network-check {
+            opacity: 1;
         }
     </style>
 
