@@ -62,9 +62,9 @@
                         <thead>
                             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                 <th class="min-w-200px">Signal</th>
-                                <th class="min-w-100px">Entry Price</th>
-                                <th class="min-w-100px">Target Price</th>
-                                <th class="min-w-100px">Stop Loss</th>
+                                <th class="min-w-100px">Opening Price</th>
+                                <th class="min-w-100px">Settlement Price</th>
+                                {{-- <th class="min-w-100px">Stop Loss</th> --}}
                                 <th class="min-w-100px">Status</th>
                                 <th class="min-w-100px">Participants</th>
                                 <th class="min-w-125px">Created</th>
@@ -99,13 +99,13 @@
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    {{-- <td>
                                         @if ($signal->stop_loss)
                                             <span class="text-danger">$ {{ number_format($signal->stop_loss, 2) }}</span>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
-                                    </td>
+                                    </td> --}}
                                     <td>
                                         @if ($signal->status === 'open')
                                             <span class="badge badge-light-success">

@@ -90,7 +90,7 @@
                         <!--begin::Input group - Prices-->
                         <div class="row mb-10">
                             <div class="col-md-4">
-                                <label class="form-label">Entry Price (USDT)</label>
+                                <label class="form-label">Opening Price (USDT)</label>
                                 <input type="number" name="entry_price"
                                     class="form-control @error('entry_price') is-invalid @enderror" step="0.01"
                                     placeholder="0.00" value="{{ old('entry_price', $signal->entry_price) }}">
@@ -99,7 +99,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Target Price (USDT)</label>
+                                <label class="form-label">Settlement Price (USDT)</label>
                                 <input type="number" name="target_price"
                                     class="form-control @error('target_price') is-invalid @enderror" step="0.01"
                                     placeholder="0.00" value="{{ old('target_price', $signal->target_price) }}">
@@ -107,7 +107,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-4">
+                            {{-- <div class="col-md-4">
                                 <label class="form-label">Stop Loss (USDT)</label>
                                 <input type="number" name="stop_loss"
                                     class="form-control @error('stop_loss') is-invalid @enderror" step="0.01"
@@ -115,7 +115,7 @@
                                 @error('stop_loss')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
                         </div>
 
                         <!--begin::Actions-->

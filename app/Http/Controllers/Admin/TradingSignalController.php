@@ -40,7 +40,7 @@ class TradingSignalController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'coin' => 'required|string|in:' . implode(',', array_keys(TradingSignal::getAvailableCoins())), // NEW
+            'coin' => 'required|string|in:' . implode(',', array_keys(TradingSignal::getAvailableCoins())),
             'description' => 'nullable|string',
             'entry_price' => 'nullable|numeric|min:0',
             'target_price' => 'nullable|numeric|min:0',
@@ -52,7 +52,7 @@ class TradingSignalController extends Controller
 
             $signal = TradingSignal::create([
                 'title' => $request->title,
-                'coin' => strtoupper($request->coin), // NEW
+                'coin' => strtoupper($request->coin),
                 'description' => $request->description,
                 'entry_price' => $request->entry_price,
                 'target_price' => $request->target_price,
@@ -99,7 +99,7 @@ class TradingSignalController extends Controller
             return redirect()->route('admin.signals.index')->with('error', 'Cannot edit signal that is already closed or settled.');
         }
 
-        $coins = TradingSignal::getAvailableCoins(); // NEW
+        $coins = TradingSignal::getAvailableCoins();
         return view('admin.pages.signals.edit', compact('signal', 'coins'));
     }
 
@@ -116,7 +116,7 @@ class TradingSignalController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'coin' => 'required|string|in:' . implode(',', array_keys(TradingSignal::getAvailableCoins())), // NEW
+            'coin' => 'required|string|in:' . implode(',', array_keys(TradingSignal::getAvailableCoins())),
             'description' => 'nullable|string',
             'entry_price' => 'nullable|numeric|min:0',
             'target_price' => 'nullable|numeric|min:0',
@@ -128,7 +128,7 @@ class TradingSignalController extends Controller
 
             $signal->update([
                 'title' => $request->title,
-                'coin' => strtoupper($request->coin), // NEW
+                'coin' => strtoupper($request->coin),
                 'description' => $request->description,
                 'entry_price' => $request->entry_price,
                 'target_price' => $request->target_price,
@@ -192,6 +192,24 @@ class TradingSignalController extends Controller
 
     /**
      * Settle signal - process all participants
+     * 
+     * FIXED VERSION:
+     * =============
+     * Perhitungan yang benar untuk WIN dan LOSS:
+     * 
+     * WIN Example (Rate 63%):
+     * - Saldo awal: 3000 USDT
+     * - Bet: 30 USDT (locked)
+     * - Step 1: Unlock → 3000 USDT (modal kembali)
+     * - Step 2: Add profit (30 * 0.63) → 3018.9 USDT
+     * - Step 3: Deduct fee (1%) → ~2988.7 USDT
+     * 
+     * LOSS Example:
+     * - Saldo awal: 3000 USDT
+     * - Bet: 30 USDT (locked)
+     * - Step 1: Unlock → 3000 USDT (modal kembali dulu)
+     * - Step 2: Deduct loss (30) → 2970 USDT (modal hilang)
+     * - Step 3: Deduct fee (1%) → ~2940.3 USDT
      */
     public function settle($id)
     {
@@ -216,34 +234,41 @@ class TradingSignalController extends Controller
                 }
 
                 $user = $participant->user;
+                $betAmount = $participant->bet_amount;
 
-                // Unlock balance
-                $user->unlockBalance($participant->bet_amount);
+                // STEP 1: Unlock balance (kembalikan modal ke trade balance)
+                // Ini mengembalikan modal yang di-lock saat join signal
+                $user->unlockBalance($betAmount);
 
-                // Calculate profit/loss
+                // STEP 2: Calculate profit/loss
                 $profitLoss = 0;
+
                 if ($signal->result === 'win') {
-                    $profitLoss = $participant->bet_amount * ($signal->rate_of_return / 100);
-                } else {
-                    $profitLoss = -$participant->bet_amount;
-                }
+                    // WIN: User dapat profit MURNI (tidak termasuk modal)
+                    // Modal sudah dikembalikan di step 1
+                    // Profit = bet_amount * (rate_of_return / 100)
+                    // Contoh: 30 * (63/100) = 18.9 USDT
+                    $profitLoss = $betAmount * ($signal->rate_of_return / 100);
 
-                // Calculate fee (1% dari trade balance saat ini)
-                $fee = $user->calculateTradingFee();
-
-                // Update trade balance
-                // Rumus: trade_balance = trade_balance + profit/loss - fee
-                if ($profitLoss > 0) {
+                    // Tambahkan profit ke trade balance
                     $user->addTradeBalance($profitLoss);
                 } else {
-                    $user->deductTradeBalance(abs($profitLoss));
+                    // LOSS: User kehilangan seluruh modal bet
+                    // Modal sudah dikembalikan di step 1, sekarang harus dikurangi lagi
+                    $profitLoss = -$betAmount;
+
+                    // Kurangi modal dari trade balance
+                    $user->deductTradeBalance($betAmount);
                 }
+
+                // STEP 3: Calculate dan potong fee (1% dari trade balance saat ini)
+                $fee = $user->calculateTradingFee();
                 $user->deductTradeBalance($fee);
 
-                // Add achieved volume
-                $user->addAchievedVolume($participant->bet_amount);
+                // STEP 4: Add achieved volume (untuk tracking progress)
+                $user->addAchievedVolume($betAmount);
 
-                // Update participant
+                // STEP 5: Update participant record
                 $participant->update([
                     'profit_loss' => $profitLoss,
                     'fee_amount' => $fee,
@@ -258,9 +283,12 @@ class TradingSignalController extends Controller
                 Log::info('Participant settled', [
                     'signal_id' => $signal->id,
                     'user_id' => $user->id,
-                    'bet_amount' => $participant->bet_amount,
+                    'bet_amount' => $betAmount,
+                    'signal_result' => $signal->result,
+                    'rate_of_return' => $signal->rate_of_return,
                     'profit_loss' => $profitLoss,
                     'fee' => $fee,
+                    'new_trade_balance' => $user->fresh()->trade_balance,
                     'achieved_volume' => $user->achieved_volume,
                 ]);
             }
@@ -270,9 +298,14 @@ class TradingSignalController extends Controller
 
             DB::commit();
 
+            // Format P/L dengan tanda + atau -
+            $plText = $totalProfitLoss >= 0
+                ? '+' . number_format($totalProfitLoss, 2)
+                : number_format($totalProfitLoss, 2);
+
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('success', "Signal settled successfully! {$settledCount} participants processed. Total P/L: " . number_format($totalProfitLoss, 2) . " USDT, Total Fees: " . number_format($totalFees, 2) . " USDT.");
+                ->with('success', "Signal settled successfully! {$settledCount} participants processed. Total P/L: {$plText} USDT, Total Fees: " . number_format($totalFees, 2) . " USDT.");
         } catch (\Exception $e) {
             DB::rollBack();
 

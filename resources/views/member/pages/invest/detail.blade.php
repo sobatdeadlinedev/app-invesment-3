@@ -76,21 +76,15 @@
                 <div class="d-flex align-items-end justify-content-between">
                     <div class="row g-3 flex-grow-1">
                         @if ($signal->entry_price)
-                            <div class="col-4">
-                                <p class="text-muted mb-1 small">Entry Price</p>
+                            <div class="col-6">
+                                <p class="text-muted mb-1 small">Opening Price</p>
                                 <h6 class="text-gold mb-0 fw-bold">$ {{ number_format($signal->entry_price, 2) }}</h6>
                             </div>
                         @endif
                         @if ($signal->target_price)
-                            <div class="col-4">
-                                <p class="text-muted mb-1 small">Target Price</p>
+                            <div class="col-6">
+                                <p class="text-muted mb-1 small">Settlement Price</p>
                                 <h6 class="text-success mb-0 fw-bold">$ {{ number_format($signal->target_price, 2) }}</h6>
-                            </div>
-                        @endif
-                        @if ($signal->stop_loss)
-                            <div class="col-4">
-                                <p class="text-muted mb-1 small">Stop Loss</p>
-                                <h6 class="text-danger mb-0 fw-bold">$ {{ number_format($signal->stop_loss, 2) }}</h6>
                             </div>
                         @endif
                     </div>

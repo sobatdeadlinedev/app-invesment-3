@@ -229,22 +229,22 @@
                                 <table class="table fs-6 fw-semibold gs-0 gy-2 gx-2 m-0">
                                     @if ($signal->entry_price)
                                         <tr>
-                                            <td class="text-gray-500">Entry Price:</td>
+                                            <td class="text-gray-500">Opening Price:</td>
                                             <td class="text-gray-800">$ {{ number_format($signal->entry_price, 2) }}</td>
                                         </tr>
                                     @endif
                                     @if ($signal->target_price)
                                         <tr>
-                                            <td class="text-gray-500">Target Price:</td>
+                                            <td class="text-gray-500">Settlement Price:</td>
                                             <td class="text-success">$ {{ number_format($signal->target_price, 2) }}</td>
                                         </tr>
                                     @endif
-                                    @if ($signal->stop_loss)
+                                    {{-- @if ($signal->stop_loss)
                                         <tr>
                                             <td class="text-gray-500">Stop Loss:</td>
                                             <td class="text-danger">$ {{ number_format($signal->stop_loss, 2) }}</td>
                                         </tr>
-                                    @endif
+                                    @endif --}}
                                 </table>
                             </div>
                             <!--end::Section-->
