@@ -57,23 +57,34 @@
                     @php
                         $signal = $participant->signal;
                         $coinInfo = $signal->getCoinInfo();
-                        $isWin = $participant->profit_loss >= 0;
+
+                        // FIXED: Determine win/loss based on signal result, not profit_loss
+                        $isWin = $signal->result === 'win';
                         $isSettled = $participant->status === 'settled';
+
+                        // Calculate display values
+                        $profitLossAmount = $participant->profit_loss ?? 0;
+                        $feeAmount = $participant->fee_amount ?? 0;
+                        $netResult = $profitLossAmount - $feeAmount;
+
+                        // Determine if final result is positive (after fees)
+                        $isFinalProfit = $netResult > 0;
                     @endphp
 
                     <div class="card-dark shadow-sm p-3 mb-3">
                         <!-- Header -->
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge {{ $isWin ? 'badge-success' : 'badge-danger' }}"
+                                <!-- Badge shows signal type (CALL/PUT) based on signal direction -->
+                                <span class="badge {{ $signal->result === 'win' ? 'badge-success' : 'badge-danger' }}"
                                     style="font-size: 11px; padding: 6px 12px;">
-                                    {{ $isWin ? 'CALL' : 'PUT' }}
+                                    {{ strtoupper($signal->title ?? 'CALL') }}
                                 </span>
                                 <span class="text-white fw-bold">{{ $coinInfo['symbol'] }}</span>
                                 <small class="text-muted">60s</small>
                             </div>
                             @if ($isSettled)
-                                <i class="bi bi-check-circle-fill text-success"></i>
+                                <i class="bi bi-check-circle-fill {{ $isWin ? 'text-success' : 'text-danger' }}"></i>
                             @else
                                 <i class="bi bi-clock-fill text-warning"></i>
                             @endif
@@ -90,11 +101,31 @@
                                 </span>
                             </div>
 
-                            <!-- Profit and Loss -->
+                            <!-- Gross Profit/Loss (before fee) -->
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted" style="font-size: 12px;">profit and loss</span>
-                                <span class="text-{{ $isWin ? 'success' : 'danger' }} fw-bold" style="font-size: 12px;">
-                                    {{ $isSettled ? number_format($participant->net_result, 2) : '-' }}
+                                <span class="text-muted" style="font-size: 12px;">gross profit/loss</span>
+                                <span class="text-{{ $profitLossAmount >= 0 ? 'success' : 'danger' }} fw-bold"
+                                    style="font-size: 12px;">
+                                    {{ $isSettled ? ($profitLossAmount >= 0 ? '+' : '') . number_format($profitLossAmount, 2) : '-' }}
+                                </span>
+                            </div>
+
+                            <!-- Fee Amount -->
+                            @if ($isSettled && $feeAmount > 0)
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted" style="font-size: 12px;">trading fee (1%)</span>
+                                    <span class="text-warning" style="font-size: 12px;">
+                                        -{{ number_format($feeAmount, 2) }}
+                                    </span>
+                                </div>
+                            @endif
+
+                            <!-- Net Result (after fee) -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">net profit/loss</span>
+                                <span class="text-{{ $isFinalProfit ? 'success' : 'danger' }} fw-bold"
+                                    style="font-size: 12px;">
+                                    {{ $isSettled ? ($netResult >= 0 ? '+' : '') . number_format($netResult, 2) : '-' }}
                                 </span>
                             </div>
 
@@ -116,7 +147,7 @@
 
                             <!-- Number of Transactions -->
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted" style="font-size: 12px;">the number of transactions</span>
+                                <span class="text-muted" style="font-size: 12px;">total participants</span>
                                 <span class="text-white" style="font-size: 12px;">
                                     {{ $signal->total_participants ?? 0 }}
                                 </span>
@@ -179,9 +210,10 @@
                     <div>
                         <h6 class="text-white mb-1" style="font-size: 13px;">About Results</h6>
                         <ul class="small text-muted mb-0 ps-3" style="font-size: 12px;">
-                            <li>CALL = Profit signal | PUT = Loss signal</li>
-                            <li>Profit and loss shows net result (P/L - Fee)</li>
-                            <li>Fee is 1% of your Trade Balance at settlement</li>
+                            <li>Signal result (WIN/LOSS) is determined by admin</li>
+                            <li>Gross P/L = Your profit/loss before fees</li>
+                            <li>Trading Fee = 1% of your bet amount (deducted on win only)</li>
+                            <li>Net P/L = Final result after deducting fees</li>
                             <li>Win Rate is calculated from settled signals only</li>
                         </ul>
                     </div>
