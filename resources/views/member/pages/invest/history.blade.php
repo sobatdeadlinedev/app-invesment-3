@@ -50,86 +50,105 @@
             </div>
 
             <!-- History List -->
-            <div class="card-dark shadow-sm p-0 mb-3">
-                <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
-                    <h6 class="text-white mb-0">Trading History</h6>
-                </div>
+            <div class="mb-3">
+                <h6 class="text-white mb-3">Trading History</h6>
 
                 @forelse($participants as $participant)
-                    <div class="coin-list-item">
-                        <div class="d-flex flex-column gap-2">
-                            <!-- Signal Header -->
-                            <div class="d-flex align-items-start justify-content-between">
-                                <div class="flex-grow-1">
-                                    <div class="text-white fw-bold mb-1" style="font-size: 14px;">
-                                        <i class="bi bi-broadcast text-gold me-2"></i>{{ $participant->signal->title }}
-                                    </div>
-                                    <small class="text-muted">{{ $participant->joined_at->format('d M Y, H:i') }}</small>
-                                </div>
-                                @if ($participant->status === 'joined')
-                                    <span class="badge badge-warning" style="font-size: 10px;">
-                                        <i class="bi bi-clock"></i> PENDING
-                                    </span>
-                                @else
-                                    <span class="badge badge-success" style="font-size: 10px;">
-                                        <i class="bi bi-check-circle"></i> SETTLED
-                                    </span>
-                                @endif
-                            </div>
+                    @php
+                        $signal = $participant->signal;
+                        $coinInfo = $signal->getCoinInfo();
+                        $isWin = $participant->profit_loss >= 0;
+                        $isSettled = $participant->status === 'settled';
+                    @endphp
 
-                            <!-- Bet Details -->
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <small class="text-muted d-block" style="font-size: 10px;">Bet Amount</small>
-                                    <small class="text-white fw-bold">$
-                                        {{ number_format($participant->bet_amount, 2) }}</small>
-                                </div>
-                                @if ($participant->status === 'settled')
-                                    <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 10px;">P/L</small>
-                                        <small
-                                            class="text-{{ $participant->profit_loss >= 0 ? 'success' : 'danger' }} fw-bold">
-                                            {{ $participant->profit_loss >= 0 ? '+' : '' }} $
-                                            {{ number_format($participant->profit_loss, 2) }}
-                                        </small>
-                                    </div>
-                                    <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 10px;">Fee</small>
-                                        <small class="text-warning fw-bold">$
-                                            {{ number_format($participant->fee_amount, 2) }}</small>
-                                    </div>
-                                @endif
+                    <div class="card-dark shadow-sm p-3 mb-3">
+                        <!-- Header -->
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge {{ $isWin ? 'badge-success' : 'badge-danger' }}"
+                                    style="font-size: 11px; padding: 6px 12px;">
+                                    {{ $isWin ? 'CALL' : 'PUT' }}
+                                </span>
+                                <span class="text-white fw-bold">{{ $coinInfo['symbol'] }}</span>
+                                <small class="text-muted">60s</small>
                             </div>
-
-                            <!-- Result (if settled) -->
-                            @if ($participant->status === 'settled')
-                                <div class="d-flex align-items-center justify-content-between pt-2"
-                                    style="border-top: 1px solid var(--border-color);">
-                                    <div>
-                                        @if ($participant->signal->result === 'win')
-                                            <span class="badge badge-success" style="font-size: 10px;">
-                                                <i class="bi bi-trophy me-1"></i>WIN
-                                            </span>
-                                        @else
-                                            <span class="badge badge-danger" style="font-size: 10px;">
-                                                <i class="bi bi-x-circle me-1"></i>LOSS
-                                            </span>
-                                        @endif
-                                        <small
-                                            class="text-muted ms-2">{{ number_format($participant->signal->rate_of_return, 2) }}%
-                                            RoR</small>
-                                    </div>
-                                    <div class="text-end">
-                                        <small class="text-muted d-block" style="font-size: 10px;">Net Result</small>
-                                        <small
-                                            class="text-{{ $participant->net_result >= 0 ? 'success' : 'danger' }} fw-bold">
-                                            {{ $participant->net_result >= 0 ? '+' : '' }} $
-                                            {{ number_format($participant->net_result, 2) }}
-                                        </small>
-                                    </div>
-                                </div>
+                            @if ($isSettled)
+                                <i class="bi bi-check-circle-fill text-success"></i>
                             @else
-                                <div class="pt-2" style="border-top: 1px solid var(--border-color);">
+                                <i class="bi bi-clock-fill text-warning"></i>
+                            @endif
+                        </div>
+
+                        <!-- Details -->
+                        <div class="d-flex flex-column gap-2">
+                            <!-- Time Period -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">time period</span>
+                                <span class="text-white" style="font-size: 12px;">
+                                    {{ $signal->opened_at ? $signal->opened_at->format('H:i') : '-' }} -
+                                    {{ $signal->closed_at ? $signal->closed_at->format('H:i') : '-' }}
+                                </span>
+                            </div>
+
+                            <!-- Profit and Loss -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">profit and loss</span>
+                                <span class="text-{{ $isWin ? 'success' : 'danger' }} fw-bold" style="font-size: 12px;">
+                                    {{ $isSettled ? number_format($participant->net_result, 2) : '-' }}
+                                </span>
+                            </div>
+
+                            <!-- Rate of Return -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">rate of return</span>
+                                <span class="text-{{ $isWin ? 'success' : 'danger' }}" style="font-size: 12px;">
+                                    {{ $isSettled ? number_format($signal->rate_of_return, 2) . '%' : '-' }}
+                                </span>
+                            </div>
+
+                            <!-- Order Quantity -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">order quantity</span>
+                                <span class="text-white" style="font-size: 12px;">
+                                    {{ number_format($participant->bet_amount, 2) }}
+                                </span>
+                            </div>
+
+                            <!-- Number of Transactions -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">the number of transactions</span>
+                                <span class="text-white" style="font-size: 12px;">
+                                    {{ $signal->total_participants ?? 0 }}
+                                </span>
+                            </div>
+
+                            <!-- Opening Price -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">opening price</span>
+                                <span class="text-white" style="font-size: 12px;">
+                                    {{ number_format($signal->entry_price, 3) }}
+                                </span>
+                            </div>
+
+                            <!-- Settlement Price -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">settlement price</span>
+                                <span class="text-white" style="font-size: 12px;">
+                                    {{ $isSettled ? number_format($signal->target_price, 3) : '-' }}
+                                </span>
+                            </div>
+
+                            <!-- Order Time -->
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted" style="font-size: 12px;">order time</span>
+                                <span class="text-white" style="font-size: 12px;">
+                                    {{ $participant->joined_at->format('Y-m-d H:i:s') }}
+                                </span>
+                            </div>
+
+                            @if (!$isSettled)
+                                <!-- Pending Notice -->
+                                <div class="mt-2 pt-2" style="border-top: 1px solid var(--border-color);">
                                     <small class="text-warning">
                                         <i class="bi bi-info-circle me-1"></i>Waiting for admin to settle this signal
                                     </small>
@@ -138,7 +157,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="p-5 text-center">
+                    <div class="card-dark shadow-sm p-5 text-center">
                         <i class="bi bi-clock-history text-muted" style="font-size: 48px;"></i>
                         <p class="text-muted mt-3 mb-0">No trading history yet</p>
                         <small class="text-muted">Join signals to start trading</small>
@@ -148,7 +167,7 @@
 
             <!-- Pagination -->
             @if ($participants->hasPages())
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center mb-3">
                     {{ $participants->links() }}
                 </div>
             @endif
@@ -160,9 +179,9 @@
                     <div>
                         <h6 class="text-white mb-1" style="font-size: 13px;">About Results</h6>
                         <ul class="small text-muted mb-0 ps-3" style="font-size: 12px;">
-                            <li>P/L shows your profit or loss from the signal</li>
-                            <li>Fee is 1% of your Trade Balance at settlement time</li>
-                            <li>Net Result = P/L - Fee (your actual gain/loss)</li>
+                            <li>CALL = Profit signal | PUT = Loss signal</li>
+                            <li>Profit and loss shows net result (P/L - Fee)</li>
+                            <li>Fee is 1% of your Trade Balance at settlement</li>
                             <li>Win Rate is calculated from settled signals only</li>
                         </ul>
                     </div>
