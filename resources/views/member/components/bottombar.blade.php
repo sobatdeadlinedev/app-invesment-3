@@ -6,7 +6,7 @@
     </a>
     <a href="{{ route('member.invest.index') }}" class="nav-item">
         <i class="bi bi-graph-up d-block fs-5"></i>
-        <span>Investasi</span>
+        <span>Trade</span>
     </a>
     <a href="{{ route('member.team.index') }}" class="nav-item">
         <i class="bi bi-people-fill d-block fs-5"></i>

@@ -151,8 +151,7 @@
                             <div class="alert-info-box mt-3">
                                 <i class="bi bi-info-circle-fill me-2"></i>
                                 <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network TRC20
-                                    dan
-                                    upload bukti transfer</span>
+                                    dan BEP 20. Lalu upload bukti transfer</span>
                             </div>
                         </div>
                     </div>

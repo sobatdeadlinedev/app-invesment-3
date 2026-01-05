@@ -61,7 +61,7 @@
                                 placeholder="Enter amount" value="{{ old('amount') }}" step="0.01" min="10"
                                 {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
                         </div>
-                        <small class="text-muted d-block mt-1">Minimum withdrawal: 10 USDT | Fee: 2%</small>
+                        <small class="text-muted d-block mt-1">Minimum withdrawal: 5 USDT | Fee: 5%</small>
                         @error('amount')
                             <small class="text-danger mt-1 d-block">{{ $message }}</small>
                         @enderror
@@ -120,7 +120,7 @@
                         <span class="text-white fw-bold" id="display-amount">0.00 USDT</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Withdrawal Fee (2%)</span>
+                        <span class="text-muted small">Withdrawal Fee (5%)</span>
                         <span class="text-white fw-bold" id="display-fee">0.00 USDT</span>
                     </div>
                     <hr style="border-color: rgba(255,255,255,0.1);">
@@ -281,7 +281,7 @@
             const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
 
             if (amount > 0) {
-                const fee = amount * 0.02; // 2% fee
+                const fee = amount * 0.05; // 5% fee
                 const total = amount - fee;
 
                 document.getElementById('display-amount').textContent = amount.toFixed(2) + ' USDT';
@@ -307,8 +307,8 @@
                 return;
             }
 
-            if (amount < 10) {
-                alert('Minimum withdrawal amount is 10 USDT');
+            if (amount < 5) {
+                alert('Minimum withdrawal amount is 5 USDT');
                 return;
             }
 

@@ -67,8 +67,8 @@ class WithdrawController extends Controller
             $user = auth()->user();
             $requestedAmount = $request->amount;
 
-            // Calculate withdrawal fee (2%)
-            $withdrawalFee = $requestedAmount * 0.02;
+            // Calculate withdrawal fee (5%)
+            $withdrawalFee = $requestedAmount * 0.05;
             $netAmount = $requestedAmount - $withdrawalFee;
             $totalAmount = $requestedAmount;
 
