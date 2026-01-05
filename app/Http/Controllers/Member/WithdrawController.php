@@ -24,11 +24,11 @@ class WithdrawController extends Controller
 
         $wallets = Wallet::where('user_id', auth()->id())->get();
 
-        // UPDATED - gunakan exchange_balance
+        // FIXED - Changed variable name from $exchangeBalance to $userBalance
         $user = auth()->user();
-        $exchangeBalance = $user->exchange_balance;
+        $userBalance = $user->exchange_balance;
 
-        return view('member.pages.withdraw.index', compact('wallets', 'exchangeBalance'));
+        return view('member.pages.withdraw.index', compact('wallets', 'userBalance'));
     }
 
     /**
@@ -72,7 +72,7 @@ class WithdrawController extends Controller
             $netAmount = $requestedAmount - $withdrawalFee;
             $totalAmount = $requestedAmount;
 
-            // UPDATED - Check exchange balance
+            // Check exchange balance
             if ($user->exchange_balance < $totalAmount) {
                 return redirect()
                     ->back()
@@ -84,14 +84,14 @@ class WithdrawController extends Controller
 
             $reference = Transaction::generateReference('WD');
 
-            // Create transaction - UPDATED: balance_type = 'exchange'
+            // Create transaction - balance_type = 'exchange'
             $transaction = Transaction::create([
                 'user_id' => auth()->id(),
                 'reference' => $reference,
                 'amount' => $netAmount,
                 'total_amount' => $totalAmount,
                 'type' => 'withdrawal',
-                'balance_type' => 'exchange', // NEW - withdrawal dari exchange
+                'balance_type' => 'exchange',
                 'wallet_id' => $request->wallet_id,
                 'withdrawal_fee' => $withdrawalFee,
                 'source_user_id' => null,
@@ -101,7 +101,7 @@ class WithdrawController extends Controller
                 'approved_by' => null,
             ]);
 
-            // UPDATED - Deduct exchange balance immediately (pending state)
+            // Deduct exchange balance immediately (pending state)
             $user->deductExchangeBalance($totalAmount);
 
             DB::commit();
@@ -165,7 +165,7 @@ class WithdrawController extends Controller
 
             DB::beginTransaction();
 
-            // UPDATED - Return balance to exchange
+            // Return balance to exchange
             $user = auth()->user();
             $user->addExchangeBalance($transaction->total_amount);
 
