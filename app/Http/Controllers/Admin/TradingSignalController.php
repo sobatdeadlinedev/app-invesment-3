@@ -287,29 +287,45 @@ class TradingSignalController extends Controller
                 $betAmount = $participant->bet_amount;
                 $originalJoinedAt = $participant->joined_at;
 
-                Log::info('BEFORE UPDATE Participant', [
+                Log::info('START - joined_at', [
                     'participant_id' => $participant->id,
-                    'user_id' => $user->id,
-                    'bet_amount' => $betAmount,
-                    'joined_at_BEFORE' => $originalJoinedAt,
-                    'status_BEFORE' => $participant->status,
-                    'locked_balance_before' => $user->locked_balance,
-                    'trade_balance_before' => $user->trade_balance,
+                    'joined_at' => $participant->fresh()->joined_at,
                 ]);
 
                 // STEP 1: Unlock balance
                 $user->unlockBalance($betAmount);
+                Log::info('AFTER unlockBalance - joined_at', [
+                    'participant_id' => $participant->id,
+                    'joined_at' => $participant->fresh()->joined_at,
+                ]);
 
                 // STEP 2: Calculate reward
                 $reward = $betAmount * ($signal->rate_of_return / 100);
+                Log::info('AFTER calculate reward - joined_at', [
+                    'participant_id' => $participant->id,
+                    'joined_at' => $participant->fresh()->joined_at,
+                ]);
 
                 // STEP 3: Add reward
                 $user->addTradeBalance($reward);
+                Log::info('AFTER addTradeBalance - joined_at', [
+                    'participant_id' => $participant->id,
+                    'joined_at' => $participant->fresh()->joined_at,
+                ]);
 
                 // STEP 4: Add volume
                 $user->addAchievedVolume($betAmount);
+                Log::info('AFTER addAchievedVolume - joined_at', [
+                    'participant_id' => $participant->id,
+                    'joined_at' => $participant->fresh()->joined_at,
+                ]);
 
-                // STEP 5: Update participant using RAW QUERY (BYPASS MODEL EVENTS)
+                // STEP 5: Update participant
+                Log::info('BEFORE DB update - joined_at', [
+                    'participant_id' => $participant->id,
+                    'joined_at' => $participant->fresh()->joined_at,
+                ]);
+
                 DB::table('signal_participants')
                     ->where('id', $participant->id)
                     ->update([
@@ -318,24 +334,35 @@ class TradingSignalController extends Controller
                         'status' => 'settled',
                         'settled_at' => now(),
                         'updated_at' => now(),
-                        // joined_at TIDAK DISENTUH - tetap original
                     ]);
+
+                Log::info('AFTER DB update - joined_at', [
+                    'participant_id' => $participant->id,
+                    'joined_at' => $participant->fresh()->joined_at,
+                ]);
+
+                // STEP 6: Restore joined_at
+                DB::table('signal_participants')
+                    ->where('id', $participant->id)
+                    ->update([
+                        'joined_at' => $originalJoinedAt,
+                    ]);
+
+                Log::info('AFTER restore joined_at', [
+                    'participant_id' => $participant->id,
+                    'joined_at' => $participant->fresh()->joined_at,
+                    'original_joined_at' => $originalJoinedAt,
+                ]);
 
                 $settledCount++;
                 $totalRewards += $reward;
 
-                // Refresh participant untuk log
                 $participant->refresh();
 
-                Log::info('AFTER UPDATE Participant', [
+                Log::info('FINAL - joined_at', [
                     'participant_id' => $participant->id,
-                    'user_id' => $user->id,
-                    'joined_at_AFTER' => $participant->joined_at,
-                    'status_AFTER' => $participant->status,
-                    'settled_at_AFTER' => $participant->settled_at,
-                    'reward' => $reward,
-                    'trade_balance_after' => $user->fresh()->trade_balance,
-                    'locked_balance_after' => $user->fresh()->locked_balance,
+                    'joined_at' => $participant->joined_at,
+                    'status' => $participant->status,
                 ]);
             }
 
@@ -348,7 +375,6 @@ class TradingSignalController extends Controller
                 'signal_id' => $signal->id,
                 'settled_count' => $settledCount,
                 'total_rewards' => $totalRewards,
-                'closed_at' => $signal->fresh()->closed_at,
             ]);
 
             return redirect()
