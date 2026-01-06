@@ -33,7 +33,7 @@
             </div>
 
             <!-- Level Statistics -->
-            @if ($levelStats->count() > 0)
+            {{-- @if ($levelStats->count() > 0)
                 <div class="card-dark shadow-sm p-3 mb-3">
                     <h6 class="text-white mb-3">Statistik Per Level</h6>
                     <div class="d-flex gap-2 overflow-auto pb-2">
@@ -46,7 +46,7 @@
                         @endforeach
                     </div>
                 </div>
-            @endif
+            @endif --}}
 
             <!-- Referral Code & Link Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
