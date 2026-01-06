@@ -61,10 +61,11 @@
                                 placeholder="Enter amount" value="{{ old('amount') }}" step="0.01" min="10"
                                 {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
                         </div>
-                        <small class="text-muted d-block mt-1">Minimum withdrawal: 5 USDT | Fee: 5%</small>
-                        @error('amount')
-                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
-                        @enderror
+                        <small class="text-muted d-block mt-1">Minimum withdrawal: 5 USDT | Fee: 5 USDT (< 100 USDT) or 5%
+                                (≥ 100 USDT)</small>
+                                @error('amount')
+                                    <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                                @enderror
                     </div>
                     <div class="mb-2">
                         <label class="text-muted small mb-2 d-block">Or choose quick amount:</label>
@@ -120,7 +121,7 @@
                         <span class="text-white fw-bold" id="display-amount">0.00 USDT</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Withdrawal Fee (5%)</span>
+                        <span class="text-muted small">Withdrawal Fee</span>
                         <span class="text-white fw-bold" id="display-fee">0.00 USDT</span>
                     </div>
                     <hr style="border-color: rgba(255,255,255,0.1);">
@@ -281,7 +282,14 @@
             const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
 
             if (amount > 0) {
-                const fee = amount * 0.05; // 5% fee
+                // NEW FEE LOGIC
+                let fee;
+                if (amount < 100) {
+                    fee = 5; // Fixed 5 USDT for amounts below 100
+                } else {
+                    fee = amount * 0.05; // 5% for amounts 100 and above
+                }
+
                 const total = amount - fee;
 
                 document.getElementById('display-amount').textContent = amount.toFixed(2) + ' USDT';
@@ -322,8 +330,20 @@
                 return;
             }
 
-            const fee = amount * 0.02;
+            // NEW FEE CALCULATION
+            let fee;
+            if (amount < 100) {
+                fee = 5; // Fixed 5 USDT
+            } else {
+                fee = amount * 0.05; // 5%
+            }
+
             const total = amount - fee;
+
+            if (total <= 0) {
+                alert('Amount too small. After fee deduction, you will receive 0 USDT or less.');
+                return;
+            }
 
             // Confirm before submit
             if (confirm('Confirm withdrawal?\n\nAmount: ' + amount.toFixed(2) + ' USDT\nFee: ' + fee.toFixed(2) +

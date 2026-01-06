@@ -24,11 +24,22 @@ class WithdrawController extends Controller
 
         $wallets = Wallet::where('user_id', auth()->id())->get();
 
-        // FIXED - Changed variable name from $exchangeBalance to $userBalance
         $user = auth()->user();
         $userBalance = $user->exchange_balance;
 
         return view('member.pages.withdraw.index', compact('wallets', 'userBalance'));
+    }
+
+    /**
+     * Calculate withdrawal fee based on amount
+     */
+    private function calculateWithdrawalFee($amount)
+    {
+        if ($amount < 100) {
+            return 5; // Fixed 5 USDT for withdrawals below 100
+        } else {
+            return $amount * 0.05; // 5% for withdrawals 100 and above
+        }
     }
 
     /**
@@ -43,11 +54,11 @@ class WithdrawController extends Controller
         }
 
         $request->validate([
-            'amount' => 'required|numeric|min:10',
+            'amount' => 'required|numeric|min:5',
             'wallet_id' => 'required|exists:wallets,id',
         ], [
             'amount.required' => 'Jumlah withdrawal harus diisi',
-            'amount.min' => 'Minimal withdrawal adalah 10 USDT',
+            'amount.min' => 'Minimal withdrawal adalah 5 USDT',
             'wallet_id.required' => 'Wallet account harus dipilih',
             'wallet_id.exists' => 'Wallet account tidak valid',
         ]);
@@ -67,10 +78,18 @@ class WithdrawController extends Controller
             $user = auth()->user();
             $requestedAmount = $request->amount;
 
-            // Calculate withdrawal fee (5%)
-            $withdrawalFee = $requestedAmount * 0.05;
+            // Calculate withdrawal fee based on new rules
+            $withdrawalFee = $this->calculateWithdrawalFee($requestedAmount);
             $netAmount = $requestedAmount - $withdrawalFee;
             $totalAmount = $requestedAmount;
+
+            // Check if net amount is positive
+            if ($netAmount <= 0) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'Jumlah withdrawal terlalu kecil. Setelah dikurangi fee, Anda akan menerima 0 USDT atau kurang.');
+            }
 
             // Check exchange balance
             if ($user->exchange_balance < $totalAmount) {
@@ -108,7 +127,7 @@ class WithdrawController extends Controller
 
             return redirect()
                 ->route('member.withdraw.history')
-                ->with('success', 'Withdrawal request submitted successfully! Reference: ' . $reference . '. You will receive: ' . number_format($netAmount, 2) . ' USDT');
+                ->with('success', 'Withdrawal request submitted successfully! Reference: ' . $reference . '. Fee: ' . number_format($withdrawalFee, 2) . ' USDT. You will receive: ' . number_format($netAmount, 2) . ' USDT');
         } catch (\Exception $e) {
             DB::rollBack();
 
