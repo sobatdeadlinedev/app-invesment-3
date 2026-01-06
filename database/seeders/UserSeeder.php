@@ -11,11 +11,11 @@ class UserSeeder extends Seeder
     {
         // Create admin user
         $admin = User::create([
-            'name' => 'Admin User',
-            'username' => 'admin',
+            'name' => 'admin44',
+            'username' => 'admin44',
             'phone' => '081234567890',
             'email' => 'admin@example.com',
-            'password' => bcrypt('password123'),
+            'password' => bcrypt('4dm1n007'),
             'is_verified' => true,
         ]);
         $admin->assignRole('admin');
