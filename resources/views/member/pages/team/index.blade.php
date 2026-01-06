@@ -3,20 +3,52 @@
     <!-- Scrollable Content Area -->
     <div class="scrollable-content">
         <div class="content-section">
-            <!-- Team Count Card -->
-            <div class="card-dark shadow-sm p-3 mb-3">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <p class="text-muted mb-1 small">Total Team Member</p>
-                        <h2 class="text-gold mb-0 fw-bold">{{ $totalTeam }}</h2>
+            <!-- Team Stats Cards Row -->
+            <div class="row g-2 mb-3">
+                <!-- Total Network -->
+                <div class="col-6">
+                    <div class="card-dark shadow-sm p-3 h-100">
+                        <div class="text-center">
+                            <div class="team-icon-wrapper mb-2">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <p class="text-muted mb-1 small">Total Network</p>
+                            <h3 class="text-gold mb-0 fw-bold">{{ $totalTeam }}</h3>
+                        </div>
                     </div>
-                    <div class="team-icon-wrapper">
-                        <i class="bi bi-people-fill"></i>
+                </div>
+
+                <!-- Direct Team -->
+                <div class="col-6">
+                    <div class="card-dark shadow-sm p-3 h-100">
+                        <div class="text-center">
+                            <div class="team-icon-wrapper mb-2">
+                                <i class="bi bi-person-plus-fill"></i>
+                            </div>
+                            <p class="text-muted mb-1 small">Direct Team</p>
+                            <h3 class="text-info mb-0 fw-bold">{{ $directTeam }}</h3>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 2: Referral Code & Link -->
+            <!-- Level Statistics -->
+            @if ($levelStats->count() > 0)
+                <div class="card-dark shadow-sm p-3 mb-3">
+                    <h6 class="text-white mb-3">Statistik Per Level</h6>
+                    <div class="d-flex gap-2 overflow-auto pb-2">
+                        @foreach ($levelStats as $level => $stats)
+                            <div class="level-stat-card">
+                                <div class="level-badge level-{{ $level }}">L{{ $level }}</div>
+                                <div class="level-count">{{ $stats['count'] }}</div>
+                                <div class="level-label">Member</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <!-- Referral Code & Link Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center gap-2">
@@ -47,35 +79,71 @@
                 </div>
             </div>
 
+            <!-- Level Filter Tabs -->
+            @if ($totalTeam > 0)
+                <div class="card-dark shadow-sm p-2 mb-3">
+                    <div class="d-flex gap-2 overflow-auto">
+                        <button class="filter-tab active" onclick="filterLevel('all')">
+                            <i class="bi bi-grid-fill"></i> Semua ({{ $totalTeam }})
+                        </button>
+                        @foreach ($levelStats as $level => $stats)
+                            <button class="filter-tab" onclick="filterLevel({{ $level }})">
+                                L{{ $level }} ({{ $stats['count'] }})
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <!-- Team Members List -->
             <div class="card-dark shadow-sm p-0 mb-3">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
                     <h6 class="text-white mb-0">Daftar Team Member</h6>
                 </div>
 
-                @forelse($teamMembers as $member)
+                @forelse($teamMembers->sortBy('level') as $member)
                     <!-- Member Item -->
-                    <div class="team-member-item">
-                        <div class="d-flex align-items-center gap-3">
+                    <div class="team-member-item" data-level="{{ $member->level }}">
+                        <div class="d-flex align-items-start gap-3">
+                            <!-- Level Badge -->
+                            <div class="level-badge-vertical level-{{ $member->level }}">
+                                <div class="level-text">L{{ $member->level }}</div>
+                            </div>
+
                             <div class="team-avatar">
                                 <i class="bi bi-person-circle"></i>
                             </div>
+
                             <div class="flex-grow-1">
-                                <div class="text-white fw-bold mb-1" style="font-size: 14px;">{{ $member->username }}</div>
-                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <div class="text-white fw-bold" style="font-size: 14px;">
+                                        {{ $member->username }}
+                                    </div>
+                                </div>
+
+                                <!-- Info Row -->
+                                <div class="d-flex align-items-center gap-3 flex-wrap mb-1">
                                     <div class="d-flex align-items-center gap-1">
                                         <i class="bi bi-telephone-fill text-muted" style="font-size: 11px;"></i>
                                         <small class="text-muted">{{ $member->phone }}</small>
                                     </div>
                                 </div>
+
+                                <!-- Referrer Info -->
+                                @if ($member->level > 1)
+                                    <div class="referrer-info mb-1">
+                                        <i class="bi bi-arrow-return-right"></i>
+                                        <small>Direferral oleh: <span
+                                                class="text-warning">{{ $member->referrer_name }}</span></small>
+                                    </div>
+                                @endif
+
+                                <!-- Join Date -->
                                 <small class="text-muted" style="font-size: 11px;">
                                     <i class="bi bi-calendar3"></i>
-                                    Bergabung {{ $member->created_at->diffForHumans() }}
+                                    Bergabung {{ \Carbon\Carbon::parse($member->created_at)->diffForHumans() }}
                                 </small>
                             </div>
-                            {{-- <div class="team-status active">
-                                <i class="bi bi-circle-fill"></i>
-                            </div> --}}
                         </div>
                     </div>
                 @empty
@@ -107,6 +175,144 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             flex: 1;
+        }
+
+        /* Level Statistics Cards */
+        .level-stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+
+        .level-badge {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        .level-badge.level-1 {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .level-badge.level-2 {
+            background: rgba(23, 162, 184, 0.2);
+            color: #17a2b8;
+        }
+
+        .level-badge.level-3 {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .level-badge.level-4,
+        .level-badge.level-5,
+        .level-badge.level-6 {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+        }
+
+        .level-count {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+
+        .level-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Filter Tabs */
+        .filter-tab {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .filter-tab.active {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+        }
+
+        .filter-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Level Badge Vertical */
+        .level-badge-vertical {
+            padding: 6px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            min-width: 36px;
+        }
+
+        .level-badge-vertical.level-1 {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .level-badge-vertical.level-2 {
+            background: rgba(23, 162, 184, 0.2);
+            color: #17a2b8;
+        }
+
+        .level-badge-vertical.level-3 {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .level-badge-vertical.level-4,
+        .level-badge-vertical.level-5,
+        .level-badge-vertical.level-6 {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+        }
+
+        .level-text {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Referrer Info */
+        .referrer-info {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 2px solid #ffc107;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .referrer-info i {
+            color: #ffc107;
+            margin-right: 4px;
+        }
+
+        /* Team Member Item Enhancement */
+        .team-member-item {
+            transition: all 0.3s;
+        }
+
+        .team-member-item.hidden {
+            display: none;
         }
     </style>
 
@@ -174,6 +380,32 @@
                 showToast('Gagal menyalin link referral', 'error');
                 console.error('Error copying:', err);
             });
+        }
+
+        // Filter by Level
+        function filterLevel(level) {
+            const allMembers = document.querySelectorAll('.team-member-item');
+            const allTabs = document.querySelectorAll('.filter-tab');
+
+            // Update active tab
+            allTabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter members
+            if (level === 'all') {
+                allMembers.forEach(member => {
+                    member.classList.remove('hidden');
+                });
+            } else {
+                allMembers.forEach(member => {
+                    const memberLevel = parseInt(member.getAttribute('data-level'));
+                    if (memberLevel === level) {
+                        member.classList.remove('hidden');
+                    } else {
+                        member.classList.add('hidden');
+                    }
+                });
+            }
         }
     </script>
 @endsection
