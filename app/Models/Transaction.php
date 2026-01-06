@@ -1,179 +1,232 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Models;
 
-use App\Http\Controllers\Controller;
-use App\Models\Transaction;
-use App\Models\ReferralUsage;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class DepositController extends Controller
+class Transaction extends Model
 {
-    public function index()
-    {
-        $deposits = Transaction::with(['user'])
-            ->deposit()
-            ->latest()
-            ->paginate(10);
+    use HasFactory;
 
-        return view('admin.pages.deposit.index', compact('deposits'));
+    protected $fillable = [
+        'user_id',
+        'reference',
+        'amount',
+        'total_amount',
+        'type',
+        'balance_type', // NEW
+        'wallet_id',
+        'withdrawal_fee',
+        'source_user_id',
+        'status',
+        'payment_method',
+        'payment_proof',
+        'approved_by',
+    ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+        'withdrawal_fee' => 'decimal:2',
+    ];
+
+    // ==================== RELATIONSHIPS ====================
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
-    public function show($id)
+    public function wallet()
     {
-        $deposit = Transaction::with(['user', 'approver'])
-            ->deposit()
-            ->findOrFail($id);
-
-        return view('admin.pages.deposit.detail', compact('deposit'));
+        return $this->belongsTo(Wallet::class);
     }
 
-    public function approve($id)
+    public function sourceUser()
     {
-        $deposit = Transaction::deposit()->findOrFail($id);
-
-        if ($deposit->status !== 'pending') {
-            return redirect()->route('admin.deposit.index')
-                ->with('error', 'This deposit has already been processed.');
-        }
-
-        DB::beginTransaction();
-        try {
-            // Update deposit status
-            $deposit->update([
-                'status' => 'approved',
-                'approved_by' => auth()->id(),
-            ]);
-
-            // Add to exchange balance
-            $user = $deposit->user;
-            $user->addExchangeBalance($deposit->total_amount);
-
-            // Check if this is first deposit
-            $previousApprovedDeposits = Transaction::where('user_id', $deposit->user_id)
-                ->where('type', 'deposit')
-                ->where('status', 'approved')
-                ->where('id', '!=', $deposit->id)
-                ->count();
-
-            $isFirstDeposit = ($previousApprovedDeposits === 0);
-
-            // Give 5% bonus for first deposit
-            if ($isFirstDeposit) {
-                $bonusAmount = $deposit->total_amount * 0.05;
-
-                // Add bonus to exchange balance
-                $user->addExchangeBalance($bonusAmount);
-
-                // Create bonus transaction record
-                Transaction::create([
-                    'user_id' => $user->id,
-                    'source_user_id' => null,
-                    'reference' => Transaction::generateReference('BONUS'),
-                    'amount' => $bonusAmount,
-                    'total_amount' => $bonusAmount,
-                    'type' => 'deposit',
-                    'balance_type' => 'exchange',
-                    'status' => 'approved',
-                    'approved_by' => auth()->id(),
-                ]);
-            }
-
-            // Process referral commissions ONLY for first deposit
-            if ($isFirstDeposit) {
-                $this->processReferralCommissions($deposit);
-            }
-
-            DB::commit();
-
-            $message = $isFirstDeposit
-                ? 'Deposit has been approved successfully and added to Exchange Balance. Bonus 5% has been credited!'
-                : 'Deposit has been approved successfully and added to Exchange Balance.';
-
-            return redirect()->route('admin.deposit.index')
-                ->with('success', $message);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return redirect()->route('admin.deposit.index')
-                ->with('error', 'Failed to approve deposit: ' . $e->getMessage());
-        }
+        return $this->belongsTo(User::class, 'source_user_id');
     }
 
-    public function reject($id)
+    public function approver()
     {
-        $deposit = Transaction::deposit()->findOrFail($id);
-
-        if ($deposit->status !== 'pending') {
-            return redirect()->route('admin.deposit.index')
-                ->with('error', 'This deposit has already been processed.');
-        }
-
-        $deposit->update([
-            'status' => 'rejected',
-            'approved_by' => auth()->id(),
-        ]);
-
-        return redirect()->route('admin.deposit.index')
-            ->with('success', 'Deposit has been rejected.');
+        return $this->belongsTo(User::class, 'approved_by');
     }
+
+    // ==================== SCOPES ====================
+
+    public function scopeDeposit($query)
+    {
+        return $query->where('type', 'deposit');
+    }
+
+    public function scopeWithdrawal($query)
+    {
+        return $query->where('type', 'withdrawal');
+    }
+
+    public function scopeCommission($query)
+    {
+        return $query->where('type', 'commission');
+    }
+
+    // NEW SCOPES
+    public function scopeExchange($query)
+    {
+        return $query->where('balance_type', 'exchange');
+    }
+
+    public function scopeTrade($query)
+    {
+        return $query->where('balance_type', 'trade');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'completed');
+    }
+
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    // ==================== HELPER METHODS ====================
 
     /**
-     * Process referral commissions - UPDATED to add to exchange balance
+     * DEPRECATED - Gunakan User->exchange_balance atau User->trade_balance
+     * Kept for backward compatibility
      */
-    private function processReferralCommissions(Transaction $deposit)
+    public static function getUserBalance($userId)
     {
-        $referralUsage = ReferralUsage::where('referred_id', $deposit->user_id)->first();
-
-        if (!$referralUsage) {
-            return;
-        }
-
-        $depositAmount = $deposit->total_amount;
-
-        // Level 1: 5%
-        $level1Commission = $depositAmount * 0.05;
-        $this->createCommissionTransaction(
-            $referralUsage->referrer_id,
-            $deposit->user_id,
-            $level1Commission,
-            'Level 1 Commission - First Deposit'
-        );
-
-        // Level 2: 2%
-        $level2ReferralUsage = ReferralUsage::where('referred_id', $referralUsage->referrer_id)->first();
-
-        if ($level2ReferralUsage) {
-            $level2Commission = $depositAmount * 0.02;
-            $this->createCommissionTransaction(
-                $level2ReferralUsage->referrer_id,
-                $deposit->user_id,
-                $level2Commission,
-                'Level 2 Commission - First Deposit'
-            );
-        }
-    }
-
-    /**
-     * Create commission transaction - UPDATED to add to exchange balance
-     */
-    private function createCommissionTransaction($userId, $sourceUserId, $amount, $note = '')
-    {
-        // Add commission to exchange balance
         $user = \App\Models\User::find($userId);
-        $user->addExchangeBalance($amount);
+        return $user ? $user->exchange_balance : 0;
+    }
 
-        return Transaction::create([
-            'user_id' => $userId,
-            'source_user_id' => $sourceUserId,
-            'reference' => Transaction::generateReference('CM'),
-            'amount' => $amount,
-            'total_amount' => $amount,
-            'type' => 'commission',
-            'balance_type' => 'exchange',
-            'status' => 'approved',
-            'approved_by' => auth()->id(),
-        ]);
+    public static function getUserBalanceBreakdown($userId)
+    {
+        $user = \App\Models\User::find($userId);
+
+        if (!$user) {
+            return [
+                'exchange_balance' => 0,
+                'trade_balance' => 0,
+                'locked_balance' => 0,
+                'available_trade_balance' => 0,
+                'total_balance' => 0,
+                'total_deposits' => 0,
+                'total_withdrawals' => 0,
+                'total_withdrawals_net' => 0,
+                'total_withdrawal_fees' => 0,
+                'total_commissions' => 0,
+            ];
+        }
+
+        // Calculate totals from transactions (for history/audit)
+        $totalDeposits = self::forUser($userId)
+            ->deposit()
+            ->approved()
+            ->sum('total_amount');
+
+        $totalWithdrawals = self::forUser($userId)
+            ->withdrawal()
+            ->whereIn('status', ['approved', 'pending'])
+            ->sum('total_amount');
+
+        $totalWithdrawalsNet = self::forUser($userId)
+            ->withdrawal()
+            ->whereIn('status', ['approved', 'pending'])
+            ->sum('amount');
+
+        $totalWithdrawalFees = self::forUser($userId)
+            ->withdrawal()
+            ->whereIn('status', ['approved', 'pending'])
+            ->sum('withdrawal_fee');
+
+        $totalCommissions = self::forUser($userId)
+            ->commission()
+            ->approved()
+            ->sum('total_amount');
+
+        return [
+            // Current balances from user table
+            'exchange_balance' => $user->exchange_balance,
+            'trade_balance' => $user->trade_balance,
+            'locked_balance' => $user->locked_balance,
+            'available_trade_balance' => $user->getAvailableTradeBalance(),
+            'total_balance' => $user->exchange_balance + $user->trade_balance,
+
+            // Transaction history totals
+            'total_deposits' => $totalDeposits,
+            'total_withdrawals' => $totalWithdrawals,
+            'total_withdrawals_net' => $totalWithdrawalsNet,
+            'total_withdrawal_fees' => $totalWithdrawalFees,
+            'total_commissions' => $totalCommissions,
+
+            // Trading volume
+            'target_volume' => $user->target_volume,
+            'achieved_volume' => $user->achieved_volume,
+            'remaining_volume' => $user->getRemainingVolume(),
+        ];
+    }
+    public static function hasSufficientBalance($userId, $totalAmount)
+    {
+        $user = \App\Models\User::find($userId);
+        return $user && $user->exchange_balance >= $totalAmount;
+    }
+
+    public static function generateReference($prefix = 'TXN')
+    {
+        do {
+            $reference = strtoupper($prefix) . '-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+        } while (self::where('reference', $reference)->exists());
+
+        return $reference;
+    }
+
+    // ==================== ATTRIBUTES ====================
+
+    public function getStatusColorAttribute()
+    {
+        return match ($this->status) {
+            'pending' => 'warning',
+            'approved' => 'success',
+            'completed' => 'success',
+            'rejected' => 'danger',
+            'cancelled' => 'secondary',
+            default => 'secondary',
+        };
+    }
+
+    public function getTypeColorAttribute()
+    {
+        return match ($this->type) {
+            'deposit' => 'success',
+            'withdrawal' => 'danger',
+            'commission' => 'info',
+            default => 'secondary',
+        };
+    }
+
+    public function getFormattedAmountAttribute()
+    {
+        $sign = $this->type === 'withdrawal' ? '-' : '+';
+        return $sign . ' ' . number_format($this->amount, 2);
+    }
+
+    public function getFormattedTotalAmountAttribute()
+    {
+        $sign = $this->type === 'withdrawal' ? '-' : '+';
+        return $sign . ' ' . number_format($this->total_amount, 2);
     }
 }
