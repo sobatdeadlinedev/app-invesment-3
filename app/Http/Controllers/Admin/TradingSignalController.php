@@ -286,12 +286,14 @@ class TradingSignalController extends Controller
                 $user = $participant->user;
                 $betAmount = $participant->bet_amount;
 
-                // ========== LOG SEBELUM UPDATE ==========
+                // ========== SIMPAN JOINED_AT ORIGINAL ==========
+                $originalJoinedAt = $participant->joined_at; // 👈 TAMBAHKAN INI
+
                 Log::info('BEFORE UPDATE Participant', [
                     'participant_id' => $participant->id,
                     'user_id' => $user->id,
                     'bet_amount' => $betAmount,
-                    'joined_at_BEFORE' => $participant->joined_at,  // 👈 CEK INI
+                    'joined_at_BEFORE' => $originalJoinedAt, // 👈 UPDATE INI
                     'status_BEFORE' => $participant->status,
                     'locked_balance_before' => $user->locked_balance,
                     'trade_balance_before' => $user->trade_balance,
@@ -309,34 +311,33 @@ class TradingSignalController extends Controller
                 // STEP 4: Add volume
                 $user->addAchievedVolume($betAmount);
 
-                // STEP 5: Update participant
+                // STEP 5: Update participant - FORCE PRESERVE joined_at
                 $participant->update([
                     'profit_loss' => $reward,
                     'fee_amount' => 0,
                     'status' => 'settled',
                     'settled_at' => now(),
+                    'joined_at' => $originalJoinedAt, // 👈 TAMBAHKAN INI
                 ]);
 
-                // ========== LOG SETELAH UPDATE ==========
+                $settledCount++;
+                $totalRewards += $reward;
+
                 $participantFresh = $participant->fresh();
                 Log::info('AFTER UPDATE Participant', [
                     'participant_id' => $participantFresh->id,
                     'user_id' => $user->id,
-                    'joined_at_AFTER' => $participantFresh->joined_at,  // 👈 CEK INI
+                    'joined_at_AFTER' => $participantFresh->joined_at,
                     'status_AFTER' => $participantFresh->status,
                     'settled_at_AFTER' => $participantFresh->settled_at,
                     'reward' => $reward,
                     'trade_balance_after' => $user->fresh()->trade_balance,
                     'locked_balance_after' => $user->fresh()->locked_balance,
-                    // Tambahan: cek semua attributes yang diubah
                     'dirty_attributes' => $participant->getDirty(),
                 ]);
-
-                $settledCount++;
-                $totalRewards += $reward;
             }
 
-            // Mark signal as settled - closed_at akan diset di dalam method ini
+            // Mark signal as settled
             $signal->markAsSettled();
 
             DB::commit();
