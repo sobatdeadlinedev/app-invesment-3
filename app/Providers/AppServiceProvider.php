@@ -15,6 +15,9 @@ class AppServiceProvider extends ServiceProvider
             'member.components.header',
             'auth.pages.login.index',
             'auth.pages.register.index',
+            'auth.pages.forget-password.index',
+            'auth.pages.forget-password.reset-password',
+            'auth.pages.forget-password.verify-otp',
         ], ConfigComposer::class);
     }
 }

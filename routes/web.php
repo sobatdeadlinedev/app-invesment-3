@@ -5,30 +5,31 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
 // Admin Controllers
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\WalletController as AdminWalletController;
-use App\Http\Controllers\Admin\TeamController as AdminTeamController;
-use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
-use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
-use App\Http\Controllers\Admin\DepositController as AdminDepositController;
-use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController;
-use App\Http\Controllers\Admin\BalanceController as AdminBalanceController;
-use App\Http\Controllers\Admin\ConfigController as AdminConfigController;
-use App\Http\Controllers\Admin\VerificationController as AdminVerificationController;
 use App\Http\Controllers\Admin\TradingSignalController;
+use App\Http\Controllers\Auth\ForgetPasswordController;
+use App\Http\Controllers\Member\BalanceTransferController;
+use App\Http\Controllers\Admin\TeamController as AdminTeamController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Member\TeamController as MemberTeamController;
+use App\Http\Controllers\Admin\ConfigController as AdminConfigController;
+use App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Admin\BalanceController as AdminBalanceController;
+use App\Http\Controllers\Admin\DepositController as AdminDepositController;
+use App\Http\Controllers\Member\InvestController as MemberInvestController;
+use App\Http\Controllers\Member\SignalController as MemberSignalController;
 
 // Member Controllers
-use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
-use App\Http\Controllers\Member\InvestController as MemberInvestController;
-use App\Http\Controllers\Member\TeamController as MemberTeamController;
-use App\Http\Controllers\Member\ProfileController as MemberProfileController;
-use App\Http\Controllers\Member\DepositController as MemberDepositController;
-use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 use App\Http\Controllers\Member\WalletController as MemberWalletController;
+use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
+use App\Http\Controllers\Member\DepositController as MemberDepositController;
+use App\Http\Controllers\Member\ProfileController as MemberProfileController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
+use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
+use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController;
+use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Admin\VerificationController as AdminVerificationController;
 use App\Http\Controllers\Member\VerificationController as MemberVerificationController;
-use App\Http\Controllers\Member\BalanceTransferController;
-use App\Http\Controllers\Member\SignalController as MemberSignalController;
 
 // Root Route - Auto redirect based on auth status
 Route::get('/', function () {
@@ -49,6 +50,14 @@ Route::middleware('guest')->group(function () {
     // Register
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
+
+    // Forgot password
+    Route::get('/forget-password', [ForgetPasswordController::class, 'showForgetPasswordForm'])->name('forget-password');
+    Route::post('/forget-password', [ForgetPasswordController::class, 'sendOtp'])->name('forget-password.send-otp');
+    Route::get('/verify-otp', [ForgetPasswordController::class, 'showVerifyOtpForm'])->name('verify-otp');
+    Route::post('/verify-otp', [ForgetPasswordController::class, 'verifyOtp'])->name('verify-otp.post');
+    Route::get('/reset-password', [ForgetPasswordController::class, 'showResetPasswordForm'])->name('reset-password');
+    Route::post('/reset-password', [ForgetPasswordController::class, 'resetPassword'])->name('reset-password.post');
 });
 
 // Logout Route
