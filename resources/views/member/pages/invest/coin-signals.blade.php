@@ -73,6 +73,11 @@
                 </div>
 
                 @forelse($openSignals as $signal)
+                    @php
+                        // Check if signal is pending
+                        $isPending = $signal->result === 'pending' || $signal->result === null;
+                    @endphp
+
                     <div class="coin-list-item">
                         <div class="d-flex flex-column gap-2">
                             <div class="d-flex align-items-start justify-content-between">
@@ -91,20 +96,26 @@
                             </div>
 
                             <div class="row g-2">
-                                @if ($signal->entry_price)
-                                    <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 10px;">Opening Price</small>
-                                        <small class="text-white fw-bold">$
-                                            {{ number_format($signal->entry_price, 2) }}</small>
-                                    </div>
-                                @endif
-                                @if ($signal->target_price)
-                                    <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 10px;">Settlement Price</small>
-                                        <small class="text-gold fw-bold">$
-                                            {{ number_format($signal->target_price, 2) }}</small>
-                                    </div>
-                                @endif
+                                <div class="col-6">
+                                    <small class="text-muted d-block" style="font-size: 10px;">Opening Price</small>
+                                    <small class="text-white fw-bold">
+                                        @if ($isPending || !$signal->entry_price)
+                                            ~
+                                        @else
+                                            $ {{ number_format($signal->entry_price, 2) }}
+                                        @endif
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block" style="font-size: 10px;">Settlement Price</small>
+                                    <small class="text-gold fw-bold">
+                                        @if ($isPending || !$signal->target_price)
+                                            ~
+                                        @else
+                                            $ {{ number_format($signal->target_price, 2) }}
+                                        @endif
+                                    </small>
+                                </div>
                             </div>
 
                             <div class="d-flex align-items-center justify-content-between pt-2"
