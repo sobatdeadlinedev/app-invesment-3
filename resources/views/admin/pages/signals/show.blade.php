@@ -383,8 +383,8 @@
                             <label class="form-label required">Result</label>
                             <select name="result" class="form-select" required>
                                 <option value="">Select Result</option>
-                                <option value="win">WIN</option>
-                                <option value="loss">LOSS</option>
+                                <option value="win">Call</option>
+                                <option value="loss">Put</option>
                             </select>
                         </div>
                         <div class="mb-5">

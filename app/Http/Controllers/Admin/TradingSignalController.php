@@ -130,57 +130,149 @@ class TradingSignalController extends Controller
     }
 
     /**
-     * Close signal - NEW: call/put instead of win/loss
+     * Close signal - WITH EXTENSIVE DEBUGGING
      */
     public function close(Request $request, $id)
     {
-        $signal = TradingSignal::findOrFail($id);
-
-        if ($signal->status !== 'open') {
-            return redirect()
-                ->route('admin.signals.index')
-                ->with('error', 'Signal is not open or already processed.');
-        }
-
-        $request->validate([
-            'result' => 'required|in:call,put',
-            'rate_of_return' => 'required|numeric|min:0|max:100',
-        ], [
-            'result.required' => 'Result (Call/Put) must be selected',
-            'result.in' => 'Result must be either Call or Put',
-            'rate_of_return.required' => 'Win rate must be filled',
-            'rate_of_return.min' => 'Win rate minimum 0%',
-            'rate_of_return.max' => 'Win rate maximum 100%',
+        // DEBUG: Log request awal
+        Log::info('=== CLOSE SIGNAL START ===', [
+            'signal_id' => $id,
+            'request_data' => $request->all(),
+            'user_id' => auth()->id(),
+            'timestamp' => now(),
         ]);
 
         try {
+            // Step 1: Find signal
+            $signal = TradingSignal::findOrFail($id);
+
+            Log::info('Signal found', [
+                'signal_id' => $signal->id,
+                'current_status' => $signal->status,
+                'title' => $signal->title,
+            ]);
+
+            // Step 2: Check status
+            if ($signal->status !== 'open') {
+                Log::warning('Signal status invalid', [
+                    'signal_id' => $signal->id,
+                    'status' => $signal->status,
+                ]);
+
+                return redirect()
+                    ->route('admin.signals.index')
+                    ->with('error', 'Signal is not open or already processed. Current status: ' . $signal->status);
+            }
+
+            // Step 3: Validate request
+            Log::info('Validating request data');
+
+            $validated = $request->validate([
+                'result' => 'required|in:call,put,win,loss',
+                'rate_of_return' => 'required|numeric|min:0|max:100',
+            ], [
+                'result.required' => 'Result must be selected',
+                'result.in' => 'Result must be Call, Put, Win, or Loss',
+                'rate_of_return.required' => 'Win rate must be filled',
+                'rate_of_return.min' => 'Win rate minimum 0%',
+                'rate_of_return.max' => 'Win rate maximum 100%',
+            ]);
+
+            Log::info('Validation passed', ['validated_data' => $validated]);
+
+            // Step 3.5: Convert call/put to win/loss for database
+            $resultForDb = $request->result;
+            if ($request->result === 'call') {
+                $resultForDb = 'win';
+            } elseif ($request->result === 'put') {
+                $resultForDb = 'loss';
+            }
+
+            Log::info('Result converted', [
+                'original' => $request->result,
+                'for_database' => $resultForDb,
+            ]);
+
+            // Step 4: Begin transaction
             DB::beginTransaction();
+            Log::info('Database transaction started');
 
-            $signal->closeSignal($request->result, $request->rate_of_return);
+            // Step 5: Call closeSignal method
+            Log::info('Calling closeSignal method', [
+                'result' => $resultForDb,
+                'rate_of_return' => $request->rate_of_return,
+            ]);
 
+            $signal->closeSignal($resultForDb, $request->rate_of_return);
+
+            Log::info('closeSignal method completed', [
+                'signal_id' => $signal->id,
+                'new_status' => $signal->fresh()->status,
+                'result' => $signal->fresh()->result,
+                'rate_of_return' => $signal->fresh()->rate_of_return,
+            ]);
+
+            // Step 6: Commit transaction
             DB::commit();
+            Log::info('Database transaction committed');
+
+            Log::info('=== CLOSE SIGNAL SUCCESS ===', [
+                'signal_id' => $signal->id,
+                'result' => strtoupper($resultForDb),
+                'display_as' => strtoupper($request->result),
+                'rate_of_return' => $request->rate_of_return,
+            ]);
+
+            // Display label based on user input (call/put), not database value
+            $displayLabel = in_array($request->result, ['call', 'put'])
+                ? strtoupper($request->result)
+                : ($resultForDb === 'win' ? 'CALL' : 'PUT');
 
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('success', 'Signal closed successfully as ' . strtoupper($request->result) . ' with ' . $request->rate_of_return . '% win rate. Now you can settle all participants.');
+                ->with('success', "Signal closed successfully as {$displayLabel} with {$request->rate_of_return}% win rate. Now you can settle all participants.");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'signal_id' => $id,
+            ]);
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Close signal failed: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to close signal: ' . $e->getMessage());
+
+            Log::error('=== CLOSE SIGNAL FAILED ===', [
+                'signal_id' => $id,
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Failed to close signal: ' . $e->getMessage() . ' (Check logs for details)');
         }
     }
 
     /**
-     * Settle signal - SIMPLIFIED: NO LOSS, NO FEE, ALWAYS REWARD!
+     * Settle signal - WITH DEBUG LOGGING
      */
     public function settle($id)
     {
+        Log::info('=== SETTLE SIGNAL START ===', ['signal_id' => $id]);
+
         $signal = TradingSignal::with('participants.user')->findOrFail($id);
 
         if ($signal->status !== 'closed') {
+            Log::warning('Signal not closed yet', [
+                'signal_id' => $signal->id,
+                'status' => $signal->status,
+            ]);
+
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('error', 'Signal must be closed before settling. Please close the signal first.');
+                ->with('error', 'Signal must be closed before settling. Current status: ' . $signal->status);
         }
 
         try {
@@ -191,16 +283,28 @@ class TradingSignalController extends Controller
 
             foreach ($signal->participants as $participant) {
                 if ($participant->isSettled()) {
+                    Log::info('Participant already settled, skipping', [
+                        'participant_id' => $participant->id,
+                        'user_id' => $participant->user_id,
+                    ]);
                     continue;
                 }
 
                 $user = $participant->user;
                 $betAmount = $participant->bet_amount;
 
+                Log::info('Processing participant', [
+                    'participant_id' => $participant->id,
+                    'user_id' => $user->id,
+                    'bet_amount' => $betAmount,
+                    'locked_balance_before' => $user->locked_balance,
+                    'trade_balance_before' => $user->trade_balance,
+                ]);
+
                 // STEP 1: Unlock balance
                 $user->unlockBalance($betAmount);
 
-                // STEP 2: Calculate reward (ALWAYS POSITIVE!)
+                // STEP 2: Calculate reward
                 $reward = $betAmount * ($signal->rate_of_return / 100);
 
                 // STEP 3: Add reward
@@ -220,14 +324,12 @@ class TradingSignalController extends Controller
                 $settledCount++;
                 $totalRewards += $reward;
 
-                Log::info('Participant settled', [
-                    'signal_id' => $signal->id,
+                Log::info('Participant settled successfully', [
+                    'participant_id' => $participant->id,
                     'user_id' => $user->id,
-                    'bet_amount' => $betAmount,
-                    'signal_result' => $signal->result,
-                    'win_rate' => $signal->rate_of_return,
                     'reward' => $reward,
-                    'new_trade_balance' => $user->fresh()->trade_balance,
+                    'trade_balance_after' => $user->fresh()->trade_balance,
+                    'locked_balance_after' => $user->fresh()->locked_balance,
                 ]);
             }
 
@@ -235,15 +337,29 @@ class TradingSignalController extends Controller
 
             DB::commit();
 
+            Log::info('=== SETTLE SIGNAL SUCCESS ===', [
+                'signal_id' => $signal->id,
+                'settled_count' => $settledCount,
+                'total_rewards' => $totalRewards,
+            ]);
+
             return redirect()
                 ->route('admin.signals.show', $signal->id)
                 ->with('success', "Signal settled successfully! {$settledCount} participants received rewards. Total rewards distributed: " . number_format($totalRewards, 2) . " USDT.");
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Settle signal failed: ' . $e->getMessage());
+
+            Log::error('=== SETTLE SIGNAL FAILED ===', [
+                'signal_id' => $signal->id,
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+            ]);
+
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('error', 'Failed to settle signal: ' . $e->getMessage());
+                ->with('error', 'Failed to settle signal: ' . $e->getMessage() . ' (Check logs for details)');
         }
     }
 
