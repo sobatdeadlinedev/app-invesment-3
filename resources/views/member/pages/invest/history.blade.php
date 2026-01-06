@@ -75,19 +75,36 @@
                         <!-- Header -->
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div class="d-flex align-items-center gap-2">
-                                <!-- Badge shows signal type (CALL/PUT) based on signal direction -->
-                                <span class="badge {{ $signal->result === 'win' ? 'badge-success' : 'badge-danger' }}"
+                                <!-- Badge shows signal title -->
+                                <span
+                                    class="badge {{ $signal->result === 'win' ? 'badge-success' : ($signal->result === 'loss' ? 'badge-danger' : 'badge-warning') }}"
                                     style="font-size: 11px; padding: 6px 12px;">
-                                    {{ strtoupper($signal->title ?? 'CALL') }}
+                                    {{ strtoupper($signal->title ?? 'SIGNAL') }}
                                 </span>
                                 <span class="text-white fw-bold">{{ $coinInfo['symbol'] }}</span>
-                                <small class="text-muted">60s</small>
                             </div>
-                            @if ($isSettled)
-                                <i class="bi bi-check-circle-fill {{ $isWin ? 'text-success' : 'text-danger' }}"></i>
-                            @else
-                                <i class="bi bi-clock-fill text-warning"></i>
-                            @endif
+
+                            <!-- Right side: CALL/PUT text only -->
+                            @php
+                                // Tentukan CALL atau PUT berdasarkan result
+                                $direction = '';
+                                $textColor = 'text-muted';
+
+                                if ($signal->result === 'win') {
+                                    $direction = 'CALL';
+                                    $textColor = 'text-success';
+                                } elseif ($signal->result === 'loss') {
+                                    $direction = 'PUT';
+                                    $textColor = 'text-danger';
+                                } else {
+                                    $direction = 'PENDING';
+                                    $textColor = 'text-warning';
+                                }
+                            @endphp
+
+                            <span class="fw-bold {{ $textColor }}" style="font-size: 12px;">
+                                {{ $direction }}
+                            </span>
                         </div>
 
                         <!-- Details -->
@@ -132,7 +149,7 @@
                             <!-- Rate of Return -->
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">rate of return</span>
-                                <span class="text-{{ $isWin ? 'success' : 'danger' }}" style="font-size: 12px;">
+                                <span class="text-white" style="font-size: 12px;">
                                     {{ $isSettled ? number_format($signal->rate_of_return, 2) . '%' : '-' }}
                                 </span>
                             </div>
@@ -147,7 +164,7 @@
 
                             <!-- Number of Transactions -->
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted" style="font-size: 12px;">total participants</span>
+                                <span class="text-muted" style="font-size: 12px;">direction</span>
                                 <span class="text-white" style="font-size: 12px;">
                                     {{ $signal->total_participants ?? 0 }}
                                 </span>
