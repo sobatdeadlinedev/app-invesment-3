@@ -119,13 +119,13 @@
                             </div>
 
                             <!-- Gross Profit/Loss (before fee) -->
-                            <div class="d-flex justify-content-between">
+                            {{-- <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">gross profit/loss</span>
                                 <span class="text-{{ $profitLossAmount >= 0 ? 'success' : 'danger' }} fw-bold"
                                     style="font-size: 12px;">
                                     {{ $isSettled ? ($profitLossAmount >= 0 ? '+' : '') . number_format($profitLossAmount, 2) : '-' }}
                                 </span>
-                            </div>
+                            </div> --}}
 
                             <!-- Fee Amount -->
                             @if ($isSettled && $feeAmount > 0)
@@ -163,14 +163,14 @@
                             </div>
 
                             <!-- Number of Transactions -->
-                            <div class="d-flex justify-content-between">
+                            {{-- <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">direction</span>
                                 <span
                                     class="text-{{ $signal->result === 'win' ? 'success' : ($signal->result === 'loss' ? 'danger' : 'warning') }}"
                                     style="font-size: 12px;">
                                     {{ $signal->result === 'win' ? 'CALL' : ($signal->result === 'loss' ? 'PUT' : 'PENDING') }}
                                 </span>
-                            </div>
+                            </div> --}}
 
                             <!-- Opening Price -->
                             <div class="d-flex justify-content-between">

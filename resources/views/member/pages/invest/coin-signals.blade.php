@@ -109,9 +109,9 @@
 
                             <div class="d-flex align-items-center justify-content-between pt-2"
                                 style="border-top: 1px solid var(--border-color);">
-                                <small class="text-muted">
+                                {{-- <small class="text-muted">
                                     <i class="bi bi-people me-1"></i>{{ $signal->participants_count }} Participants
-                                </small>
+                                </small> --}}
 
                                 @if (in_array($signal->id, $joinedSignalIds))
                                     <span class="badge bg-primary" style="font-size: 11px;">

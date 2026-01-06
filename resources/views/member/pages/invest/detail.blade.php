@@ -69,22 +69,42 @@
                     </div>
                 @endif
 
-                <div class="d-flex align-items-end justify-content-between">
-                    <div class="row g-3 flex-grow-1">
-                        @if ($signal->entry_price)
-                            <div class="col-6">
-                                <p class="text-muted mb-1 small">Opening Price</p>
-                                <h6 class="text-gold mb-0 fw-bold">$ {{ number_format($signal->entry_price, 2) }}</h6>
-                            </div>
-                        @endif
-                        @if ($signal->target_price)
-                            <div class="col-6">
-                                <p class="text-muted mb-1 small">Settlement Price</p>
-                                <h6 class="text-success mb-0 fw-bold">$ {{ number_format($signal->target_price, 2) }}</h6>
-                            </div>
-                        @endif
+                @if ($signal->status != 'settled')
+                    <div class="d-flex align-items-end justify-content-between">
+                        <div class="row g-3 flex-grow-1">
+                            @if ($signal->entry_price)
+                                <div class="col-6">
+                                    <p class="text-muted mb-1 small">Opening Price</p>
+                                    <h6 class="text-gold mb-0 fw-bold">~</h6>
+                                </div>
+                            @endif
+                            @if ($signal->target_price)
+                                <div class="col-6">
+                                    <p class="text-muted mb-1 small">Settlement Price</p>
+                                    <h6 class="text-success mb-0 fw-bold">~</h6>
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                </div>
+                @else
+                    <div class="d-flex align-items-end justify-content-between">
+                        <div class="row g-3 flex-grow-1">
+                            @if ($signal->entry_price)
+                                <div class="col-6">
+                                    <p class="text-muted mb-1 small">Opening Price</p>
+                                    <h6 class="text-gold mb-0 fw-bold">$ {{ number_format($signal->entry_price, 2) }}</h6>
+                                </div>
+                            @endif
+                            @if ($signal->target_price)
+                                <div class="col-6">
+                                    <p class="text-muted mb-1 small">Settlement Price</p>
+                                    <h6 class="text-success mb-0 fw-bold">$ {{ number_format($signal->target_price, 2) }}
+                                    </h6>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <div class="card-dark shadow-sm p-3 mb-3">
