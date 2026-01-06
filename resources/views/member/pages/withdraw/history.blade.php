@@ -116,7 +116,7 @@
                                     </div>
                                     @if ($transaction->withdrawal_fee > 0)
                                         <div class="detail-row">
-                                            <span class="text-muted small">Fee (2%):</span>
+                                            <span class="text-muted small">Fee (5%):</span>
                                             <span class="text-danger small fw-bold">
                                                 -{{ number_format($transaction->withdrawal_fee, 2) }} USDT
                                             </span>

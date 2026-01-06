@@ -72,10 +72,10 @@
                         <div class="input-with-icon">
                             <span class="input-icon">₮</span>
                             <input type="number" name="amount" id="withdraw-amount" class="form-control-dark with-icon"
-                                placeholder="Enter amount" value="{{ old('amount') }}" step="0.01" min="10"
+                                placeholder="Enter amount" value="{{ old('amount') }}" step="0.01" min="20"
                                 {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
                         </div>
-                        <small class="text-muted d-block mt-1">Minimum withdrawal: 5 USDT | Fee: 5 USDT (< 100 USDT) or 5%
+                        <small class="text-muted d-block mt-1">Minimum withdrawal: 20 USDT | Fee: 5 USDT (< 100 USDT) or 5%
                                 (≥ 100 USDT)</small>
                                 @error('amount')
                                     <small class="text-danger mt-1 d-block">{{ $message }}</small>
@@ -85,14 +85,14 @@
                         <label class="text-muted small mb-2 d-block">Or choose quick amount:</label>
                     </div>
                     <div class="amount-quick-select">
+                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(20)"
+                            {{ !auth()->user()->is_verified ? 'disabled' : '' }}>20 USDT</button>
                         <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(50)"
                             {{ !auth()->user()->is_verified ? 'disabled' : '' }}>50 USDT</button>
                         <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(100)"
                             {{ !auth()->user()->is_verified ? 'disabled' : '' }}>100 USDT</button>
                         <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(250)"
                             {{ !auth()->user()->is_verified ? 'disabled' : '' }}>250 USDT</button>
-                        <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(500)"
-                            {{ !auth()->user()->is_verified ? 'disabled' : '' }}>500 USDT</button>
                     </div>
                 </div>
 
@@ -120,8 +120,8 @@
                         @if ($wallets->isEmpty())
                             <div class="alert-info-box mt-2">
                                 <i class="bi bi-info-circle-fill me-2"></i>
-                                <span class="small">You need to add a wallet account first. <a
-                                        href="{{ route('member.profile.index') }}" class="text-gold">Add Wallet</a></span>
+                                <span class="small">You need to add a wallet account first.
+                                    href="{{ route('member.profile.index') }}" class="text-gold">Add Wallet</a></span>
                             </div>
                         @endif
                     </div>
@@ -296,7 +296,7 @@
             const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
 
             if (amount > 0) {
-                // NEW FEE LOGIC
+                // FEE LOGIC: 5 USDT for < 100, 5% for >= 100
                 let fee;
                 if (amount < 100) {
                     fee = 5; // Fixed 5 USDT for amounts below 100
@@ -329,8 +329,8 @@
                 return;
             }
 
-            if (amount < 5) {
-                alert('Minimum withdrawal amount is 5 USDT');
+            if (amount < 20) {
+                alert('Minimum withdrawal amount is 20 USDT');
                 return;
             }
 
@@ -344,7 +344,7 @@
                 return;
             }
 
-            // NEW FEE CALCULATION
+            // FEE CALCULATION: 5 USDT for < 100, 5% for >= 100
             let fee;
             if (amount < 100) {
                 fee = 5; // Fixed 5 USDT

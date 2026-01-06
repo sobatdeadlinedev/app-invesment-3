@@ -309,7 +309,7 @@
                                     </div>
                                     <div class="d-flex flex-column gap-1 mt-2">
                                         <div class="d-flex justify-content-between">
-                                            <small class="text-muted" style="font-size: 11px;">Fee (2%)</small>
+                                            <small class="text-muted" style="font-size: 11px;">Fee (5%)</small>
                                             <small class="text-muted"
                                                 style="font-size: 11px;">{{ number_format($withdrawal->withdrawal_fee, 2) }}
                                                 USDT</small>
