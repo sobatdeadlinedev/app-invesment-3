@@ -285,15 +285,13 @@ class TradingSignalController extends Controller
 
                 $user = $participant->user;
                 $betAmount = $participant->bet_amount;
-
-                // ========== SIMPAN JOINED_AT ORIGINAL ==========
-                $originalJoinedAt = $participant->joined_at; // 👈 TAMBAHKAN INI
+                $originalJoinedAt = $participant->joined_at;
 
                 Log::info('BEFORE UPDATE Participant', [
                     'participant_id' => $participant->id,
                     'user_id' => $user->id,
                     'bet_amount' => $betAmount,
-                    'joined_at_BEFORE' => $originalJoinedAt, // 👈 UPDATE INI
+                    'joined_at_BEFORE' => $originalJoinedAt,
                     'status_BEFORE' => $participant->status,
                     'locked_balance_before' => $user->locked_balance,
                     'trade_balance_before' => $user->trade_balance,
@@ -311,29 +309,33 @@ class TradingSignalController extends Controller
                 // STEP 4: Add volume
                 $user->addAchievedVolume($betAmount);
 
-                // STEP 5: Update participant - FORCE PRESERVE joined_at
-                $participant->update([
-                    'profit_loss' => $reward,
-                    'fee_amount' => 0,
-                    'status' => 'settled',
-                    'settled_at' => now(),
-                    'joined_at' => $originalJoinedAt, // 👈 TAMBAHKAN INI
-                ]);
+                // STEP 5: Update participant using RAW QUERY (BYPASS MODEL EVENTS)
+                DB::table('signal_participants')
+                    ->where('id', $participant->id)
+                    ->update([
+                        'profit_loss' => $reward,
+                        'fee_amount' => 0,
+                        'status' => 'settled',
+                        'settled_at' => now(),
+                        'updated_at' => now(),
+                        // joined_at TIDAK DISENTUH - tetap original
+                    ]);
 
                 $settledCount++;
                 $totalRewards += $reward;
 
-                $participantFresh = $participant->fresh();
+                // Refresh participant untuk log
+                $participant->refresh();
+
                 Log::info('AFTER UPDATE Participant', [
-                    'participant_id' => $participantFresh->id,
+                    'participant_id' => $participant->id,
                     'user_id' => $user->id,
-                    'joined_at_AFTER' => $participantFresh->joined_at,
-                    'status_AFTER' => $participantFresh->status,
-                    'settled_at_AFTER' => $participantFresh->settled_at,
+                    'joined_at_AFTER' => $participant->joined_at,
+                    'status_AFTER' => $participant->status,
+                    'settled_at_AFTER' => $participant->settled_at,
                     'reward' => $reward,
                     'trade_balance_after' => $user->fresh()->trade_balance,
                     'locked_balance_after' => $user->fresh()->locked_balance,
-                    'dirty_attributes' => $participant->getDirty(),
                 ]);
             }
 
