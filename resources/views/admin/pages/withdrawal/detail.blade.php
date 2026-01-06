@@ -91,7 +91,7 @@
                         <!--end::Card header-->
                         <!--begin::Card body-->
                         <div class="card-body pt-0">
-                            @if ($withdrawal->status === 'completed' && $withdrawal->payment_proof)
+                            @if ($withdrawal->status === 'approved' && $withdrawal->payment_proof)
                                 <div class="text-center">
                                     <img src="{{ asset('storage/' . $withdrawal->payment_proof) }}" alt="Payment Proof"
                                         class="img-fluid rounded" style="max-height: 600px; cursor: pointer;"
@@ -117,14 +117,21 @@
                                         </div>
                                     </div>
                                 </div>
-                            @else
+                            @elseif ($withdrawal->status === 'approved' && !$withdrawal->payment_proof)
+                                <div class="alert alert-success d-flex align-items-center p-5">
+                                    <i class="ki-outline ki-check-circle fs-2hx text-success me-4"></i>
+                                    <div class="d-flex flex-column">
+                                        <h4 class="mb-1 text-success">Withdrawal Approved</h4>
+                                        <span>This withdrawal has been approved without payment proof.</span>
+                                    </div>
+                                </div>
+                            @elseif ($withdrawal->status === 'pending')
                                 <div class="alert alert-primary d-flex align-items-center p-5">
                                     <i class="ki-outline ki-information-5 fs-2hx text-primary me-4"></i>
                                     <div class="d-flex flex-column">
                                         <h4 class="mb-1 text-primary">Withdrawal Request</h4>
-                                        <span>User has requested a withdrawal. Please transfer the amount to their wallet
-                                            and
-                                            upload the payment proof to complete this transaction.</span>
+                                        <span>User has requested a withdrawal. Please transfer the amount to their wallet.
+                                            You can optionally upload payment proof when approving.</span>
                                     </div>
                                 </div>
 
@@ -135,19 +142,29 @@
                                                 Wallet Details</h5>
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="text-muted small mb-1">Account Number</label>
+                                                    <label class="text-muted small mb-1">Wallet Address</label>
                                                     <div class="fw-bold text-gray-800">
                                                         {{ $withdrawal->wallet->account_number }}</div>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="text-muted small mb-1">Account Holder Name</label>
+                                                    <label class="text-muted small mb-1">Network Type</label>
                                                     <div class="fw-bold text-gray-800">
-                                                        {{ $withdrawal->wallet->account_name }}</div>
+                                                        <span
+                                                            class="badge badge-light-primary">{{ strtoupper($withdrawal->wallet->type) }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 @endif
+                            @else
+                                <div class="alert alert-info d-flex align-items-center p-5">
+                                    <i class="ki-outline ki-information fs-2hx text-info me-4"></i>
+                                    <div class="d-flex flex-column">
+                                        <h4 class="mb-1 text-info">Withdrawal {{ ucfirst($withdrawal->status) }}</h4>
+                                        <span>This withdrawal has been {{ $withdrawal->status }}.</span>
+                                    </div>
+                                </div>
                             @endif
                         </div>
                         <!--end::Card body-->
@@ -318,11 +335,12 @@
                         </div>
 
                         <div class="fv-row mb-7">
-                            <label class="required fw-semibold fs-6 mb-2">Upload Payment Proof</label>
+                            <label class="fw-semibold fs-6 mb-2">Upload Payment Proof (Optional)</label>
                             <input type="file" name="payment_proof"
                                 class="form-control form-control-solid @error('payment_proof') is-invalid @enderror"
-                                accept="image/*" required onchange="previewImage(event)" />
-                            <small class="text-muted d-block mt-1">Upload proof of transfer (JPG, PNG - Max 5MB)</small>
+                                accept="image/*" onchange="previewImage(event)" />
+                            <small class="text-muted d-block mt-1">Upload proof of transfer if available (JPG, PNG - Max
+                                5MB)</small>
                             @error('payment_proof')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

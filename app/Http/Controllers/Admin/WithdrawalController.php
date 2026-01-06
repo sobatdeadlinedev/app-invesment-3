@@ -39,11 +39,10 @@ class WithdrawalController extends Controller
                 ->with('error', 'This withdrawal has already been processed.');
         }
 
-        // Validate payment proof upload
+        // Validate payment proof upload - OPTIONAL
         $request->validate([
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB
+            'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // 5MB - CHANGED to nullable
         ], [
-            'payment_proof.required' => 'Payment proof is required to approve withdrawal.',
             'payment_proof.image' => 'Payment proof must be an image.',
             'payment_proof.mimes' => 'Payment proof must be a file of type: jpeg, png, jpg.',
             'payment_proof.max' => 'Payment proof must not be greater than 5MB.',
@@ -52,8 +51,12 @@ class WithdrawalController extends Controller
         try {
             DB::beginTransaction();
 
-            // Store payment proof
-            $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+            $paymentProofPath = null;
+
+            // Store payment proof if uploaded
+            if ($request->hasFile('payment_proof')) {
+                $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+            }
 
             // Update withdrawal status
             $withdrawal->update([
@@ -62,8 +65,7 @@ class WithdrawalController extends Controller
                 'approved_by' => auth()->id(),
             ]);
 
-            // TIDAK PERLU update balance lagi karena sudah di-deduct saat request
-            // Balance sudah dikurangi di MemberWithdrawController saat pending
+            // Balance sudah dikurangi saat pending, tidak perlu update lagi
 
             DB::commit();
 
@@ -92,7 +94,7 @@ class WithdrawalController extends Controller
 
             $user = $withdrawal->user;
 
-            // UPDATED: Return balance to exchange balance
+            // Return balance to exchange balance
             $user->addExchangeBalance($withdrawal->total_amount);
 
             // Update withdrawal status
