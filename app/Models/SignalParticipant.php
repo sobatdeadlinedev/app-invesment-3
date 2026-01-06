@@ -34,11 +34,13 @@ class SignalParticipant extends Model
     {
         parent::boot();
 
-        // Prevent joined_at from being updated after initial set
+        // Protect joined_at from being updated after initial set
         static::updating(function ($participant) {
-            if ($participant->isDirty('joined_at') && $participant->getOriginal('joined_at')) {
-                // Restore original joined_at if someone tries to change it
-                $participant->joined_at = $participant->getOriginal('joined_at');
+            $original = $participant->getOriginal('joined_at');
+
+            // Always restore original joined_at if it was already set
+            if ($original !== null) {
+                $participant->joined_at = $original;
             }
         });
     }
@@ -74,25 +76,16 @@ class SignalParticipant extends Model
 
     // ==================== HELPER METHODS ====================
 
-    /**
-     * Check if participant is settled
-     */
     public function isSettled()
     {
         return $this->status === 'settled';
     }
 
-    /**
-     * Get net result (profit/loss - fee)
-     */
     public function getNetResultAttribute()
     {
         return $this->profit_loss - $this->fee_amount;
     }
 
-    /**
-     * Get final balance change
-     */
     public function getFinalBalanceChangeAttribute()
     {
         return $this->bet_amount + $this->profit_loss - $this->fee_amount;
