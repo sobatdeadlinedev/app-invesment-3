@@ -166,7 +166,7 @@
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">direction</span>
                                 <span class="text-white" style="font-size: 12px;">
-                                    {{ $signal->total_participants ?? 0 }}
+                                    {{ ($signal->result === 'win' ? 'CALL' : ($signal->result === 'loss' ? 'PUT' : 'PENDING')) ?? 0 }}
                                 </span>
                             </div>
 
