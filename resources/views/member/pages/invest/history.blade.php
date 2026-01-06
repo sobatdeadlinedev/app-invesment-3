@@ -165,8 +165,10 @@
                             <!-- Number of Transactions -->
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">direction</span>
-                                <span class="text-white" style="font-size: 12px;">
-                                    {{ ($signal->result === 'win' ? 'CALL' : ($signal->result === 'loss' ? 'PUT' : 'PENDING')) ?? 0 }}
+                                <span
+                                    class="text-{{ $signal->result === 'win' ? 'success' : ($signal->result === 'loss' ? 'danger' : 'warning') }}"
+                                    style="font-size: 12px;">
+                                    {{ $signal->result === 'win' ? 'CALL' : ($signal->result === 'loss' ? 'PUT' : 'PENDING') }}
                                 </span>
                             </div>
 
