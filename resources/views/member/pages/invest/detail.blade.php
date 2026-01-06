@@ -41,6 +41,11 @@
                 </div>
             </div>
 
+            @php
+                // Check if signal is pending or has null values
+                $isPending = $signal->result === 'pending' || $signal->result === null;
+            @endphp
+
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <div class="coin-icon-large" style="background: linear-gradient(135deg, #f5a623 0%, #f7b733 100%);">
@@ -69,42 +74,30 @@
                     </div>
                 @endif
 
-                @if ($signal->status != 'settled')
-                    <div class="d-flex align-items-end justify-content-between">
-                        <div class="row g-3 flex-grow-1">
-                            @if ($signal->entry_price)
-                                <div class="col-6">
-                                    <p class="text-muted mb-1 small">Opening Price</p>
-                                    <h6 class="text-gold mb-0 fw-bold">~</h6>
-                                </div>
-                            @endif
-                            @if ($signal->target_price)
-                                <div class="col-6">
-                                    <p class="text-muted mb-1 small">Settlement Price</p>
-                                    <h6 class="text-success mb-0 fw-bold">~</h6>
-                                </div>
-                            @endif
+                <div class="d-flex align-items-end justify-content-between">
+                    <div class="row g-3 flex-grow-1">
+                        <div class="col-6">
+                            <p class="text-muted mb-1 small">Opening Price</p>
+                            <h6 class="text-gold mb-0 fw-bold">
+                                @if ($isPending || !$signal->entry_price)
+                                    ~
+                                @else
+                                    $ {{ number_format($signal->entry_price, 2) }}
+                                @endif
+                            </h6>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted mb-1 small">Settlement Price</p>
+                            <h6 class="text-success mb-0 fw-bold">
+                                @if ($isPending || !$signal->target_price)
+                                    ~
+                                @else
+                                    $ {{ number_format($signal->target_price, 2) }}
+                                @endif
+                            </h6>
                         </div>
                     </div>
-                @else
-                    <div class="d-flex align-items-end justify-content-between">
-                        <div class="row g-3 flex-grow-1">
-                            @if ($signal->entry_price)
-                                <div class="col-6">
-                                    <p class="text-muted mb-1 small">Opening Price</p>
-                                    <h6 class="text-gold mb-0 fw-bold">$ {{ number_format($signal->entry_price, 2) }}</h6>
-                                </div>
-                            @endif
-                            @if ($signal->target_price)
-                                <div class="col-6">
-                                    <p class="text-muted mb-1 small">Settlement Price</p>
-                                    <h6 class="text-success mb-0 fw-bold">$ {{ number_format($signal->target_price, 2) }}
-                                    </h6>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endif
+                </div>
             </div>
 
             <div class="card-dark shadow-sm p-3 mb-3">
@@ -192,19 +185,19 @@
             <div class="card-dark shadow-sm p-3 mb-3">
                 <h6 class="text-white mb-3">Signal Statistics</h6>
                 <div class="row g-3">
-                    {{-- <div class="col-4">
-                        <p class="text-muted mb-1 small">Participants</p>
-                        <h6 class="text-white mb-0 fw-bold">
-                            <i class="bi bi-people me-1"></i>{{ $signal->total_participants }}
-                        </h6>
-                    </div> --}}
                     <div class="col-6">
                         <p class="text-muted mb-1 small">Total Bets</p>
                         <h6 class="text-white mb-0 fw-bold">$ {{ number_format($signal->total_bet_amount, 2) }}</h6>
                     </div>
                     <div class="col-6">
                         <p class="text-muted mb-1 small">Opened</p>
-                        <h6 class="text-white mb-0 fw-bold">{{ $signal->opened_at->format('H:i') }}</h6>
+                        <h6 class="text-white mb-0 fw-bold">
+                            @if ($signal->opened_at)
+                                {{ $signal->opened_at->format('H:i') }}
+                            @else
+                                ~
+                            @endif
+                        </h6>
                     </div>
                 </div>
 
@@ -213,19 +206,29 @@
                         <div class="row g-3">
                             <div class="col-6">
                                 <p class="text-muted mb-1 small">Result</p>
-                                @if ($signal->result === 'call')
+                                @if ($signal->result === 'win')
                                     <span class="badge badge-success">
-                                        <i class="bi bi-arrow-up me-1"></i>CALL (Market Up)
+                                        <i class="bi bi-arrow-up me-1"></i>WIN (CALL)
+                                    </span>
+                                @elseif($signal->result === 'loss')
+                                    <span class="badge badge-danger">
+                                        <i class="bi bi-arrow-down me-1"></i>LOSS (PUT)
                                     </span>
                                 @else
-                                    <span class="badge badge-danger">
-                                        <i class="bi bi-arrow-down me-1"></i>PUT (Market Down)
+                                    <span class="badge badge-warning">
+                                        <i class="bi bi-clock me-1"></i>PENDING
                                     </span>
                                 @endif
                             </div>
                             <div class="col-6">
                                 <p class="text-muted mb-1 small">Win Rate</p>
-                                <h6 class="text-gold mb-0 fw-bold">{{ number_format($signal->rate_of_return, 2) }}%</h6>
+                                <h6 class="text-gold mb-0 fw-bold">
+                                    @if ($isPending || !$signal->rate_of_return)
+                                        ~
+                                    @else
+                                        {{ number_format($signal->rate_of_return, 2) }}%
+                                    @endif
+                                </h6>
                             </div>
                         </div>
                     </div>
@@ -346,7 +349,7 @@
                                 size: 11
                             },
                             callback: function(value) {
-                                return ' + value.toLocaleString();
+                                return '$' + value.toLocaleString();
                             }
                         }
                     }
