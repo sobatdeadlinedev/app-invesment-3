@@ -50,8 +50,8 @@ class TradingSignalController extends Controller
                 'entry_price' => $request->entry_price,
                 'target_price' => $request->target_price,
                 'status' => 'open',
-                'opened_at' => now(),
                 'created_by' => auth()->id(),
+                // opened_at TIDAK diset disini, akan diset saat status closed
             ]);
 
             DB::commit();
@@ -130,11 +130,10 @@ class TradingSignalController extends Controller
     }
 
     /**
-     * Close signal - WITH EXTENSIVE DEBUGGING
+     * Close signal - opened_at akan diset disini (saat status closed)
      */
     public function close(Request $request, $id)
     {
-        // DEBUG: Log request awal
         Log::info('=== CLOSE SIGNAL START ===', [
             'signal_id' => $id,
             'request_data' => $request->all(),
@@ -143,7 +142,6 @@ class TradingSignalController extends Controller
         ]);
 
         try {
-            // Step 1: Find signal
             $signal = TradingSignal::findOrFail($id);
 
             Log::info('Signal found', [
@@ -152,7 +150,6 @@ class TradingSignalController extends Controller
                 'title' => $signal->title,
             ]);
 
-            // Step 2: Check status
             if ($signal->status !== 'open') {
                 Log::warning('Signal status invalid', [
                     'signal_id' => $signal->id,
@@ -164,7 +161,6 @@ class TradingSignalController extends Controller
                     ->with('error', 'Signal is not open or already processed. Current status: ' . $signal->status);
             }
 
-            // Step 3: Validate request
             Log::info('Validating request data');
 
             $validated = $request->validate([
@@ -180,7 +176,6 @@ class TradingSignalController extends Controller
 
             Log::info('Validation passed', ['validated_data' => $validated]);
 
-            // Step 3.5: Convert call/put to win/loss for database
             $resultForDb = $request->result;
             if ($request->result === 'call') {
                 $resultForDb = 'win';
@@ -193,26 +188,29 @@ class TradingSignalController extends Controller
                 'for_database' => $resultForDb,
             ]);
 
-            // Step 4: Begin transaction
             DB::beginTransaction();
             Log::info('Database transaction started');
 
-            // Step 5: Call closeSignal method
             Log::info('Calling closeSignal method', [
                 'result' => $resultForDb,
                 'rate_of_return' => $request->rate_of_return,
             ]);
 
+            // Call closeSignal method
             $signal->closeSignal($resultForDb, $request->rate_of_return);
 
-            Log::info('closeSignal method completed', [
+            // SET opened_at saat status berubah ke CLOSED
+            $signal->opened_at = now();
+            $signal->save();
+
+            Log::info('closeSignal method completed and opened_at set', [
                 'signal_id' => $signal->id,
                 'new_status' => $signal->fresh()->status,
                 'result' => $signal->fresh()->result,
                 'rate_of_return' => $signal->fresh()->rate_of_return,
+                'opened_at' => $signal->fresh()->opened_at,
             ]);
 
-            // Step 6: Commit transaction
             DB::commit();
             Log::info('Database transaction committed');
 
@@ -221,9 +219,9 @@ class TradingSignalController extends Controller
                 'result' => strtoupper($resultForDb),
                 'display_as' => strtoupper($request->result),
                 'rate_of_return' => $request->rate_of_return,
+                'opened_at' => $signal->opened_at,
             ]);
 
-            // Display label based on user input (call/put), not database value
             $displayLabel = in_array($request->result, ['call', 'put'])
                 ? strtoupper($request->result)
                 : ($resultForDb === 'win' ? 'CALL' : 'PUT');
@@ -256,7 +254,7 @@ class TradingSignalController extends Controller
     }
 
     /**
-     * Settle signal - WITH DEBUG LOGGING
+     * Settle signal - closed_at akan diset disini (saat status settled)
      */
     public function settle($id)
     {
@@ -333,7 +331,12 @@ class TradingSignalController extends Controller
                 ]);
             }
 
+            // Mark signal as settled
             $signal->markAsSettled();
+
+            // SET closed_at saat status berubah ke SETTLED
+            $signal->closed_at = now();
+            $signal->save();
 
             DB::commit();
 
@@ -341,6 +344,7 @@ class TradingSignalController extends Controller
                 'signal_id' => $signal->id,
                 'settled_count' => $settledCount,
                 'total_rewards' => $totalRewards,
+                'closed_at' => $signal->closed_at,
             ]);
 
             return redirect()
