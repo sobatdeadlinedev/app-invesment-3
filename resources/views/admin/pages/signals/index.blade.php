@@ -124,7 +124,7 @@
                                     <td>
                                         <span class="badge badge-light-info">{{ $signal->participants_count }} Users</span>
                                     </td>
-                                    <td>{{ $signal->created_at->format('d M Y, H:i') }}</td>
+                                    <td>{{ $signal->created_at->format('d M Y, H:i:s') }}</td>
                                     <td class="text-end">
                                         <a href="{{ route('admin.signals.show', $signal->id) }}"
                                             class="btn btn-light btn-active-light-primary btn-sm">

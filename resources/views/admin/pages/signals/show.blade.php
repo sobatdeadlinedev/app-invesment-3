@@ -285,13 +285,15 @@
                                     @if ($signal->closed_at)
                                         <tr>
                                             <td class="text-gray-500">Closed At:</td>
-                                            <td class="text-gray-800">{{ $signal->closed_at->format('d M Y, H:i') }}</td>
+                                            <td class="text-gray-800">{{ $signal->closed_at->format('d M Y, H:i:s') }}
+                                            </td>
                                         </tr>
                                     @endif
                                     @if ($signal->settled_at)
                                         <tr>
                                             <td class="text-gray-500">Settled At:</td>
-                                            <td class="text-gray-800">{{ $signal->settled_at->format('d M Y, H:i') }}</td>
+                                            <td class="text-gray-800">{{ $signal->settled_at->format('d M Y, H:i:s') }}
+                                            </td>
                                         </tr>
                                     @endif
                                 </table>

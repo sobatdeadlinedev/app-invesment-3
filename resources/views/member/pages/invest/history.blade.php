@@ -119,8 +119,8 @@
                                     @if ($isPending)
                                         ~
                                     @else
-                                        {{ $signal->opened_at ? $signal->opened_at->format('H:i:s') : '-' }} -
-                                        {{ $signal->closed_at ? $signal->closed_at->format('H:i:s') : '-' }}
+                                        {{ $signal->opened_at ? $signal->opened_at->format('H:i') : '-' }} -
+                                        {{ $signal->closed_at ? $signal->closed_at->format('H:i') : '-' }}
                                     @endif
                                 </span>
                             </div>
