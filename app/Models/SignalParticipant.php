@@ -28,6 +28,21 @@ class SignalParticipant extends Model
         'settled_at' => 'datetime',
     ];
 
+    // ==================== BOOT METHOD ====================
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Prevent joined_at from being updated after initial set
+        static::updating(function ($participant) {
+            if ($participant->isDirty('joined_at') && $participant->getOriginal('joined_at')) {
+                // Restore original joined_at if someone tries to change it
+                $participant->joined_at = $participant->getOriginal('joined_at');
+            }
+        });
+    }
+
     // ==================== RELATIONSHIPS ====================
 
     public function signal()
@@ -80,7 +95,6 @@ class SignalParticipant extends Model
      */
     public function getFinalBalanceChangeAttribute()
     {
-        // Bet amount dikembalikan + profit/loss - fee
         return $this->bet_amount + $this->profit_loss - $this->fee_amount;
     }
 }

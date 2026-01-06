@@ -282,17 +282,17 @@
                                             </td>
                                         </tr>
                                     @endif
-                                    @if ($signal->closed_at)
+                                    @if ($signal->opened_at)
                                         <tr>
                                             <td class="text-gray-500">Closed At:</td>
-                                            <td class="text-gray-800">{{ $signal->closed_at->format('d M Y, H:i:s') }}
+                                            <td class="text-gray-800">{{ $signal->opened_at->format('d M Y, H:i:s') }}
                                             </td>
                                         </tr>
                                     @endif
-                                    @if ($signal->settled_at)
+                                    @if ($signal->clossed_at)
                                         <tr>
                                             <td class="text-gray-500">Settled At:</td>
-                                            <td class="text-gray-800">{{ $signal->settled_at->format('d M Y, H:i:s') }}
+                                            <td class="text-gray-800">{{ $signal->clossed_at->format('d M Y, H:i:s') }}
                                             </td>
                                         </tr>
                                     @endif
