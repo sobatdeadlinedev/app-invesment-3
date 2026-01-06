@@ -58,6 +58,9 @@
                         $signal = $participant->signal;
                         $coinInfo = $signal->getCoinInfo();
 
+                        // Check if signal is pending
+                        $isPending = $signal->result === 'pending' || $signal->result === null;
+
                         // FIXED: Determine win/loss based on signal result, not profit_loss
                         $isWin = $signal->result === 'win';
                         $isSettled = $participant->status === 'settled';
@@ -90,15 +93,15 @@
                                 $direction = '';
                                 $textColor = 'text-muted';
 
-                                if ($signal->result === 'win') {
+                                if ($isPending) {
+                                    $direction = 'PENDING';
+                                    $textColor = 'text-warning';
+                                } elseif ($signal->result === 'win') {
                                     $direction = 'CALL';
                                     $textColor = 'text-success';
                                 } elseif ($signal->result === 'loss') {
                                     $direction = 'PUT';
                                     $textColor = 'text-danger';
-                                } else {
-                                    $direction = 'PENDING';
-                                    $textColor = 'text-warning';
                                 }
                             @endphp
 
@@ -113,22 +116,17 @@
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">time period</span>
                                 <span class="text-white" style="font-size: 12px;">
-                                    {{ $signal->opened_at ? $signal->opened_at->format('H:i') : '-' }} -
-                                    {{ $signal->closed_at ? $signal->closed_at->format('H:i') : '-' }}
+                                    @if ($isPending)
+                                        ~
+                                    @else
+                                        {{ $signal->opened_at ? $signal->opened_at->format('H:i') : '-' }} -
+                                        {{ $signal->closed_at ? $signal->closed_at->format('H:i') : '-' }}
+                                    @endif
                                 </span>
                             </div>
 
-                            <!-- Gross Profit/Loss (before fee) -->
-                            {{-- <div class="d-flex justify-content-between">
-                                <span class="text-muted" style="font-size: 12px;">gross profit/loss</span>
-                                <span class="text-{{ $profitLossAmount >= 0 ? 'success' : 'danger' }} fw-bold"
-                                    style="font-size: 12px;">
-                                    {{ $isSettled ? ($profitLossAmount >= 0 ? '+' : '') . number_format($profitLossAmount, 2) : '-' }}
-                                </span>
-                            </div> --}}
-
                             <!-- Fee Amount -->
-                            @if ($isSettled && $feeAmount > 0)
+                            @if (!$isPending && $isSettled && $feeAmount > 0)
                                 <div class="d-flex justify-content-between">
                                     <span class="text-muted" style="font-size: 12px;">trading fee (1%)</span>
                                     <span class="text-warning" style="font-size: 12px;">
@@ -142,7 +140,11 @@
                                 <span class="text-muted" style="font-size: 12px;">net profit/loss</span>
                                 <span class="text-{{ $isFinalProfit ? 'success' : 'danger' }} fw-bold"
                                     style="font-size: 12px;">
-                                    {{ $isSettled ? ($netResult >= 0 ? '+' : '') . number_format($netResult, 2) : '-' }}
+                                    @if ($isPending)
+                                        ~
+                                    @else
+                                        {{ $isSettled ? ($netResult >= 0 ? '+' : '') . number_format($netResult, 2) : '-' }}
+                                    @endif
                                 </span>
                             </div>
 
@@ -150,7 +152,11 @@
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">rate of return</span>
                                 <span class="text-white" style="font-size: 12px;">
-                                    {{ $isSettled ? number_format($signal->rate_of_return, 2) . '%' : '-' }}
+                                    @if ($isPending)
+                                        ~
+                                    @else
+                                        {{ $isSettled ? number_format($signal->rate_of_return, 2) . '%' : '-' }}
+                                    @endif
                                 </span>
                             </div>
 
@@ -162,21 +168,15 @@
                                 </span>
                             </div>
 
-                            <!-- Number of Transactions -->
-                            {{-- <div class="d-flex justify-content-between">
-                                <span class="text-muted" style="font-size: 12px;">direction</span>
-                                <span
-                                    class="text-{{ $signal->result === 'win' ? 'success' : ($signal->result === 'loss' ? 'danger' : 'warning') }}"
-                                    style="font-size: 12px;">
-                                    {{ $signal->result === 'win' ? 'CALL' : ($signal->result === 'loss' ? 'PUT' : 'PENDING') }}
-                                </span>
-                            </div> --}}
-
                             <!-- Opening Price -->
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">opening price</span>
                                 <span class="text-white" style="font-size: 12px;">
-                                    {{ number_format($signal->entry_price, 3) }}
+                                    @if ($isPending)
+                                        ~
+                                    @else
+                                        {{ number_format($signal->entry_price, 3) }}
+                                    @endif
                                 </span>
                             </div>
 
@@ -184,7 +184,11 @@
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted" style="font-size: 12px;">settlement price</span>
                                 <span class="text-white" style="font-size: 12px;">
-                                    {{ $isSettled ? number_format($signal->target_price, 3) : '-' }}
+                                    @if ($isPending)
+                                        ~
+                                    @else
+                                        {{ $isSettled ? number_format($signal->target_price, 3) : '-' }}
+                                    @endif
                                 </span>
                             </div>
 
@@ -196,7 +200,7 @@
                                 </span>
                             </div>
 
-                            @if (!$isSettled)
+                            @if ($isPending)
                                 <!-- Pending Notice -->
                                 <div class="mt-2 pt-2" style="border-top: 1px solid var(--border-color);">
                                     <small class="text-warning">
