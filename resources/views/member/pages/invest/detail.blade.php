@@ -1,6 +1,5 @@
 @extends('member.layouts.app')
 @section('content')
-    <!-- Scrollable Content Area -->
     <div class="scrollable-content">
         <div class="content-section">
 
@@ -18,14 +17,12 @@
                 </div>
             @endif
 
-            <!-- Back Button -->
             <div class="mb-3">
                 <a href="{{ route('member.invest.index') }}" class="btn-back">
                     <i class="bi bi-arrow-left me-2"></i>Back to Signals
                 </a>
             </div>
 
-            <!-- Balance Info Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="row g-3">
                     <div class="col-4">
@@ -44,7 +41,6 @@
                 </div>
             </div>
 
-            <!-- Signal Header Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <div class="coin-icon-large" style="background: linear-gradient(135deg, #f5a623 0%, #f7b733 100%);">
@@ -91,7 +87,6 @@
                 </div>
             </div>
 
-            <!-- Chart Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h6 class="text-white mb-0">Signal Activity</h6>
@@ -102,13 +97,11 @@
                     </div>
                 </div>
 
-                <!-- Simple Chart Placeholder -->
                 <div class="chart-container">
                     <canvas id="priceChart"></canvas>
                 </div>
             </div>
 
-            <!-- Your Participation Status -->
             @if ($hasJoined)
                 <div class="card-dark shadow-sm p-3 mb-3">
                     <h6 class="text-white mb-3">
@@ -136,26 +129,14 @@
                     @if ($participant->status === 'settled')
                         <div class="mt-3 pt-3" style="border-top: 1px solid var(--border-color);">
                             <div class="row g-3">
-                                <div class="col-4">
-                                    <p class="text-muted mb-1 small">Profit/Loss</p>
-                                    <h6
-                                        class="{{ $participant->profit_loss >= 0 ? 'text-success' : 'text-danger' }} mb-0 fw-bold">
-                                        {{ $participant->profit_loss >= 0 ? '+' : '' }} $
-                                        {{ number_format($participant->profit_loss, 2) }}
+                                <div class="col-12">
+                                    <p class="text-muted mb-1 small">Your Reward</p>
+                                    <h6 class="text-success mb-0 fw-bold">
+                                        + $ {{ number_format($participant->profit_loss, 2) }}
                                     </h6>
-                                </div>
-                                <div class="col-4">
-                                    <p class="text-muted mb-1 small">Fee</p>
-                                    <h6 class="text-warning mb-0 fw-bold">$
-                                        {{ number_format($participant->fee_amount, 2) }}</h6>
-                                </div>
-                                <div class="col-4">
-                                    <p class="text-muted mb-1 small">Net Result</p>
-                                    <h6
-                                        class="{{ $participant->net_result >= 0 ? 'text-success' : 'text-danger' }} mb-0 fw-bold">
-                                        {{ $participant->net_result >= 0 ? '+' : '' }} $
-                                        {{ number_format($participant->net_result, 2) }}
-                                    </h6>
+                                    <small class="text-muted">You received
+                                        {{ number_format(($participant->profit_loss / $participant->bet_amount) * 100, 2) }}%
+                                        reward</small>
                                 </div>
                             </div>
                         </div>
@@ -163,7 +144,6 @@
                 </div>
             @endif
 
-            <!-- Bet Calculation Card -->
             @if (!$hasJoined && $signal->status === 'open')
                 <div class="card-dark shadow-sm p-3 mb-3">
                     <h6 class="text-white mb-3">Your Bet Calculation</h6>
@@ -180,15 +160,15 @@
                         </div>
                     </div>
                     <div class="alert"
-                        style="background-color: rgba(245, 166, 35, 0.1); border: 1px solid #f5a623; color: #f5a623; font-size: 12px;">
+                        style="background-color: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #22c55e; font-size: 12px;">
                         <i class="bi bi-info-circle me-2"></i>
-                        Your bet amount is automatically calculated as 1% of your current Trade Balance and will be locked
-                        until settlement.
+                        <strong>Good news!</strong> You will always receive rewards based on the win rate. No losses, no
+                        fees!
+                        Your bet is just locked temporarily for volume tracking.
                     </div>
                 </div>
             @endif
 
-            <!-- Signal Statistics -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <h6 class="text-white mb-3">Signal Statistics</h6>
                 <div class="row g-3">
@@ -213,18 +193,18 @@
                         <div class="row g-3">
                             <div class="col-6">
                                 <p class="text-muted mb-1 small">Result</p>
-                                @if ($signal->result === 'win')
+                                @if ($signal->result === 'call')
                                     <span class="badge badge-success">
-                                        <i class="bi bi-trophy me-1"></i>WIN
+                                        <i class="bi bi-arrow-up me-1"></i>CALL (Market Up)
                                     </span>
                                 @else
                                     <span class="badge badge-danger">
-                                        <i class="bi bi-x-circle me-1"></i>LOSS
+                                        <i class="bi bi-arrow-down me-1"></i>PUT (Market Down)
                                     </span>
                                 @endif
                             </div>
                             <div class="col-6">
-                                <p class="text-muted mb-1 small">Rate of Return</p>
+                                <p class="text-muted mb-1 small">Win Rate</p>
                                 <h6 class="text-gold mb-0 fw-bold">{{ number_format($signal->rate_of_return, 2) }}%</h6>
                             </div>
                         </div>
@@ -232,13 +212,12 @@
                 @endif
             </div>
 
-            <!-- Join Button -->
             @if (!$hasJoined && $signal->status === 'open')
                 @if (auth()->user()->canJoinSignal())
                     <form action="{{ route('member.signals.join', $signal->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-call w-100"
-                            onclick="return confirm('Join this signal?\n\nYour bet: ${{ number_format(auth()->user()->calculateBetAmount(), 2) }} will be locked until settlement.\n\nDo you want to continue?')">
+                            onclick="return confirm('Join this signal?\n\nYour bet: ${{ number_format(auth()->user()->calculateBetAmount(), 2) }} will be locked until settlement.\n\nYou will receive rewards based on the win rate set by admin.\n\nDo you want to continue?')">
                             <i class="bi bi-check-circle me-2"></i>JOIN THIS SIGNAL
                         </button>
                     </form>
@@ -252,7 +231,7 @@
             @elseif($hasJoined)
                 <div class="alert alert-success">
                     <i class="bi bi-check-circle me-2"></i>
-                    You have joined this signal. Wait for admin to settle the result.
+                    You have joined this signal. Wait for admin to settle and receive your rewards!
                 </div>
             @else
                 <div class="alert alert-secondary">
@@ -261,7 +240,6 @@
                 </div>
             @endif
 
-            <!-- Info Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-start gap-2">
                     <i class="bi bi-info-circle-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
@@ -271,9 +249,9 @@
                             <li>Bet is automatically calculated as 1% of Trade Balance</li>
                             <li>Minimum $100.00 available balance required</li>
                             <li>Your bet will be locked until signal settlement</li>
-                            <li>Trading fee (1% of Trade Balance) applies on settlement</li>
-                            <li>Results are settled by admin</li>
-                            <li>Check your history for past signal results</li>
+                            <li><strong class="text-success">No losses! No fees!</strong> You always win rewards</li>
+                            <li>Reward amount depends on the win rate set by admin</li>
+                            <li>Call/Put indicates market direction (both receive rewards)</li>
                         </ul>
                     </div>
                 </div>
@@ -284,10 +262,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Simple Chart Implementation
         const ctx = document.getElementById('priceChart').getContext('2d');
 
-        // Generate sample data
         const generateData = () => {
             const data = [];
             let value = {{ $signal->entry_price ?? 43000 }};
@@ -350,7 +326,7 @@
                                 size: 11
                             },
                             callback: function(value) {
-                                return '$' + value.toLocaleString();
+                                return ' + value.toLocaleString();
                             }
                         }
                     }
@@ -362,7 +338,6 @@
             }
         });
 
-        // Timeframe buttons
         document.querySelectorAll('.timeframe-pill').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.timeframe-pill').forEach(b => b.classList.remove('active'));
@@ -372,7 +347,6 @@
             });
         });
 
-        // Auto hide alerts
         setTimeout(function() {
             $('.alert').fadeOut('slow');
         }, 5000);

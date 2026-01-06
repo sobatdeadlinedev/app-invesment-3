@@ -1,6 +1,5 @@
 @extends('member.layouts.app')
 @section('content')
-    <!-- Scrollable Content Area -->
     <div class="scrollable-content">
         <div class="content-section">
 
@@ -18,14 +17,12 @@
                 </div>
             @endif
 
-            <!-- Back Button -->
             <div class="mb-3">
                 <a href="{{ route('member.invest.index') }}" class="btn-back">
                     <i class="bi bi-arrow-left me-2"></i>Back to Coins
                 </a>
             </div>
 
-            <!-- Coin Header Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center gap-3">
                     <div class="coin-icon-large"
@@ -43,7 +40,6 @@
                 </div>
             </div>
 
-            <!-- Balance Info Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="row g-3">
                     <div class="col-4">
@@ -62,7 +58,6 @@
                 </div>
             </div>
 
-            <!-- Status Info -->
             @if (!auth()->user()->canJoinSignal())
                 <div class="alert alert-danger" style="font-size: 12px;">
                     <i class="bi bi-exclamation-triangle me-2"></i>
@@ -72,7 +67,6 @@
                 </div>
             @endif
 
-            <!-- Signals List -->
             <div class="card-dark shadow-sm p-0 mb-3">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
                     <h6 class="text-white mb-0">Available Trading Signals</h6>
@@ -81,7 +75,6 @@
                 @forelse($openSignals as $signal)
                     <div class="coin-list-item">
                         <div class="d-flex flex-column gap-2">
-                            <!-- Signal Header -->
                             <div class="d-flex align-items-start justify-content-between">
                                 <div class="flex-grow-1">
                                     <div class="text-white fw-bold mb-1" style="font-size: 14px;">
@@ -97,32 +90,23 @@
                                 </span>
                             </div>
 
-                            <!-- Signal Details -->
                             <div class="row g-2">
                                 @if ($signal->entry_price)
-                                    <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 10px;">Entry</small>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block" style="font-size: 10px;">Opening Price</small>
                                         <small class="text-white fw-bold">$
                                             {{ number_format($signal->entry_price, 2) }}</small>
                                     </div>
                                 @endif
                                 @if ($signal->target_price)
-                                    <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 10px;">Target</small>
-                                        <small class="text-success fw-bold">$
+                                    <div class="col-6">
+                                        <small class="text-muted d-block" style="font-size: 10px;">Settlement Price</small>
+                                        <small class="text-gold fw-bold">$
                                             {{ number_format($signal->target_price, 2) }}</small>
-                                    </div>
-                                @endif
-                                @if ($signal->stop_loss)
-                                    <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 10px;">Stop Loss</small>
-                                        <small class="text-danger fw-bold">$
-                                            {{ number_format($signal->stop_loss, 2) }}</small>
                                     </div>
                                 @endif
                             </div>
 
-                            <!-- Participants Info & Action -->
                             <div class="d-flex align-items-center justify-content-between pt-2"
                                 style="border-top: 1px solid var(--border-color);">
                                 <small class="text-muted">
@@ -153,7 +137,6 @@
                 @endforelse
             </div>
 
-            <!-- Info Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-start gap-2">
                     <i class="bi bi-info-circle-fill text-gold" style="font-size: 18px; margin-top: 2px;"></i>
@@ -164,7 +147,8 @@
                             <li>Bet amount is 1% of your Trade Balance</li>
                             <li>Minimum $ 100.00 available balance required</li>
                             <li>Your bet will be locked until settlement</li>
-                            <li>Trading fee (1%) applies when settled</li>
+                            <li><strong class="text-success">You always win rewards!</strong> No losses, no fees</li>
+                            <li>Reward = Bet × Win Rate (set by admin)</li>
                         </ul>
                     </div>
                 </div>
