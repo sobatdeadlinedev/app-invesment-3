@@ -12,7 +12,6 @@ class Wallet extends Model
     protected $fillable = [
         'user_id',
         'type',
-        'account_name',
         'account_number',
     ];
 
@@ -30,9 +29,12 @@ class Wallet extends Model
 
     public function getTypeLabel()
     {
-        return self::getTypes()[$this->type] ?? $this->type;
+        return match ($this->type) {
+            'trc20' => 'TRON Network (TRC20)',
+            'bep20' => 'Binance Smart Chain (BEP20)',
+            default => strtoupper($this->type),
+        };
     }
-
     public function user()
     {
         return $this->belongsTo(User::class);

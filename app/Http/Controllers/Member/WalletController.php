@@ -19,12 +19,12 @@ class WalletController extends Controller
         }
 
         $request->validate([
-            'account_name' => 'required|string|max:255',
+            'type' => 'required|in:trc20,bep20',
             'account_number' => 'required|string|max:255',
         ]);
 
         $user->wallets()->create([
-            'account_name' => $request->account_name,
+            'type' => $request->type,
             'account_number' => $request->account_number,
         ]);
 
@@ -41,12 +41,12 @@ class WalletController extends Controller
         }
 
         $request->validate([
-            'account_name' => 'required|string|max:255',
+            'type' => 'required|in:trc20,bep20',
             'account_number' => 'required|string|max:255',
         ]);
 
         $wallet->update([
-            'account_name' => $request->account_name,
+            'type' => $request->type,
             'account_number' => $request->account_number,
         ]);
 

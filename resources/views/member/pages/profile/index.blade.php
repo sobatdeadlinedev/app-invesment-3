@@ -412,12 +412,13 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center gap-2 mb-1">
-                                        <div class="text-white fw-bold">{{ $wallet->account_name }}</div>
                                         <span class="wallet-type-badge {{ $wallet->type }}">
                                             {{ strtoupper($wallet->type) }}
                                         </span>
                                     </div>
-                                    <div class="text-muted small mb-1">{{ $wallet->account_number }}</div>
+                                    <div class="text-white fw-bold mb-1" style="font-size: 13px;">
+                                        {{ $wallet->account_number }}
+                                    </div>
                                     <small class="text-gold" style="font-size: 11px;">
                                         <i class="bi bi-info-circle me-1"></i>{{ $wallet->getTypeLabel() }}
                                     </small>
@@ -425,7 +426,7 @@
                             </div>
                             <div class="d-flex gap-2">
                                 <button class="btn-bank-action btn-bank-edit"
-                                    onclick="openEditModal({{ $wallet->id }}, '{{ $wallet->type }}', '{{ $wallet->account_name }}', '{{ $wallet->account_number }}')">
+                                    onclick="openEditModal({{ $wallet->id }}, '{{ $wallet->type }}', '{{ $wallet->account_number }}')">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <form action="{{ route('member.wallet.destroy', $wallet->id) }}" method="POST"
@@ -509,14 +510,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-white">Nama Wallet</label>
-                            <input type="text" name="account_name" class="form-control-dark"
-                                placeholder="Contoh: My Main Wallet" required value="{{ old('account_name') }}">
-                            @error('account_name')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                        <!-- Wallet Address -->
                         <div class="mb-3">
                             <label class="form-label text-white">Wallet Address</label>
                             <input type="text" name="account_number" class="form-control-dark"
@@ -590,14 +584,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-white">Nama Wallet</label>
-                            <input type="text" name="account_name" id="edit_account_name" class="form-control-dark"
-                                placeholder="Contoh: My Main Wallet" required>
-                            @error('account_name')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                        <!-- Wallet Address -->
                         <div class="mb-3">
                             <label class="form-label text-white">Wallet Address</label>
                             <input type="text" name="account_number" id="edit_account_number"
@@ -982,10 +969,16 @@
             document.getElementById(type + '-list').classList.add('active');
         }
 
-        function openEditModal(id, accountName, accountNumber) {
+        function openEditModal(id, type, accountNumber) {
             document.getElementById('editWalletForm').action = "{{ url('member/wallet') }}/" + id;
-            document.getElementById('edit_account_name').value = accountName;
             document.getElementById('edit_account_number').value = accountNumber;
+
+            // Set radio button type
+            if (type === 'trc20') {
+                document.getElementById('edit_type_trc20').checked = true;
+            } else {
+                document.getElementById('edit_type_bep20').checked = true;
+            }
 
             var editModal = new bootstrap.Modal(document.getElementById('editWalletModal'));
             editModal.show();
