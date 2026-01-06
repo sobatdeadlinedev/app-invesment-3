@@ -11,7 +11,7 @@ class TradingSignal extends Model
 
     protected $fillable = [
         'title',
-        'coin', // NEW
+        'coin',
         'description',
         'entry_price',
         'target_price',
@@ -120,7 +120,6 @@ class TradingSignal extends Model
         return $query->where('status', 'settled');
     }
 
-    // NEW: Filter by coin
     public function scopeForCoin($query, $coin)
     {
         return $query->where('coin', strtoupper($coin));
@@ -153,21 +152,28 @@ class TradingSignal extends Model
         return $this->participants()->sum('bet_amount');
     }
 
+    /**
+     * Close signal - set opened_at saat status closed
+     */
     public function closeSignal($result, $rateOfReturn)
     {
         $this->update([
             'status' => 'closed',
             'result' => $result,
             'rate_of_return' => $rateOfReturn,
-            'closed_at' => now(),
+            'opened_at' => now(), // Set opened_at saat close
         ]);
     }
 
+    /**
+     * Mark as settled - set closed_at saat status settled
+     */
     public function markAsSettled()
     {
         $this->update([
             'status' => 'settled',
             'settled_at' => now(),
+            'closed_at' => now(), // Set closed_at saat settled
         ]);
     }
 }

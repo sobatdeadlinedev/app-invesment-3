@@ -51,7 +51,6 @@ class TradingSignalController extends Controller
                 'target_price' => $request->target_price,
                 'status' => 'open',
                 'created_by' => auth()->id(),
-                // opened_at TIDAK diset disini, akan diset saat status closed
             ]);
 
             DB::commit();
@@ -130,7 +129,7 @@ class TradingSignalController extends Controller
     }
 
     /**
-     * Close signal - opened_at akan diset disini (saat status closed)
+     * Close signal - opened_at akan diset di method closeSignal()
      */
     public function close(Request $request, $id)
     {
@@ -196,14 +195,10 @@ class TradingSignalController extends Controller
                 'rate_of_return' => $request->rate_of_return,
             ]);
 
-            // Call closeSignal method
+            // Call closeSignal method - opened_at akan diset di dalam method ini
             $signal->closeSignal($resultForDb, $request->rate_of_return);
 
-            // SET opened_at saat status berubah ke CLOSED
-            $signal->opened_at = now();
-            $signal->save();
-
-            Log::info('closeSignal method completed and opened_at set', [
+            Log::info('closeSignal method completed', [
                 'signal_id' => $signal->id,
                 'new_status' => $signal->fresh()->status,
                 'result' => $signal->fresh()->result,
@@ -219,7 +214,7 @@ class TradingSignalController extends Controller
                 'result' => strtoupper($resultForDb),
                 'display_as' => strtoupper($request->result),
                 'rate_of_return' => $request->rate_of_return,
-                'opened_at' => $signal->opened_at,
+                'opened_at' => $signal->fresh()->opened_at,
             ]);
 
             $displayLabel = in_array($request->result, ['call', 'put'])
@@ -254,7 +249,7 @@ class TradingSignalController extends Controller
     }
 
     /**
-     * Settle signal - closed_at akan diset disini (saat status settled)
+     * Settle signal - closed_at akan diset di method markAsSettled()
      */
     public function settle($id)
     {
@@ -331,12 +326,8 @@ class TradingSignalController extends Controller
                 ]);
             }
 
-            // Mark signal as settled
+            // Mark signal as settled - closed_at akan diset di dalam method ini
             $signal->markAsSettled();
-
-            // SET closed_at saat status berubah ke SETTLED
-            $signal->closed_at = now();
-            $signal->save();
 
             DB::commit();
 
@@ -344,7 +335,7 @@ class TradingSignalController extends Controller
                 'signal_id' => $signal->id,
                 'settled_count' => $settledCount,
                 'total_rewards' => $totalRewards,
-                'closed_at' => $signal->closed_at,
+                'closed_at' => $signal->fresh()->closed_at,
             ]);
 
             return redirect()
