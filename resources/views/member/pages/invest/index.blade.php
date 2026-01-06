@@ -41,7 +41,7 @@
             <div class="row g-2 mb-3">
                 <div class="col-6">
                     <a href="{{ route('member.invest.history') }}" class="btn btn-outline-light w-100 btn-sm">
-                        <i class="bi bi-clock-history me-1"></i>Trading History
+                        <i class="bi bi-clock-history me-1"></i>Historical Orders
                     </a>
                 </div>
                 <div class="col-6">

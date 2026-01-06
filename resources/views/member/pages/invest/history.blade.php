@@ -59,7 +59,7 @@
                         $coinInfo = $signal->getCoinInfo();
 
                         // Check if signal is pending
-                        $isPending = $signal->result === 'pending' || $signal->result === null;
+                        $isPending = $signal->status != 'settled' || $signal->result === null;
 
                         // FIXED: Determine win/loss based on signal result, not profit_loss
                         $isWin = $signal->result === 'win';
