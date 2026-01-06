@@ -46,17 +46,54 @@ class DepositController extends Controller
                 'approved_by' => auth()->id(),
             ]);
 
-            // UPDATED - Add to exchange balance
+            // Add to exchange balance
             $user = $deposit->user;
             $user->addExchangeBalance($deposit->total_amount);
 
+            // Check if this is first deposit
+            $previousApprovedDeposits = Transaction::where('user_id', $deposit->user_id)
+                ->where('type', 'deposit')
+                ->where('status', 'approved')
+                ->where('id', '!=', $deposit->id)
+                ->count();
+
+            $isFirstDeposit = ($previousApprovedDeposits === 0);
+
+            // Give 5% bonus for first deposit
+            if ($isFirstDeposit) {
+                $bonusAmount = $deposit->total_amount * 0.05;
+
+                // Add bonus to exchange balance
+                $user->addExchangeBalance($bonusAmount);
+
+                // Create bonus transaction record
+                Transaction::create([
+                    'user_id' => $user->id,
+                    'source_user_id' => null,
+                    'reference' => Transaction::generateReference('DP'),
+                    'amount' => $bonusAmount,
+                    'total_amount' => $bonusAmount,
+                    'type' => 'deposit',
+                    'balance_type' => 'exchange',
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'note' => 'Bonus 5% - First Deposit',
+                ]);
+            }
+
             // Process referral commissions ONLY for first deposit
-            $this->processReferralCommissions($deposit);
+            if ($isFirstDeposit) {
+                $this->processReferralCommissions($deposit);
+            }
 
             DB::commit();
 
+            $message = $isFirstDeposit
+                ? 'Deposit has been approved successfully and added to Exchange Balance. Bonus 5% has been credited!'
+                : 'Deposit has been approved successfully and added to Exchange Balance.';
+
             return redirect()->route('admin.deposit.index')
-                ->with('success', 'Deposit has been approved successfully and added to Exchange Balance.');
+                ->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -88,16 +125,6 @@ class DepositController extends Controller
      */
     private function processReferralCommissions(Transaction $deposit)
     {
-        $previousApprovedDeposits = Transaction::where('user_id', $deposit->user_id)
-            ->where('type', 'deposit')
-            ->where('status', 'approved')
-            ->where('id', '!=', $deposit->id)
-            ->count();
-
-        if ($previousApprovedDeposits > 0) {
-            return;
-        }
-
         $referralUsage = ReferralUsage::where('referred_id', $deposit->user_id)->first();
 
         if (!$referralUsage) {
@@ -145,7 +172,7 @@ class DepositController extends Controller
             'amount' => $amount,
             'total_amount' => $amount,
             'type' => 'commission',
-            'balance_type' => 'exchange', // Commission masuk ke exchange
+            'balance_type' => 'exchange',
             'status' => 'approved',
             'approved_by' => auth()->id(),
         ]);
