@@ -1,179 +1,154 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Member;
 
-use App\Http\Controllers\Controller;
+use App\Models\Config;
 use App\Models\Transaction;
-use App\Models\ReferralUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class DepositController extends Controller
 {
+    /**
+     * Display the deposit form
+     */
     public function index()
     {
-        $deposits = Transaction::with(['user'])
-            ->deposit()
-            ->latest()
-            ->paginate(10);
+        $wallet = Config::get('app_wallet_address');
+        $walletName = $wallet['name'];
+        $walletNumber = $wallet['number'];
+        $qrCode = Config::get('app_qr_code')['value'] ?? null;
 
-        return view('admin.pages.deposit.index', compact('deposits'));
+        // Get user balance - UPDATED
+        $user = auth()->user();
+        $exchangeBalance = $user->exchange_balance;
+        $tradeBalance = $user->trade_balance;
+        $userBalance = $user->exchange_balance + $user->trade_balance; // Total balance untuk display
+
+        return view('member.pages.deposit.index', compact(
+            'walletNumber',
+            'walletName',
+            'qrCode',
+            'exchangeBalance',
+            'tradeBalance',
+            'userBalance'
+        ));
     }
 
-    public function show($id)
+    /**
+     * Process deposit request
+     */
+    public function store(Request $request)
     {
-        $deposit = Transaction::with(['user', 'approver'])
-            ->deposit()
-            ->findOrFail($id);
+        $request->validate([
+            'amount' => 'required|numeric|min:10',
+            'payment_method' => 'required|in:ewallet,qrcode',
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+        ], [
+            'amount.required' => 'Jumlah deposit harus diisi',
+            'amount.min' => 'Minimal deposit adalah 10 USDT',
+            'payment_method.required' => 'Metode pembayaran harus dipilih',
+            'payment_proof.required' => 'Bukti transfer harus diupload',
+            'payment_proof.image' => 'File harus berupa gambar',
+            'payment_proof.mimes' => 'Format file harus jpeg, png, atau jpg',
+            'payment_proof.max' => 'Ukuran file maksimal 5MB',
+        ]);
 
-        return view('admin.pages.deposit.detail', compact('deposit'));
-    }
-
-    public function approve($id)
-    {
-        $deposit = Transaction::deposit()->findOrFail($id);
-
-        if ($deposit->status !== 'pending') {
-            return redirect()->route('admin.deposit.index')
-                ->with('error', 'This deposit has already been processed.');
-        }
-
-        DB::beginTransaction();
         try {
-            // Update deposit status
-            $deposit->update([
-                'status' => 'approved',
-                'approved_by' => auth()->id(),
+            DB::beginTransaction();
+
+            // Upload payment proof
+            $proofPath = $this->uploadPaymentProof($request->file('payment_proof'));
+
+            // Generate unique reference
+            $reference = Transaction::generateReference('DEP');
+
+            $depositAmount = $request->amount;
+
+            // Create transaction - UPDATED: balance_type = 'exchange'
+            $transaction = Transaction::create([
+                'user_id' => auth()->id(),
+                'reference' => $reference,
+                'amount' => $depositAmount,
+                'total_amount' => $depositAmount,
+                'type' => 'deposit',
+                'balance_type' => 'exchange', // NEW - deposit masuk ke exchange
+                'wallet_id' => null,
+                'withdrawal_fee' => null,
+                'source_user_id' => null,
+                'status' => 'pending',
+                'payment_method' => $request->payment_method,
+                'payment_proof' => $proofPath,
+                'approved_by' => null,
             ]);
-
-            // Add to exchange balance
-            $user = $deposit->user;
-            $user->addExchangeBalance($deposit->total_amount);
-
-            // Check if this is first deposit
-            $previousApprovedDeposits = Transaction::where('user_id', $deposit->user_id)
-                ->where('type', 'deposit')
-                ->where('status', 'approved')
-                ->where('id', '!=', $deposit->id)
-                ->count();
-
-            $isFirstDeposit = ($previousApprovedDeposits === 0);
-
-            // Give 5% bonus for first deposit
-            if ($isFirstDeposit) {
-                $bonusAmount = $deposit->total_amount * 0.05;
-
-                // Add bonus to exchange balance
-                $user->addExchangeBalance($bonusAmount);
-
-                // Create bonus transaction record
-                Transaction::create([
-                    'user_id' => $user->id,
-                    'source_user_id' => null,
-                    'reference' => Transaction::generateReference('BONUS'),
-                    'amount' => $bonusAmount,
-                    'total_amount' => $bonusAmount,
-                    'type' => 'deposit',
-                    'balance_type' => 'exchange',
-                    'status' => 'approved',
-                    'approved_by' => auth()->id(),
-                ]);
-            }
-
-            // Process referral commissions ONLY for first deposit
-            if ($isFirstDeposit) {
-                $this->processReferralCommissions($deposit);
-            }
 
             DB::commit();
 
-            $message = $isFirstDeposit
-                ? 'Deposit has been approved successfully and added to Exchange Balance. Bonus 5% has been credited!'
-                : 'Deposit has been approved successfully and added to Exchange Balance.';
-
-            return redirect()->route('admin.deposit.index')
-                ->with('success', $message);
+            return redirect()
+                ->route('member.deposit.history')
+                ->with('success', 'Deposit request submitted successfully! Reference: ' . $reference);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('admin.deposit.index')
-                ->with('error', 'Failed to approve deposit: ' . $e->getMessage());
-        }
-    }
+            if (isset($proofPath) && Storage::disk('public')->exists($proofPath)) {
+                Storage::disk('public')->delete($proofPath);
+            }
 
-    public function reject($id)
-    {
-        $deposit = Transaction::deposit()->findOrFail($id);
+            Log::error('Deposit failed: ' . $e->getMessage());
 
-        if ($deposit->status !== 'pending') {
-            return redirect()->route('admin.deposit.index')
-                ->with('error', 'This deposit has already been processed.');
-        }
-
-        $deposit->update([
-            'status' => 'rejected',
-            'approved_by' => auth()->id(),
-        ]);
-
-        return redirect()->route('admin.deposit.index')
-            ->with('success', 'Deposit has been rejected.');
-    }
-
-    /**
-     * Process referral commissions - UPDATED to add to exchange balance
-     */
-    private function processReferralCommissions(Transaction $deposit)
-    {
-        $referralUsage = ReferralUsage::where('referred_id', $deposit->user_id)->first();
-
-        if (!$referralUsage) {
-            return;
-        }
-
-        $depositAmount = $deposit->total_amount;
-
-        // Level 1: 5%
-        $level1Commission = $depositAmount * 0.05;
-        $this->createCommissionTransaction(
-            $referralUsage->referrer_id,
-            $deposit->user_id,
-            $level1Commission,
-            'Level 1 Commission - First Deposit'
-        );
-
-        // Level 2: 2%
-        $level2ReferralUsage = ReferralUsage::where('referred_id', $referralUsage->referrer_id)->first();
-
-        if ($level2ReferralUsage) {
-            $level2Commission = $depositAmount * 0.02;
-            $this->createCommissionTransaction(
-                $level2ReferralUsage->referrer_id,
-                $deposit->user_id,
-                $level2Commission,
-                'Level 2 Commission - First Deposit'
-            );
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Failed to submit deposit request. Please try again.');
         }
     }
 
     /**
-     * Create commission transaction - UPDATED to add to exchange balance
+     * Show deposit history
      */
-    private function createCommissionTransaction($userId, $sourceUserId, $amount, $note = '')
+    public function history()
     {
-        // Add commission to exchange balance
-        $user = \App\Models\User::find($userId);
-        $user->addExchangeBalance($amount);
+        $transactions = Transaction::forUser(auth()->id())
+            ->deposit()
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
-        return Transaction::create([
-            'user_id' => $userId,
-            'source_user_id' => $sourceUserId,
-            'reference' => Transaction::generateReference('CM'),
-            'amount' => $amount,
-            'total_amount' => $amount,
-            'type' => 'commission',
-            'balance_type' => 'exchange',
-            'status' => 'approved',
-            'approved_by' => auth()->id(),
+        $pendingCount = Transaction::forUser(auth()->id())
+            ->deposit()
+            ->pending()
+            ->count();
+
+        $completedCount = Transaction::forUser(auth()->id())
+            ->deposit()
+            ->whereIn('status', ['approved', 'completed'])
+            ->count();
+
+        return view('member.pages.deposit.history', compact('transactions', 'pendingCount', 'completedCount'));
+    }
+
+    private function uploadPaymentProof($file)
+    {
+        if (!$file) {
+            throw new \Exception('Payment proof file is required');
+        }
+
+        $fileName = 'deposit_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        return $file->storeAs('payment_proofs', $fileName, 'public');
+    }
+
+    public function getPendingCount()
+    {
+        $count = Transaction::forUser(auth()->id())
+            ->deposit()
+            ->pending()
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'count' => $count,
         ]);
     }
 }
