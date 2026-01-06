@@ -15,6 +15,20 @@
 
             <h5 class="text-white mb-3">Withdraw</h5>
 
+            <!-- Currency Info Card -->
+            <div class="card-dark shadow-sm p-3 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div
+                        style="width: 40px; height: 40px; background: rgba(245, 166, 35, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: var(--gold-color); font-size: 20px; font-weight: bold;">₮</span>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-0 small">Currency</p>
+                        <h6 class="text-white mb-0 fw-bold">USDT (Tether)</h6>
+                    </div>
+                </div>
+            </div>
+
             <!-- Verification Alert (if not verified) -->
             @if (!auth()->user()->is_verified)
                 <div class="alert alert-warning mb-3"

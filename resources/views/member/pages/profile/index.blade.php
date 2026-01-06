@@ -402,6 +402,21 @@
                     </div>
                 </div>
 
+                <!-- Currency Info Card Inside Wallet -->
+                <div class="p-3"
+                    style="border-bottom: 1px solid var(--border-color); background: rgba(245, 166, 35, 0.03);">
+                    <div class="d-flex align-items-center gap-2">
+                        <div
+                            style="width: 36px; height: 36px; background: rgba(245, 166, 35, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: var(--gold-color); font-size: 18px; font-weight: bold;">₮</span>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0 small" style="font-size: 11px;">Currency</p>
+                            <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">USDT (Tether)</h6>
+                        </div>
+                    </div>
+                </div>
+
                 @forelse($wallets as $wallet)
                     <!-- Wallet Item -->
                     <div class="bank-list-item">
@@ -470,6 +485,21 @@
                 <form action="{{ route('member.wallet.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
+                        <!-- Currency Info in Modal -->
+                        <div class="mb-3 p-3"
+                            style="background: rgba(245, 166, 35, 0.05); border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center gap-2">
+                                <div
+                                    style="width: 36px; height: 36px; background: rgba(245, 166, 35, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: var(--gold-color); font-size: 18px; font-weight: bold;">₮</span>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-0 small" style="font-size: 11px;">Currency</p>
+                                    <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">USDT (Tether)</h6>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Type Selection -->
                         <div class="mb-3">
                             <label class="form-label text-white">Network Type</label>
@@ -544,6 +574,21 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
+                        <!-- Currency Info in Modal -->
+                        <div class="mb-3 p-3"
+                            style="background: rgba(245, 166, 35, 0.05); border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center gap-2">
+                                <div
+                                    style="width: 36px; height: 36px; background: rgba(245, 166, 35, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: var(--gold-color); font-size: 18px; font-weight: bold;">₮</span>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-0 small" style="font-size: 11px;">Currency</p>
+                                    <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">USDT (Tether)</h6>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Type Selection -->
                         <div class="mb-3">
                             <label class="form-label text-white">Network Type</label>
