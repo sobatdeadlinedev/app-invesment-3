@@ -12,9 +12,13 @@ class TeamController extends Controller
     {
         $users = User::role('member')
             ->withCount('referrals')
-            ->with(['referrals.referred'])
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                // Append multi-level referrals data
+                $user->append('multi_level_referrals', 'total_multi_level_referrals');
+                return $user;
+            });
 
         return view('admin.pages.team.index', compact('users'));
     }

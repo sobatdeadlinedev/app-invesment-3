@@ -380,4 +380,48 @@ class User extends Authenticatable
             $this->verification->isSubmitted() &&
             !$this->verification->isVerified();
     }
+    // Add this to User model
+
+    public function getMultiLevelReferralsAttribute()
+    {
+        return $this->getMultiLevelReferralsEfficient();
+    }
+
+    private function getMultiLevelReferralsEfficient($maxLevel = 10)
+    {
+        $results = collect([]);
+        $currentLevelIds = [$this->id];
+
+        for ($level = 1; $level <= $maxLevel; $level++) {
+            if (empty($currentLevelIds)) {
+                break;
+            }
+
+            $referrals = ReferralUsage::whereIn('referrer_id', $currentLevelIds)
+                ->with(['referred', 'referrer'])
+                ->get();
+
+            if ($referrals->isEmpty()) {
+                break;
+            }
+
+            foreach ($referrals as $referral) {
+                $results->push([
+                    'level' => $level,
+                    'referral_id' => $referral->id,
+                    'referrer_id' => $referral->referrer_id,
+                    'referrer_name' => $referral->referrer->name ?? 'Unknown',
+                    'referred_id' => $referral->referred_id,
+                    'referred' => $referral->referred,
+                    'referral_code' => $referral->referral_code,
+                    'used_at' => $referral->used_at,
+                ]);
+            }
+
+            // Get IDs for next level
+            $currentLevelIds = $referrals->pluck('referred_id')->toArray();
+        }
+
+        return $results;
+    }
 }
