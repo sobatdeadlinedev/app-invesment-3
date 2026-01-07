@@ -38,7 +38,7 @@
 
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.signals.update', $signal->id) }}" method="POST">
+                    <form action="{{ route('admin.signals.update', $signal->id) }}" method="POST" id="signalForm">
                         @csrf
                         @method('PUT')
 
@@ -80,9 +80,14 @@
                         <div class="row mb-10">
                             <div class="col-md-6">
                                 <label class="form-label required">Opening Price (USDT)</label>
-                                <input type="number" name="entry_price"
-                                    class="form-control @error('entry_price') is-invalid @enderror" step="0.01"
-                                    placeholder="0.00" value="{{ old('entry_price', $signal->entry_price) }}" required>
+                                <!-- Hidden input for actual value -->
+                                <input type="hidden" name="entry_price" id="entry_price_hidden" value="{{ old('entry_price', $signal->entry_price) }}">
+                                <!-- Display input with formatting -->
+                                <input type="text" id="entry_price_display" 
+                                    class="form-control @error('entry_price') is-invalid @enderror"
+                                    placeholder="92,920.80" 
+                                    value="{{ old('entry_price') ? number_format(old('entry_price'), 2) : number_format($signal->entry_price, 2) }}"
+                                    required>
                                 @error('entry_price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -90,9 +95,14 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label required">Settlement Price (USDT)</label>
-                                <input type="number" name="target_price"
-                                    class="form-control @error('target_price') is-invalid @enderror" step="0.01"
-                                    placeholder="0.00" value="{{ old('target_price', $signal->target_price) }}" required>
+                                <!-- Hidden input for actual value -->
+                                <input type="hidden" name="target_price" id="target_price_hidden" value="{{ old('target_price', $signal->target_price) }}">
+                                <!-- Display input with formatting -->
+                                <input type="text" id="target_price_display"
+                                    class="form-control @error('target_price') is-invalid @enderror"
+                                    placeholder="95,840.50"
+                                    value="{{ old('target_price') ? number_format(old('target_price'), 2) : number_format($signal->target_price, 2) }}"
+                                    required>
                                 @error('target_price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -120,4 +130,110 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to format number with commas
+            function formatNumber(value) {
+                // Remove all non-digit and non-decimal characters
+                let num = value.replace(/[^\d.]/g, '');
+                
+                // Split by decimal point
+                let parts = num.split('.');
+                
+                // Format integer part with commas
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                
+                // Limit decimal places to 2
+                if (parts[1]) {
+                    parts[1] = parts[1].substring(0, 2);
+                }
+                
+                return parts.join('.');
+            }
+
+            // Function to parse formatted number to float
+            function parseFormattedNumber(value) {
+                return value.replace(/,/g, '');
+            }
+
+            // Entry Price formatting
+            const entryPriceDisplay = document.getElementById('entry_price_display');
+            const entryPriceHidden = document.getElementById('entry_price_hidden');
+
+            entryPriceDisplay.addEventListener('input', function(e) {
+                let cursorPosition = e.target.selectionStart;
+                let oldValue = e.target.value;
+                let formatted = formatNumber(e.target.value);
+                
+                e.target.value = formatted;
+                entryPriceHidden.value = parseFormattedNumber(formatted);
+
+                // Adjust cursor position after formatting
+                let diff = formatted.length - oldValue.length;
+                e.target.selectionStart = e.target.selectionEnd = cursorPosition + diff;
+            });
+
+            entryPriceDisplay.addEventListener('blur', function(e) {
+                let value = parseFormattedNumber(e.target.value);
+                if (value && !isNaN(value)) {
+                    let num = parseFloat(value);
+                    e.target.value = num.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    entryPriceHidden.value = num;
+                }
+            });
+
+            // Target Price formatting
+            const targetPriceDisplay = document.getElementById('target_price_display');
+            const targetPriceHidden = document.getElementById('target_price_hidden');
+
+            targetPriceDisplay.addEventListener('input', function(e) {
+                let cursorPosition = e.target.selectionStart;
+                let oldValue = e.target.value;
+                let formatted = formatNumber(e.target.value);
+                
+                e.target.value = formatted;
+                targetPriceHidden.value = parseFormattedNumber(formatted);
+
+                // Adjust cursor position after formatting
+                let diff = formatted.length - oldValue.length;
+                e.target.selectionStart = e.target.selectionEnd = cursorPosition + diff;
+            });
+
+            targetPriceDisplay.addEventListener('blur', function(e) {
+                let value = parseFormattedNumber(e.target.value);
+                if (value && !isNaN(value)) {
+                    let num = parseFloat(value);
+                    e.target.value = num.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    targetPriceHidden.value = num;
+                }
+            });
+
+            // Form validation before submit
+            document.getElementById('signalForm').addEventListener('submit', function(e) {
+                const entryPrice = parseFloat(entryPriceHidden.value);
+                const targetPrice = parseFloat(targetPriceHidden.value);
+
+                if (isNaN(entryPrice) || entryPrice <= 0) {
+                    e.preventDefault();
+                    alert('Please enter a valid Opening Price');
+                    entryPriceDisplay.focus();
+                    return false;
+                }
+
+                if (isNaN(targetPrice) || targetPrice <= 0) {
+                    e.preventDefault();
+                    alert('Please enter a valid Settlement Price');
+                    targetPriceDisplay.focus();
+                    return false;
+                }
+            });
+        });
+    </script>
 @endsection
