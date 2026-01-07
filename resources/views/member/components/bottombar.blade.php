@@ -14,6 +14,6 @@
     </a>
     <a href="{{ route('member.profile.index') }}" class="nav-item">
         <i class="bi bi-wallet-fill d-block fs-5"></i>
-        <span>Profile</span>
+        <span>My assets</span>
     </a>
 </div>
