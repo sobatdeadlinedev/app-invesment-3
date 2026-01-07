@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <!-- Card 2: Referral Code & Link -->
+            {{-- <!-- Card 2: Referral Code & Link -->
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center gap-2">
@@ -62,7 +62,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Card 3: Market Overview with Real-Time Prices -->
             <div class="card-dark shadow-sm p-0 mb-3">
