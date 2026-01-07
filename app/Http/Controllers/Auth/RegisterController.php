@@ -28,11 +28,23 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        // Format phone number first
+        $phone = $request->phone;
+        if (substr($phone, 0, 1) === '0') {
+            $phone = '62' . substr($phone, 1);
+        } elseif (substr($phone, 0, 2) !== '62') {
+            $phone = '62' . $phone;
+        }
+
+        // Check if phone already exists
+        $phoneExists = User::where('phone', $phone)->exists();
+
+        // Validate without phone unique rule
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username|alpha_dash',
             'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'required|string|max:20|unique:users,phone|regex:/^[0-9]+$/',
+            'phone' => 'required|string|max:20|regex:/^[0-9]+$/',
             'password' => ['required', 'confirmed', Password::min(8)],
             'referral_code' => 'nullable|string|exists:users,refferal_code',
         ], [
@@ -44,21 +56,12 @@ class RegisterController extends Controller
             'email.email' => 'Format email tidak valid',
             'email.unique' => 'Email sudah terdaftar',
             'phone.required' => 'Nomor telepon harus diisi',
-            'phone.unique' => 'Nomor telepon sudah terdaftar',
             'phone.regex' => 'Nomor telepon hanya boleh berisi angka',
             'password.required' => 'Password harus diisi',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
             'password.min' => 'Password minimal 8 karakter',
             'referral_code.exists' => 'Kode referral tidak valid',
         ]);
-
-        // Format phone number to start with 62
-        $phone = $request->phone;
-        if (substr($phone, 0, 1) === '0') {
-            $phone = '62' . substr($phone, 1);
-        } elseif (substr($phone, 0, 2) !== '62') {
-            $phone = '62' . $phone;
-        }
 
         // Create user
         $user = User::create([
@@ -75,7 +78,6 @@ class RegisterController extends Controller
         // Save referral usage if referral code is provided
         if ($request->referral_code) {
             $referrer = User::where('refferal_code', $request->referral_code)->first();
-
             if ($referrer) {
                 ReferralUsage::create([
                     'referrer_id' => $referrer->id,
@@ -89,6 +91,12 @@ class RegisterController extends Controller
         // Auto login setelah register
         Auth::login($user);
 
-        return redirect()->route('member.dashboard.index')->with('success', 'Registrasi berhasil! Selamat datang.');
+        // Show notification if phone was already used
+        $message = 'Registrasi berhasil! Selamat datang.';
+        if ($phoneExists) {
+            $message .= ' Catatan: Nomor telepon ini sudah terdaftar di sistem sebelumnya.';
+        }
+
+        return redirect()->route('member.dashboard.index')->with('success', $message);
     }
 }
