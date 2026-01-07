@@ -67,6 +67,26 @@
                 </div>
             @endif
 
+            {{-- CHART SECTION --}}
+            <div class="card-dark shadow-sm p-3 mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="text-white mb-0">{{ $coinInfo['name'] }} Chart</h6>
+                    <div class="chart-timeframe-pills">
+                        <button class="timeframe-pill active" data-interval="60">1H</button>
+                        <button class="timeframe-pill" data-interval="D">1D</button>
+                        <button class="timeframe-pill" data-interval="W">1W</button>
+                    </div>
+                </div>
+
+                <div class="chart-container" style="height: 400px;">
+                    <iframe id="tradingViewChart"
+                        src="https://www.tradingview.com/widgetembed/?symbol={{ $coinInfo['tradingview_symbol'] }}&interval=60&theme=dark&style=1&locale=en&toolbar_bg=1d2058&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=0&saveimage=0&withdateranges=0&allow_symbol_change=0&show_popup_button=0&details=0&calendar=0&studies=%5B%5D"
+                        style="width: 100%; height: 100%; border: none; border-radius: 8px;" frameborder="0"
+                        allowtransparency="true" scrolling="no">
+                    </iframe>
+                </div>
+            </div>
+
             <div class="card-dark shadow-sm p-0 mb-3">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
                     <h6 class="text-white mb-0">Available Trading Signals</h6>
@@ -120,10 +140,6 @@
 
                             <div class="d-flex align-items-center justify-content-between pt-2"
                                 style="border-top: 1px solid var(--border-color);">
-                                {{-- <small class="text-muted">
-                                    <i class="bi bi-people me-1"></i>{{ $signal->participants_count }} Participants
-                                </small> --}}
-
                                 @if (in_array($signal->id, $joinedSignalIds))
                                     <span class="badge bg-primary" style="font-size: 11px;">
                                         <i class="bi bi-check-circle me-1"></i>Joined
@@ -170,6 +186,21 @@
 
     @push('scripts')
         <script>
+            // Timeframe switcher untuk TradingView
+            document.querySelectorAll('.timeframe-pill').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.timeframe-pill').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const interval = this.getAttribute('data-interval');
+                    const iframe = document.getElementById('tradingViewChart');
+                    const currentSrc = iframe.src;
+                    const newSrc = currentSrc.replace(/interval=\w+/, 'interval=' + interval);
+                    iframe.src = newSrc;
+                });
+            });
+
+            // Auto hide alerts
             setTimeout(function() {
                 $('.alert').fadeOut('slow');
             }, 5000);

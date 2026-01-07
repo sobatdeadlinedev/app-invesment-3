@@ -102,16 +102,20 @@
 
             <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="text-white mb-0">Signal Activity</h6>
+                    <h6 class="text-white mb-0">{{ $signal->getCoinInfo()['name'] }} Chart</h6>
                     <div class="chart-timeframe-pills">
-                        <button class="timeframe-pill active">1H</button>
-                        <button class="timeframe-pill">1D</button>
-                        <button class="timeframe-pill">1W</button>
+                        <button class="timeframe-pill active" data-interval="60">1H</button>
+                        <button class="timeframe-pill" data-interval="D">1D</button>
+                        <button class="timeframe-pill" data-interval="W">1W</button>
                     </div>
                 </div>
 
-                <div class="chart-container">
-                    <canvas id="priceChart"></canvas>
+                <div class="chart-container" style="height: 400px;">
+                    <iframe id="tradingViewChart"
+                        src="https://www.tradingview.com/widgetembed/?symbol={{ $signal->getTradingViewSymbol() }}&interval=60&theme=dark&style=1&locale=en&toolbar_bg=1d2058&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=0&saveimage=0&withdateranges=0&hide_legend=0&allow_symbol_change=0&details=0&calendar=0&show_popup_button=0&studies=%5B%5D"
+                        style="width: 100%; height: 100%; border: none; border-radius: 8px;" frameborder="0"
+                        allowtransparency="true" scrolling="no">
+                    </iframe>
                 </div>
             </div>
 
@@ -285,91 +289,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('priceChart').getContext('2d');
-
-        const generateData = () => {
-            const data = [];
-            let value = {{ $signal->entry_price ?? 43000 }};
-            for (let i = 0; i < 20; i++) {
-                value += (Math.random() - 0.5) * 500;
-                data.push(value);
-            }
-            return data;
-        };
-
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({
-                    length: 20
-                }, (_, i) => ''),
-                datasets: [{
-                    label: 'Price',
-                    data: generateData(),
-                    borderColor: '#f5a623',
-                    backgroundColor: 'rgba(245, 166, 35, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0,
-                    pointHoverRadius: 4,
-                    pointHoverBackgroundColor: '#f5a623',
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(29, 32, 88, 0.95)',
-                        titleColor: '#f5a623',
-                        bodyColor: '#ffffff',
-                        borderColor: '#f5a623',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        display: false
-                    },
-                    y: {
-                        display: true,
-                        grid: {
-                            color: 'rgba(61, 65, 112, 0.3)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#a5a8c4',
-                            font: {
-                                size: 11
-                            },
-                            callback: function(value) {
-                                return '$' + value.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                }
-            }
-        });
-
+        // Timeframe switcher untuk TradingView
         document.querySelectorAll('.timeframe-pill').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.timeframe-pill').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                chart.data.datasets[0].data = generateData();
-                chart.update();
+
+                const interval = this.getAttribute('data-interval');
+                const iframe = document.getElementById('tradingViewChart');
+                const currentSrc = iframe.src;
+                const newSrc = currentSrc.replace(/interval=\w+/, 'interval=' + interval);
+                iframe.src = newSrc;
             });
         });
 
+        // Auto hide alerts
         setTimeout(function() {
             $('.alert').fadeOut('slow');
         }, 5000);
