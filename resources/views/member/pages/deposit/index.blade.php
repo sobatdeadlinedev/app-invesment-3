@@ -130,6 +130,8 @@
                     <div id="payment-details-ewallet" class="payment-details active">
                         <div class="card-dark shadow-sm p-3 mb-3">
                             <h6 class="text-white mb-3">USDT</h6>
+                            
+                            <!-- Jaringan -->
                             <div class="payment-info-item">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <span class="text-muted small">Jaringan</span>
@@ -142,12 +144,15 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Alamat Setoran - Fixed Responsive Layout -->
                             <div class="payment-info-item">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted small">Alamat Setoran</span>
-                                    <span class="text-white fw-bold">{{ $walletName }}</span>
+                                <div class="payment-info-row">
+                                    <span class="text-muted small payment-label">Alamat Setoran</span>
+                                    <span class="text-white fw-bold payment-value">{{ $walletName }}</span>
                                 </div>
                             </div>
+                            
                             <div class="alert-info-box mt-3">
                                 <i class="bi bi-info-circle-fill me-2"></i>
                                 <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network TRC20
@@ -237,6 +242,92 @@
 
         .btn-history i {
             font-size: 14px;
+        }
+
+        /* Payment Info Responsive Layout */
+        .payment-info-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-info-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .payment-label {
+            flex-shrink: 0;
+            min-width: 100px;
+        }
+
+        .payment-value {
+            flex: 1;
+            text-align: right;
+            word-break: break-word;
+            max-width: 100%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .payment-info-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .payment-label {
+                min-width: auto;
+            }
+            
+            .payment-value {
+                text-align: left;
+                font-size: 13px;
+            }
+        }
+
+        /* Button copy styling */
+        .btn-copy-mini {
+            background: rgba(245, 166, 35, 0.1);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            color: var(--gold-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+
+        .btn-copy-mini:hover {
+            background: rgba(245, 166, 35, 0.2);
+            border-color: var(--gold-color);
+        }
+
+        /* Alert info box */
+        .alert-info-box {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: flex-start;
+            color: #3498db;
+        }
+
+        .alert-info-box i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-info-box .small {
+            line-height: 1.5;
         }
     </style>
 
