@@ -133,10 +133,10 @@
                             
                             <!-- Jaringan -->
                             <div class="payment-info-item">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted small">Jaringan</span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="text-white fw-bold">{{ $walletNumber }}</span>
+                                <div class="payment-info-row">
+                                    <span class="text-muted small payment-label">Jaringan</span>
+                                    <div class="payment-value-with-copy">
+                                        <span class="text-white fw-bold payment-value-text">{{ $walletNumber }}</span>
                                         <button type="button" class="btn-copy-mini"
                                             onclick="copyText('{{ $walletNumber }}')" title="Copy">
                                             <i class="bi bi-clipboard"></i>
@@ -149,7 +149,13 @@
                             <div class="payment-info-item">
                                 <div class="payment-info-row">
                                     <span class="text-muted small payment-label">Alamat Setoran</span>
-                                    <span class="text-white fw-bold payment-value">{{ $walletName }}</span>
+                                    <div class="payment-value-with-copy">
+                                        <span class="text-white fw-bold payment-value-text wallet-address">{{ $walletName }}</span>
+                                        <button type="button" class="btn-copy-mini"
+                                            onclick="copyText('{{ $walletName }}')" title="Copy">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -267,13 +273,25 @@
             min-width: 100px;
         }
 
-        .payment-value {
+        .payment-value-with-copy {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex: 1;
-            text-align: right;
-            word-break: break-word;
-            max-width: 100%;
+            justify-content: flex-end;
+        }
+
+        .payment-value-text {
             font-size: 14px;
             line-height: 1.5;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        .wallet-address {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            letter-spacing: 0.5px;
         }
 
         /* Responsive adjustments */
@@ -281,15 +299,27 @@
             .payment-info-row {
                 flex-direction: column;
                 gap: 8px;
+                align-items: flex-start;
             }
             
             .payment-label {
                 min-width: auto;
             }
             
-            .payment-value {
+            .payment-value-with-copy {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .payment-value-text {
                 text-align: left;
-                font-size: 13px;
+                font-size: 12px;
+                flex: 1;
+                word-break: break-all;
+            }
+
+            .wallet-address {
+                font-size: 11px;
             }
         }
 
