@@ -202,11 +202,11 @@
 
                             @if ($isPending)
                                 <!-- Pending Notice -->
-                                <div class="mt-2 pt-2" style="border-top: 1px solid var(--border-color);">
+                                {{-- <div class="mt-2 pt-2" style="border-top: 1px solid var(--border-color);">
                                     <small class="text-warning">
                                         <i class="bi bi-info-circle me-1"></i>Waiting for admin to settle this signal
                                     </small>
-                                </div>
+                                </div> --}}
                             @endif
                         </div>
                     </div>
