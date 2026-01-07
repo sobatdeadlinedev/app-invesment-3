@@ -132,7 +132,7 @@
                             <h6 class="text-white mb-3">USDT</h6>
                             <div class="payment-info-item">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted small">Wallet Addres</span>
+                                    <span class="text-muted small">Jaringan</span>
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-white fw-bold">{{ $walletNumber }}</span>
                                         <button type="button" class="btn-copy-mini"
@@ -144,7 +144,7 @@
                             </div>
                             <div class="payment-info-item">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted small">Account Name</span>
+                                    <span class="text-muted small">Alamat Setoran</span>
                                     <span class="text-white fw-bold">{{ $walletName }}</span>
                                 </div>
                             </div>
