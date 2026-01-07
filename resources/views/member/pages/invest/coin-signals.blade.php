@@ -175,7 +175,6 @@
                             <li>Minimum $ 100.00 available balance required</li>
                             <li>Your bet will be locked until settlement</li>
                             <li><strong class="text-success">You always win rewards!</strong> No losses, no fees</li>
-                            <li>Reward = Bet × Win Rate (set by admin)</li>
                         </ul>
                     </div>
                 </div>
