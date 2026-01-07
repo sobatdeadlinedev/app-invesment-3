@@ -129,10 +129,10 @@
                     <!-- Payment Details: E-Wallet -->
                     <div id="payment-details-ewallet" class="payment-details active">
                         <div class="card-dark shadow-sm p-3 mb-3">
-                            <h6 class="text-white mb-3">Payment Details</h6>
+                            <h6 class="text-white mb-3">USDT</h6>
                             <div class="payment-info-item">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted small">Wallet Number</span>
+                                    <span class="text-muted small">Wallet Addres</span>
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-white fw-bold">{{ $walletNumber }}</span>
                                         <button type="button" class="btn-copy-mini"
