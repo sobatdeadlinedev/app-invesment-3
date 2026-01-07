@@ -253,11 +253,10 @@
         /* Payment Info Responsive Layout */
         .payment-info-item {
             padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .payment-info-item:last-child {
-            border-bottom: none;
+            padding-bottom: 0;
         }
 
         .payment-info-row {
