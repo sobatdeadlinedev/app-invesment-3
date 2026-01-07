@@ -64,7 +64,7 @@
                 </div>
             </div>
 
-            <!-- Card 3: Market Overview with Real-Time Data -->
+            <!-- Card 3: Market Overview with Real-Time Prices -->
             <div class="card-dark shadow-sm p-0 mb-3">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
                     <div class="d-flex align-items-center justify-content-between">
@@ -75,9 +75,149 @@
                     </div>
                 </div>
 
-                <!-- TradingView Widget Container -->
-                <div class="tradingview-widget-container" style="background: transparent;">
-                    <div class="tradingview-widget-container__widget"></div>
+                <!-- Market Item 1: BTC/USDT -->
+                <div class="market-coin-item">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="coin-icon btc">
+                                <i class="bi bi-currency-bitcoin"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold mb-1" style="font-size: 14px;">BTC/USDT</div>
+                                <small class="text-muted">Bitcoin</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">
+                                ${{ $cryptoPrices['BTCUSDT']['price'] ?? '0.00' }}
+                            </div>
+                            <small
+                                class="price-change {{ $cryptoPrices['BTCUSDT']['isPositive'] ? 'positive' : 'negative' }}">
+                                @if ($cryptoPrices['BTCUSDT']['isPositive'])
+                                    <i class="bi bi-arrow-up"></i>
+                                @else
+                                    <i class="bi bi-arrow-down"></i>
+                                @endif
+                                {{ $cryptoPrices['BTCUSDT']['change'] }}%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Item 2: ETH/USDT -->
+                <div class="market-coin-item">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="coin-icon eth">
+                                <i class="bi bi-currency-exchange"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold mb-1" style="font-size: 14px;">ETH/USDT</div>
+                                <small class="text-muted">Ethereum</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">
+                                ${{ $cryptoPrices['ETHUSDT']['price'] ?? '0.00' }}
+                            </div>
+                            <small
+                                class="price-change {{ $cryptoPrices['ETHUSDT']['isPositive'] ? 'positive' : 'negative' }}">
+                                @if ($cryptoPrices['ETHUSDT']['isPositive'])
+                                    <i class="bi bi-arrow-up"></i>
+                                @else
+                                    <i class="bi bi-arrow-down"></i>
+                                @endif
+                                {{ $cryptoPrices['ETHUSDT']['change'] }}%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Item 3: DOGE/USDT -->
+                <div class="market-coin-item">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="coin-icon doge">
+                                <i class="bi bi-coin"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold mb-1" style="font-size: 14px;">DOGE/USDT</div>
+                                <small class="text-muted">Dogecoin</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">
+                                ${{ $cryptoPrices['DOGEUSDT']['price'] ?? '0.00' }}
+                            </div>
+                            <small
+                                class="price-change {{ $cryptoPrices['DOGEUSDT']['isPositive'] ? 'positive' : 'negative' }}">
+                                @if ($cryptoPrices['DOGEUSDT']['isPositive'])
+                                    <i class="bi bi-arrow-up"></i>
+                                @else
+                                    <i class="bi bi-arrow-down"></i>
+                                @endif
+                                {{ $cryptoPrices['DOGEUSDT']['change'] }}%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Item 4: BNB/USDT -->
+                <div class="market-coin-item">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="coin-icon bnb">
+                                <i class="bi bi-triangle-fill"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold mb-1" style="font-size: 14px;">BNB/USDT</div>
+                                <small class="text-muted">Binance Coin</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">
+                                ${{ $cryptoPrices['BNBUSDT']['price'] ?? '0.00' }}
+                            </div>
+                            <small
+                                class="price-change {{ $cryptoPrices['BNBUSDT']['isPositive'] ? 'positive' : 'negative' }}">
+                                @if ($cryptoPrices['BNBUSDT']['isPositive'])
+                                    <i class="bi bi-arrow-up"></i>
+                                @else
+                                    <i class="bi bi-arrow-down"></i>
+                                @endif
+                                {{ $cryptoPrices['BNBUSDT']['change'] }}%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Item 5: SOL/USDT -->
+                <div class="market-coin-item" style="border-bottom: none;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="coin-icon sol">
+                                <i class="bi bi-sun-fill"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold mb-1" style="font-size: 14px;">SOL/USDT</div>
+                                <small class="text-muted">Solana</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold mb-1" style="font-size: 14px;">
+                                ${{ $cryptoPrices['SOLUSDT']['price'] ?? '0.00' }}
+                            </div>
+                            <small
+                                class="price-change {{ $cryptoPrices['SOLUSDT']['isPositive'] ? 'positive' : 'negative' }}">
+                                @if ($cryptoPrices['SOLUSDT']['isPositive'])
+                                    <i class="bi bi-arrow-up"></i>
+                                @else
+                                    <i class="bi bi-arrow-down"></i>
+                                @endif
+                                {{ $cryptoPrices['SOLUSDT']['change'] }}%
+                            </small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,49 +238,20 @@
             flex: 1;
         }
 
-        .tradingview-widget-container {
-            height: auto;
+        .price-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .price-change.positive {
+            color: #22c55e;
+        }
+
+        .price-change.negative {
+            color: #ef4444;
         }
     </style>
-
-    <!-- TradingView Widget Script -->
-    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js"
-        async>
-        {
-            "symbols": [
-                ["BINANCE:BTCUSDT|1D"],
-                ["BINANCE:ETHUSDT|1D"],
-                ["BINANCE:DOGEUSDT|1D"],
-                ["BINANCE:BNBUSDT|1D"],
-                ["BINANCE:SOLUSDT|1D"]
-            ],
-            "chartOnly": false,
-            "width": "100%",
-            "height": "400",
-            "locale": "en",
-            "colorTheme": "dark",
-            "autosize": false,
-            "showVolume": false,
-            "showMA": false,
-            "hideDateRanges": false,
-            "hideMarketStatus": false,
-            "hideSymbolLogo": false,
-            "scalePosition": "right",
-            "scaleMode": "Normal",
-            "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
-            "fontSize": "10",
-            "noTimeScale": false,
-            "valuesTracking": "1",
-            "changeMode": "price-and-percent",
-            "chartType": "area",
-            "backgroundColor": "rgba(10, 14, 39, 1)",
-            "gridLineColor": "rgba(29, 32, 88, 0.3)",
-            "lineColor": "rgba(245, 166, 35, 1)",
-            "topColor": "rgba(245, 166, 35, 0.4)",
-            "bottomColor": "rgba(245, 166, 35, 0.0)",
-            "lineWidth": 2
-        }
-    </script>
 
     <script>
         function showToast(message, type = 'success') {
