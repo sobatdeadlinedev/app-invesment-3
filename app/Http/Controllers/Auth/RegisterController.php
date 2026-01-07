@@ -12,7 +12,7 @@ use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
 {
-    public function index(Request $request)
+    public function showRegistrationForm(Request $request)
     {
         $referralCode = $request->query('ref');
 
