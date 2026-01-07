@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\ReferralUsage;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -12,9 +12,8 @@ use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
 {
-    public function showRegistrationForm(Request $request)
+    public function index(Request $request)
     {
-        // Get referral code from URL parameter
         $referralCode = $request->query('ref');
 
         // Validate if referral code exists
@@ -28,7 +27,7 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-        // Format phone number first
+        // Format phone number first before validation
         $phone = $request->phone;
         if (substr($phone, 0, 1) === '0') {
             $phone = '62' . substr($phone, 1);
@@ -36,15 +35,15 @@ class RegisterController extends Controller
             $phone = '62' . $phone;
         }
 
-        // Check if phone already exists
-        $phoneExists = User::where('phone', $phone)->exists();
+        // Merge formatted phone back to request for validation
+        $request->merge(['phone' => $phone]);
 
-        // Validate without phone unique rule
+        // Validate with custom phone unique check
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username|alpha_dash',
             'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'required|string|max:20|regex:/^[0-9]+$/',
+            'phone' => 'required|string|max:20|unique:users,phone|regex:/^[0-9]+$/',
             'password' => ['required', 'confirmed', Password::min(8)],
             'referral_code' => 'nullable|string|exists:users,refferal_code',
         ], [
@@ -56,6 +55,7 @@ class RegisterController extends Controller
             'email.email' => 'Format email tidak valid',
             'email.unique' => 'Email sudah terdaftar',
             'phone.required' => 'Nomor telepon harus diisi',
+            'phone.unique' => 'Nomor telepon ' . $phone . ' sudah terdaftar. Silakan gunakan nomor lain atau login jika Anda sudah memiliki akun.',
             'phone.regex' => 'Nomor telepon hanya boleh berisi angka',
             'password.required' => 'Password harus diisi',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
@@ -91,12 +91,6 @@ class RegisterController extends Controller
         // Auto login setelah register
         Auth::login($user);
 
-        // Show notification if phone was already used
-        $message = 'Registrasi berhasil! Selamat datang.';
-        if ($phoneExists) {
-            $message .= ' Catatan: Nomor telepon ini sudah terdaftar di sistem sebelumnya.';
-        }
-
-        return redirect()->route('member.dashboard.index')->with('success', $message);
+        return redirect()->route('member.dashboard.index')->with('success', 'Registrasi berhasil! Selamat datang.');
     }
 }
