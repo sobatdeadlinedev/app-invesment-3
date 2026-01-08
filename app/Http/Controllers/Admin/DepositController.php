@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\ReferralUsage;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,12 +13,17 @@ class DepositController extends Controller
 {
     public function index()
     {
+        // Gabungkan deposit dan adjustment
         $deposits = Transaction::with(['user'])
-            ->deposit()
+            ->whereIn('type', ['deposit', 'adjustment'])
             ->latest()
             ->paginate(10);
 
-        return view('admin.pages.deposit.index', compact('deposits'));
+        $members = User::role('member')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.pages.deposit.index', compact('deposits', 'members'));
     }
 
     public function show($id)
@@ -77,7 +83,6 @@ class DepositController extends Controller
                     'balance_type' => 'exchange',
                     'status' => 'approved',
                     'approved_by' => auth()->id(),
-                    'note' => 'Bonus 5% - First Deposit',
                 ]);
             }
 
@@ -118,6 +123,54 @@ class DepositController extends Controller
 
         return redirect()->route('admin.deposit.index')
             ->with('success', 'Deposit has been rejected.');
+    }
+
+    /**
+     * NEW: Manual adjustment (add balance)
+     */
+    public function adjustment(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0.01',
+            'balance_type' => 'required|in:exchange,trade',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user = User::findOrFail($request->user_id);
+            $amount = $request->amount;
+            $balanceType = $request->balance_type;
+
+            // Create adjustment transaction
+            Transaction::create([
+                'user_id' => $user->id,
+                'reference' => Transaction::generateReference('ADJ'),
+                'amount' => $amount,
+                'total_amount' => $amount,
+                'type' => 'adjustment',
+                'balance_type' => $balanceType,
+                'status' => 'approved',
+                'approved_by' => auth()->id(),
+            ]);
+
+            // Add balance based on type
+            if ($balanceType === 'trade') {
+                $user->addTradeBalance($amount);
+            } else {
+                $user->addExchangeBalance($amount);
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.deposit.index')
+                ->with('success', "Successfully added {$amount} USDT to {$user->name}'s {$balanceType} balance.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->route('admin.deposit.index')
+                ->with('error', 'Failed to add balance: ' . $e->getMessage());
+        }
     }
 
     /**

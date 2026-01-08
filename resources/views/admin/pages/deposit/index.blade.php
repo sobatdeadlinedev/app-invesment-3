@@ -1,12 +1,12 @@
 @extends('admin.layouts.app')
 @section('content')
-    <!--begin::Toolbar-->
+    <!-- Toolbar tetap sama -->
     <div id="kt_app_toolbar" class="app-toolbar pt-5 pt-lg-10">
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack flex-wrap">
             <div class="app-toolbar-wrapper d-flex flex-stack flex-wrap gap-4 w-100">
                 <div class="page-title d-flex flex-column justify-content-center gap-1 me-3">
                     <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">
-                        Deposit List</h1>
+                        Deposit & Adjustment List</h1>
                     <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0">
                         <li class="breadcrumb-item text-muted">
                             <a href="{{ route('admin.dashboard.index') }}" class="text-muted text-hover-primary">Home</a>
@@ -17,26 +17,27 @@
                         <li class="breadcrumb-item text-muted">Deposit Management</li>
                     </ul>
                 </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adjustmentModal">
+                        <i class="ki-outline ki-plus fs-2"></i>
+                        Add Balance
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    <!--end::Toolbar-->
 
-    <!--begin::Content-->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-
-            <!--begin::Card-->
             <div class="card">
-
-                <!--begin::Card body-->
                 <div class="card-body py-4">
-                    <!--begin::Table-->
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_deposits">
                         <thead>
                             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                 <th class="min-w-150px">User</th>
                                 <th class="min-w-125px">Reference</th>
+                                <th class="min-w-100px">Type</th>
+                                <th class="min-w-100px">Balance Type</th>
                                 <th class="min-w-100px">Amount</th>
                                 <th class="min-w-100px">Status</th>
                                 <th class="min-w-125px">Date</th>
@@ -56,6 +57,17 @@
                                         <span class="badge badge-light-primary">{{ $deposit->reference }}</span>
                                     </td>
                                     <td>
+                                        <span class="badge badge-light-{{ $deposit->type_color }}">
+                                            {{ ucfirst($deposit->type) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="badge badge-light-{{ $deposit->balance_type === 'trade' ? 'info' : 'success' }}">
+                                            {{ ucfirst($deposit->balance_type) }}
+                                        </span>
+                                    </td>
+                                    <td>
                                         <span class="text-success fw-bold">{{ number_format($deposit->amount, 2) }}
                                             USDT</span>
                                     </td>
@@ -66,33 +78,83 @@
                                     </td>
                                     <td>{{ $deposit->created_at->format('d M Y, h:i a') }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('admin.deposit.show', $deposit->id) }}"
-                                            class="btn btn-light btn-active-light-primary btn-sm">
-                                            <i class="ki-outline ki-eye fs-5"></i> Detail
-                                        </a>
+                                        @if ($deposit->type === 'deposit')
+                                            <a href="{{ route('admin.deposit.show', $deposit->id) }}"
+                                                class="btn btn-light btn-active-light-primary btn-sm">
+                                                <i class="ki-outline ki-eye fs-5"></i> Detail
+                                            </a>
+                                        @else
+                                            <span class="badge badge-light-info">Manual Adjustment</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-10">
-                                        <div class="text-gray-600">No deposit transactions found</div>
+                                    <td colspan="8" class="text-center py-10">
+                                        <div class="text-gray-600">No transactions found</div>
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
-                    <!--end::Table-->
 
-                    <!--begin::Pagination-->
                     <div class="d-flex justify-content-center mt-5">
                         {{ $deposits->links() }}
                     </div>
-                    <!--end::Pagination-->
                 </div>
-                <!--end::Card body-->
             </div>
-            <!--end::Card-->
         </div>
     </div>
-    <!--end::Content-->
+
+    <!-- Modal tetap sama -->
+    <div class="modal fade" id="adjustmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content">
+                <form action="{{ route('admin.deposit.adjustment') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h2 class="fw-bold">Add Balance to User</h2>
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal">
+                            <i class="ki-outline ki-cross fs-1"></i>
+                        </div>
+                    </div>
+
+                    <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                        <div class="fv-row mb-7">
+                            <label class="required fs-6 fw-semibold mb-2">Select User</label>
+                            <select name="user_id" class="form-select form-select-solid" required>
+                                <option value="">Choose user...</option>
+                                @foreach ($members as $member)
+                                    <option value="{{ $member->id }}">
+                                        {{ $member->name }} ({{ $member->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="fv-row mb-7">
+                            <label class="required fs-6 fw-semibold mb-2">Amount (USDT)</label>
+                            <input type="number" step="0.01" min="0.01" name="amount"
+                                class="form-control form-control-solid" placeholder="Enter amount" required />
+                        </div>
+
+                        <div class="fv-row mb-7">
+                            <label class="required fs-6 fw-semibold mb-2">Balance Type</label>
+                            <select name="balance_type" class="form-select form-select-solid" required>
+                                <option value="exchange">Exchange Balance</option>
+                                <option value="trade">Trade Balance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer flex-center">
+                        <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="indicator-label">Add Balance</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection

@@ -15,7 +15,7 @@ class Transaction extends Model
         'amount',
         'total_amount',
         'type',
-        'balance_type', // NEW
+        'balance_type',
         'wallet_id',
         'withdrawal_fee',
         'source_user_id',
@@ -71,6 +71,16 @@ class Transaction extends Model
     }
 
     // NEW SCOPES
+    public function scopeAdjustment($query)
+    {
+        return $query->where('type', 'adjustment');
+    }
+
+    public function scopeDeduction($query)
+    {
+        return $query->where('type', 'deduction');
+    }
+
     public function scopeExchange($query)
     {
         return $query->where('balance_type', 'exchange');
@@ -179,10 +189,15 @@ class Transaction extends Model
             'remaining_volume' => $user->getRemainingVolume(),
         ];
     }
-    public static function hasSufficientBalance($userId, $totalAmount)
+
+    public static function hasSufficientBalance($userId, $totalAmount, $balanceType = 'exchange')
     {
         $user = \App\Models\User::find($userId);
-        return $user && $user->exchange_balance >= $totalAmount;
+        if (!$user) return false;
+
+        return $balanceType === 'trade'
+            ? $user->trade_balance >= $totalAmount
+            : $user->exchange_balance >= $totalAmount;
     }
 
     public static function generateReference($prefix = 'TXN')
@@ -214,19 +229,21 @@ class Transaction extends Model
             'deposit' => 'success',
             'withdrawal' => 'danger',
             'commission' => 'info',
+            'adjustment' => 'primary',
+            'deduction' => 'warning',
             default => 'secondary',
         };
     }
 
     public function getFormattedAmountAttribute()
     {
-        $sign = $this->type === 'withdrawal' ? '-' : '+';
+        $sign = in_array($this->type, ['withdrawal', 'deduction']) ? '-' : '+';
         return $sign . ' ' . number_format($this->amount, 2);
     }
 
     public function getFormattedTotalAmountAttribute()
     {
-        $sign = $this->type === 'withdrawal' ? '-' : '+';
+        $sign = in_array($this->type, ['withdrawal', 'deduction']) ? '-' : '+';
         return $sign . ' ' . number_format($this->total_amount, 2);
     }
 }

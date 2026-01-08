@@ -95,6 +95,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/{deposit}', [AdminDepositController::class, 'show'])->name('show');
         Route::post('/{deposit}/approve', [AdminDepositController::class, 'approve'])->name('approve');
         Route::post('/{deposit}/reject', [AdminDepositController::class, 'reject'])->name('reject');
+
+        // NEW: Manual adjustment (add balance)
+        Route::post('/adjustment', [AdminDepositController::class, 'adjustment'])->name('adjustment');
     });
 
     Route::prefix('withdrawal')->name('withdrawal.')->group(function () {
@@ -102,6 +105,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/{withdrawal}', [AdminWithdrawalController::class, 'show'])->name('show');
         Route::post('/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('approve');
         Route::post('/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('reject');
+
+        // NEW: Manual deduction (reduce balance)
+        Route::post('/deduction', [AdminWithdrawalController::class, 'deduction'])->name('deduction');
     });
 
     Route::prefix('balance')->name('balance.')->group(function () {
