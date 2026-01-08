@@ -189,10 +189,10 @@
             <div class="card-dark shadow-sm p-3 mb-3">
                 <h6 class="text-white mb-3">Signal Statistics</h6>
                 <div class="row g-3">
-                    <div class="col-6">
+                    {{-- <div class="col-6">
                         <p class="text-muted mb-1 small">Total Bets</p>
                         <h6 class="text-white mb-0 fw-bold">$ {{ number_format($signal->total_bet_amount, 2) }}</h6>
-                    </div>
+                    </div> --}}
                     <div class="col-6">
                         <p class="text-muted mb-1 small">Opened</p>
                         <h6 class="text-white mb-0 fw-bold">
