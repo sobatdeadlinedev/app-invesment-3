@@ -19,7 +19,7 @@
                 <div class="d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deductionModal">
                         <i class="ki-outline ki-minus fs-2"></i>
-                        Deduct Balance
+                        <span class="d-none d-sm-inline">Deduct Balance</span>
                     </button>
                 </div>
             </div>
@@ -80,96 +80,177 @@
             @endif
 
             <div class="card">
-                <div class="card-body py-4">
-                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_withdrawals">
-                        <thead>
-                            <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-150px">User</th>
-                                <th class="min-w-125px">Reference</th>
-                                <th class="min-w-100px">Type</th>
-                                <th class="min-w-100px">Balance Type</th>
-                                <th class="min-w-125px">Wallet</th>
-                                <th class="min-w-100px">Amount</th>
-                                <th class="min-w-100px">Fee</th>
-                                <th class="min-w-100px">Status</th>
-                                <th class="min-w-125px">Date</th>
-                                <th class="text-end min-w-100px">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-600 fw-semibold">
-                            @forelse($withdrawals as $withdrawal)
-                                <tr>
-                                    <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="text-gray-800 mb-1">{{ $withdrawal->user->name }}</span>
-                                            <span class="text-muted">{{ $withdrawal->user->email }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-light-primary">{{ $withdrawal->reference }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-light-{{ $withdrawal->type_color }}">
-                                            {{ ucfirst($withdrawal->type) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="badge badge-light-{{ $withdrawal->balance_type === 'trade' ? 'info' : 'success' }}">
-                                            {{ ucfirst($withdrawal->balance_type) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if ($withdrawal->wallet)
+                <div class="card-body p-0">
+                    {{-- Desktop Table View --}}
+                    <div class="table-responsive d-none d-lg-block">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_withdrawals">
+                            <thead>
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="min-w-150px ps-4">User</th>
+                                    <th class="min-w-125px">Reference</th>
+                                    <th class="min-w-100px">Type</th>
+                                    <th class="min-w-100px">Balance Type</th>
+                                    <th class="min-w-125px">Wallet</th>
+                                    <th class="min-w-100px">Amount</th>
+                                    <th class="min-w-100px">Fee</th>
+                                    <th class="min-w-100px">Status</th>
+                                    <th class="min-w-125px">Date</th>
+                                    <th class="text-end min-w-100px pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                                @forelse($withdrawals as $withdrawal)
+                                    <tr>
+                                        <td class="ps-4">
                                             <div class="d-flex flex-column">
-                                                <span class="text-gray-800">{{ $withdrawal->wallet->bank_name }}</span>
-                                                <span class="text-muted">{{ $withdrawal->wallet->account_number }}</span>
+                                                <span class="text-gray-800 mb-1">{{ $withdrawal->user->name }}</span>
+                                                <span class="text-muted">{{ $withdrawal->user->email }}</span>
                                             </div>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="text-danger fw-bold">{{ number_format($withdrawal->amount, 2) }}
-                                            USDT</span>
-                                    </td>
-                                    <td>
-                                        @if ($withdrawal->type === 'withdrawal')
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light-primary">{{ $withdrawal->reference }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light-{{ $withdrawal->type_color }}">
+                                                {{ ucfirst($withdrawal->type) }}
+                                            </span>
+                                        </td>
+                                        <td>
                                             <span
-                                                class="text-warning fw-bold">{{ number_format($withdrawal->withdrawal_fee, 2) }}
+                                                class="badge badge-light-{{ $withdrawal->balance_type === 'trade' ? 'info' : 'success' }}">
+                                                {{ ucfirst($withdrawal->balance_type) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if ($withdrawal->wallet)
+                                                <div class="d-flex flex-column">
+                                                    <span class="text-gray-800">{{ $withdrawal->wallet->bank_name }}</span>
+                                                    <span class="text-muted">{{ $withdrawal->wallet->account_number }}</span>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <span class="text-danger fw-bold">{{ number_format($withdrawal->amount, 2) }}
                                                 USDT</span>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td>
+                                        </td>
+                                        <td>
+                                            @if ($withdrawal->type === 'withdrawal')
+                                                <span
+                                                    class="text-warning fw-bold">{{ number_format($withdrawal->withdrawal_fee, 2) }}
+                                                    USDT</span>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light-{{ $withdrawal->status_color }}">
+                                                {{ ucfirst($withdrawal->status) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $withdrawal->created_at->format('d M Y, h:i a') }}</td>
+                                        <td class="text-end pe-4">
+                                            @if ($withdrawal->type === 'withdrawal')
+                                                <a href="{{ route('admin.withdrawal.show', $withdrawal->id) }}"
+                                                    class="btn btn-light btn-active-light-primary btn-sm">
+                                                    <i class="ki-outline ki-eye fs-5"></i> Detail
+                                                </a>
+                                            @else
+                                                <span class="badge badge-light-warning">Manual Deduction</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="10" class="text-center py-10">
+                                            <div class="text-gray-600">No transactions found</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Mobile Card View --}}
+                    <div class="d-lg-none">
+                        @forelse($withdrawals as $withdrawal)
+                            <div class="card border border-gray-300 mb-3 mx-3 mt-3">
+                                <div class="card-body p-4">
+                                    {{-- User Info --}}
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold text-gray-800 mb-1">{{ $withdrawal->user->name }}</div>
+                                            <div class="text-muted fs-7">{{ $withdrawal->user->email }}</div>
+                                        </div>
                                         <span class="badge badge-light-{{ $withdrawal->status_color }}">
                                             {{ ucfirst($withdrawal->status) }}
                                         </span>
-                                    </td>
-                                    <td>{{ $withdrawal->created_at->format('d M Y, h:i a') }}</td>
-                                    <td class="text-end">
+                                    </div>
+
+                                    {{-- Reference & Type --}}
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <span class="badge badge-light-primary">{{ $withdrawal->reference }}</span>
+                                        <span class="badge badge-light-{{ $withdrawal->type_color }}">
+                                            {{ ucfirst($withdrawal->type) }}
+                                        </span>
+                                        <span class="badge badge-light-{{ $withdrawal->balance_type === 'trade' ? 'info' : 'success' }}">
+                                            {{ ucfirst($withdrawal->balance_type) }}
+                                        </span>
+                                    </div>
+
+                                    {{-- Amount Info --}}
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-top border-gray-300">
+                                        <span class="text-muted fs-7">Amount</span>
+                                        <span class="text-danger fw-bold">{{ number_format($withdrawal->amount, 2) }} USDT</span>
+                                    </div>
+
+                                    @if ($withdrawal->type === 'withdrawal')
+                                        <div class="d-flex justify-content-between align-items-center py-2 border-top border-gray-300">
+                                            <span class="text-muted fs-7">Fee</span>
+                                            <span class="text-warning fw-bold">{{ number_format($withdrawal->withdrawal_fee, 2) }} USDT</span>
+                                        </div>
+                                    @endif
+
+                                    {{-- Wallet Info --}}
+                                    @if ($withdrawal->wallet)
+                                        <div class="d-flex justify-content-between align-items-center py-2 border-top border-gray-300">
+                                            <span class="text-muted fs-7">Wallet</span>
+                                            <div class="text-end">
+                                                <div class="text-gray-800 fs-7">{{ $withdrawal->wallet->bank_name }}</div>
+                                                <div class="text-muted fs-8">{{ $withdrawal->wallet->account_number }}</div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    {{-- Date --}}
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-top border-gray-300">
+                                        <span class="text-muted fs-7">Date</span>
+                                        <span class="text-gray-800 fs-7">{{ $withdrawal->created_at->format('d M Y, h:i a') }}</span>
+                                    </div>
+
+                                    {{-- Action Button --}}
+                                    <div class="mt-3">
                                         @if ($withdrawal->type === 'withdrawal')
                                             <a href="{{ route('admin.withdrawal.show', $withdrawal->id) }}"
-                                                class="btn btn-light btn-active-light-primary btn-sm">
-                                                <i class="ki-outline ki-eye fs-5"></i> Detail
+                                                class="btn btn-light btn-active-light-primary btn-sm w-100">
+                                                <i class="ki-outline ki-eye fs-5"></i> View Detail
                                             </a>
                                         @else
-                                            <span class="badge badge-light-warning">Manual Deduction</span>
+                                            <div class="badge badge-light-warning w-100 py-2">Manual Deduction</div>
                                         @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="10" class="text-center py-10">
-                                        <div class="text-gray-600">No transactions found</div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-10 px-4">
+                                <div class="text-gray-600">No transactions found</div>
+                            </div>
+                        @endforelse
+                    </div>
 
-                    <div class="d-flex justify-content-center mt-5">
+                    {{-- Pagination --}}
+                    <div class="d-flex justify-content-center p-4">
                         {{ $withdrawals->links() }}
                     </div>
                 </div>
@@ -208,7 +289,7 @@
                         <!--begin::Balance Info-->
                         <div class="fv-row mb-7" id="balanceInfo" style="display: none;">
                             <div class="alert alert-info d-flex align-items-center p-4">
-                                <i class="ki-outline ki-information-5 fs-2x text-info me-4"></i>
+                                <i class="ki-outline ki-information-5 fs-2x text-info me-4 d-none d-sm-block"></i>
                                 <div class="d-flex flex-column w-100">
                                     <h5 class="mb-2">Current Balance</h5>
                                     <div class="d-flex justify-content-between mb-1">
@@ -242,11 +323,11 @@
                         </div>
 
                         <!--begin::Warning Alert-->
-                        <div class="alert alert-warning d-flex align-items-center p-5 mb-5">
-                            <i class="ki-outline ki-information-5 fs-2hx text-warning me-4"></i>
+                        <div class="alert alert-warning d-flex align-items-center p-4 mb-5">
+                            <i class="ki-outline ki-information-5 fs-2x text-warning me-4 d-none d-sm-block"></i>
                             <div class="d-flex flex-column">
                                 <h5 class="mb-1">Warning</h5>
-                                <span>This action will immediately deduct the balance from the selected user. Make sure the
+                                <span class="fs-7">This action will immediately deduct the balance from the selected user. Make sure the
                                     amount is correct.</span>
                             </div>
                         </div>
@@ -266,20 +347,12 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // Debug: Check if alerts exist
-                console.log('Success message:', '{{ session('success') }}');
-                console.log('Error message:', '{{ session('error') }}');
-
                 // Auto hide alerts after 5 seconds (EXCLUDE modal alerts)
                 setTimeout(function() {
                     const alerts = document.querySelectorAll('.alert:not(#deductionModal .alert)');
-                    console.log('Found alerts:', alerts.length);
-
                     alerts.forEach(function(alert) {
-                        // Only close success/error alerts, not info alerts
                         if (alert.classList.contains('alert-success') ||
                             alert.classList.contains('alert-danger')) {
-                            console.log('Closing alert:', alert);
                             const bsAlert = new bootstrap.Alert(alert);
                             bsAlert.close();
                         }
@@ -321,12 +394,10 @@
                     const amount = parseFloat(amountInput.value) || 0;
                     const userName = userSelect.options[userSelect.selectedIndex].text;
 
-                    // Simple confirmation before submit
                     const confirmMsg =
                         `Are you sure you want to deduct ${amount.toFixed(2)} USDT from ${userName}'s ${balanceType} balance?`;
 
                     if (confirm(confirmMsg)) {
-                        // Submit the form - let controller handle validation
                         this.submit();
                     }
                 });
