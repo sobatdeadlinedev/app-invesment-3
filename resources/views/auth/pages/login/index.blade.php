@@ -435,11 +435,9 @@
             <div class="login-form-wrapper">
                 <!-- Logo -->
                 <div class="logo-container">
-                    <div class="logo-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h1 class="login-title">Welcome Back</h1>
-                    <p class="login-subtitle">Sign in to your STARS INVESTMENT account</p>
+                    <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}" style="max-width: 150px; height: auto; margin-bottom: 24px;" />
+                    <h1 class="login-title">Sign in to your Account</h1>
+                    <p class="login-subtitle">Enter your credentials to access your account</p>
                 </div>
 
                 <!-- Login Form -->
