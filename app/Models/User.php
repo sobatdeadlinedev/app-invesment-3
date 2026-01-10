@@ -424,4 +424,8 @@ class User extends Authenticatable
 
         return $results;
     }
+    public function getTotalMultiLevelReferralsAttribute()
+    {
+        return $this->multi_level_referrals->count();
+    }
 }

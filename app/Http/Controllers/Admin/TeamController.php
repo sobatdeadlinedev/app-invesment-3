@@ -13,12 +13,13 @@ class TeamController extends Controller
         $users = User::role('member')
             ->withCount('referrals')
             ->latest()
-            ->get()
-            ->map(function ($user) {
-                // Append multi-level referrals data
-                $user->append('multi_level_referrals', 'total_multi_level_referrals');
-                return $user;
-            });
+            ->get();
+
+        // Load multi-level referrals for all users
+        foreach ($users as $user) {
+            // Force load the attribute
+            $user->loadMissing('referrals');
+        }
 
         return view('admin.pages.team.index', compact('users'));
     }
