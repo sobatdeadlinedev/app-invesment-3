@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Member;
 
 use App\Models\Wallet;
+use App\Models\Config;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminNotificationMail;
 
 class WithdrawController extends Controller
 {
@@ -123,6 +126,9 @@ class WithdrawController extends Controller
             // Deduct exchange balance immediately (pending state)
             $user->deductExchangeBalance($totalAmount);
 
+            // Kirim email notifikasi ke admin
+            $this->sendAdminNotification($transaction, $wallet);
+
             DB::commit();
 
             return redirect()
@@ -137,6 +143,44 @@ class WithdrawController extends Controller
                 ->back()
                 ->withInput()
                 ->with('error', 'Failed to submit withdrawal request. Please try again.');
+        }
+    }
+
+    /**
+     * Send email notification to admin
+     */
+    private function sendAdminNotification($transaction, $wallet)
+    {
+        try {
+            $adminEmail = Config::get('app_email')['value'] ?? null;
+
+            if (!$adminEmail) {
+                Log::warning('Admin email not configured in database');
+                return;
+            }
+
+            $user = $transaction->user;
+
+            $data = [
+                'reference' => $transaction->reference,
+                'net_amount' => $transaction->amount,
+                'fee' => $transaction->withdrawal_fee,
+                'wallet_address' => $wallet->wallet_address,
+                'network' => $wallet->network,
+                'created_at' => $transaction->created_at->format('d M Y H:i'),
+            ];
+
+            Mail::to($adminEmail)->send(new AdminNotificationMail(
+                'withdrawal',
+                $data,
+                $user->name,
+                $user->email
+            ));
+
+            Log::info('Withdrawal notification email sent to admin: ' . $adminEmail);
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notification email: ' . $e->getMessage());
+            // Don't throw exception, just log it so withdrawal process continues
         }
     }
 

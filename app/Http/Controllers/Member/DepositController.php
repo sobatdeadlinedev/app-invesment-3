@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminNotificationMail;
 
 class DepositController extends Controller
 {
@@ -85,6 +87,9 @@ class DepositController extends Controller
                 'approved_by' => null,
             ]);
 
+            // Kirim email notifikasi ke admin
+            $this->sendAdminNotification($transaction);
+
             DB::commit();
 
             return redirect()
@@ -103,6 +108,40 @@ class DepositController extends Controller
                 ->back()
                 ->withInput()
                 ->with('error', 'Failed to submit deposit request. Please try again.');
+        }
+    }
+
+    /**
+     * Send email notification to admin
+     */
+    private function sendAdminNotification($transaction)
+    {
+        try {
+            $adminEmail = Config::get('app_email')['value'] ?? null;
+
+            if (!$adminEmail) {
+                Log::warning('Admin email not configured');
+                return;
+            }
+
+            $user = $transaction->user;
+
+            $data = [
+                'reference' => $transaction->reference,
+                'amount' => $transaction->amount,
+                'payment_method' => $transaction->payment_method,
+                'created_at' => $transaction->created_at->format('d M Y H:i'),
+            ];
+
+            Mail::to($adminEmail)->send(new AdminNotificationMail(
+                'deposit',
+                $data,
+                $user->name,
+                $user->email
+            ));
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notification email: ' . $e->getMessage());
+            // Don't throw exception, just log it
         }
     }
 

@@ -36,6 +36,10 @@ class ConfigSeeder extends Seeder
                 'key' => 'app_qr_code',
                 'value' => ['value' => 'QR code image here'],
             ],
+            [
+                'key' => 'app_email',
+                'value' => ['value' => 'jamesbond130694@gmail.com'],
+            ],
         ];
 
         foreach ($configs as $config) {

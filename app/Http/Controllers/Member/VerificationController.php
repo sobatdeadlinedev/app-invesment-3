@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserVerification;
+use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\AdminNotificationMail;
 
 class VerificationController extends Controller
 {
@@ -57,7 +61,7 @@ class VerificationController extends Controller
             $selfieFullUrl = url('storage/' . $selfiePath);
 
             // Create or update verification
-            UserVerification::updateOrCreate(
+            $verification = UserVerification::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'full_name' => $validated['full_name'],
@@ -69,9 +73,47 @@ class VerificationController extends Controller
                 ]
             );
 
+            // Kirim email notifikasi ke admin
+            $this->sendAdminNotification($verification);
+
             return redirect()->route('member.verification.index')->with('success', 'Verifikasi berhasil diajukan! Mohon tunggu konfirmasi dari admin.');
         } catch (\Exception $e) {
+            Log::error('Verification submission failed: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengupload dokumen. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Send email notification to admin
+     */
+    private function sendAdminNotification($verification)
+    {
+        try {
+            $adminEmail = Config::get('app_email')['value'] ?? null;
+
+            if (!$adminEmail) {
+                Log::warning('Admin email not configured');
+                return;
+            }
+
+            $user = $verification->user;
+
+            $data = [
+                'full_name' => $verification->full_name,
+                'identity_type' => $verification->identity_type,
+                'identity_number' => $verification->identity_number,
+                'submitted_at' => $verification->submitted_at->format('d M Y H:i'),
+            ];
+
+            Mail::to($adminEmail)->send(new AdminNotificationMail(
+                'verification',
+                $data,
+                $user->name,
+                $user->email
+            ));
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notification email: ' . $e->getMessage());
+            // Don't throw exception, just log it
         }
     }
 }
