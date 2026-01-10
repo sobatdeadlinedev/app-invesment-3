@@ -11,8 +11,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer([
+            'admin.layouts.app',
             'admin.components.sidebar',
             'member.components.header',
+            'member.layouts.app',
             'auth.pages.login.index',
             'auth.pages.register.index',
             'auth.pages.forget-password.index',

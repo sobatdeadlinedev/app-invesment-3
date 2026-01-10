@@ -6,7 +6,7 @@
     <title>STARS INVESMENT - Register</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
+    <link rel="shortcut icon" href="{{ $appConfig['app_logo']['value'] }}" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
@@ -18,7 +18,7 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
+
         * {
             margin: 0;
             padding: 0;
@@ -389,7 +389,8 @@
             <div class="login-form-wrapper">
                 <!-- Logo -->
                 <div class="logo-container">
-                    <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}" style="max-width: 150px; height: auto; margin-bottom: 24px;" />
+                    <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}"
+                        style="max-width: 150px; height: auto; margin-bottom: 24px;" />
                     <h1 class="login-title">Create New Account</h1>
                     <p class="login-subtitle">Sign up to start trading with STARS INVESTMENT</p>
                 </div>
@@ -415,7 +416,8 @@
                             <div class="referral-content">
                                 <div class="referral-title">Referral Code Detected</div>
                                 <div class="referral-text">You will be registered as a referral from
-                                    <strong>{{ $referrer->username }}</strong></div>
+                                    <strong>{{ $referrer->username }}</strong>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -425,15 +427,9 @@
                         <label class="form-label">Full Name</label>
                         <div class="input-wrapper">
                             <i class="fas fa-user input-icon"></i>
-                            <input 
-                                type="text" 
-                                name="name" 
-                                placeholder="Enter your full name"
-                                autocomplete="off" 
-                                value="{{ old('name') }}"
-                                class="form-input @error('name') is-invalid @enderror" 
-                                required 
-                            />
+                            <input type="text" name="name" placeholder="Enter your full name" autocomplete="off"
+                                value="{{ old('name') }}" class="form-input @error('name') is-invalid @enderror"
+                                required />
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -445,15 +441,9 @@
                         <label class="form-label">Username</label>
                         <div class="input-wrapper">
                             <i class="fas fa-at input-icon"></i>
-                            <input 
-                                type="text" 
-                                name="username" 
-                                placeholder="Choose a username"
-                                autocomplete="off" 
-                                value="{{ old('username') }}"
-                                class="form-input @error('username') is-invalid @enderror" 
-                                required 
-                            />
+                            <input type="text" name="username" placeholder="Choose a username" autocomplete="off"
+                                value="{{ old('username') }}" class="form-input @error('username') is-invalid @enderror"
+                                required />
                             @error('username')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -465,15 +455,9 @@
                         <label class="form-label">Email Address</label>
                         <div class="input-wrapper">
                             <i class="fas fa-envelope input-icon"></i>
-                            <input 
-                                type="email" 
-                                name="email" 
-                                placeholder="Enter your email"
-                                autocomplete="off" 
-                                value="{{ old('email') }}"
-                                class="form-input @error('email') is-invalid @enderror" 
-                                required 
-                            />
+                            <input type="email" name="email" placeholder="Enter your email" autocomplete="off"
+                                value="{{ old('email') }}" class="form-input @error('email') is-invalid @enderror"
+                                required />
                             @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -485,15 +469,9 @@
                         <label class="form-label">Phone Number</label>
                         <div class="input-wrapper">
                             <i class="fas fa-phone input-icon"></i>
-                            <input 
-                                type="text" 
-                                name="phone" 
-                                placeholder="08xxxxxxxxxx"
-                                autocomplete="off" 
-                                value="{{ old('phone') }}"
-                                class="form-input @error('phone') is-invalid @enderror" 
-                                required 
-                            />
+                            <input type="text" name="phone" placeholder="08xxxxxxxxxx" autocomplete="off"
+                                value="{{ old('phone') }}" class="form-input @error('phone') is-invalid @enderror"
+                                required />
                             @error('phone')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -506,20 +484,11 @@
                         <label class="form-label">Password</label>
                         <div class="input-wrapper">
                             <i class="fas fa-lock input-icon"></i>
-                            <input 
-                                type="password" 
-                                name="password" 
-                                id="password"
-                                placeholder="Create a password"
-                                autocomplete="off"
-                                class="form-input @error('password') is-invalid @enderror" 
-                                required 
-                            />
-                            <button 
-                                type="button" 
-                                class="password-toggle"
-                                onclick="togglePassword('password', 'password-icon')"
-                            >
+                            <input type="password" name="password" id="password" placeholder="Create a password"
+                                autocomplete="off" class="form-input @error('password') is-invalid @enderror"
+                                required />
+                            <button type="button" class="password-toggle"
+                                onclick="togglePassword('password', 'password-icon')">
                                 <i class="fas fa-eye" id="password-icon"></i>
                             </button>
                             @error('password')
@@ -534,20 +503,10 @@
                         <label class="form-label">Confirm Password</label>
                         <div class="input-wrapper">
                             <i class="fas fa-lock input-icon"></i>
-                            <input 
-                                type="password" 
-                                name="password_confirmation" 
-                                id="password_confirmation"
-                                placeholder="Confirm your password"
-                                autocomplete="off"
-                                class="form-input" 
-                                required 
-                            />
-                            <button 
-                                type="button" 
-                                class="password-toggle"
-                                onclick="togglePassword('password_confirmation', 'password-confirmation-icon')"
-                            >
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                placeholder="Confirm your password" autocomplete="off" class="form-input" required />
+                            <button type="button" class="password-toggle"
+                                onclick="togglePassword('password_confirmation', 'password-confirmation-icon')">
                                 <i class="fas fa-eye" id="password-confirmation-icon"></i>
                             </button>
                         </div>
@@ -558,15 +517,10 @@
                         <label class="form-label">Referral Code (Optional)</label>
                         <div class="input-wrapper">
                             <i class="fas fa-gift input-icon"></i>
-                            <input 
-                                type="text" 
-                                name="referral_code" 
-                                placeholder="Enter referral code"
-                                autocomplete="off" 
-                                value="{{ old('referral_code', $referralCode ?? '') }}"
+                            <input type="text" name="referral_code" placeholder="Enter referral code"
+                                autocomplete="off" value="{{ old('referral_code', $referralCode ?? '') }}"
                                 class="form-input @error('referral_code') is-invalid @enderror"
-                                {{ $referralCode ? 'readonly' : '' }}
-                            />
+                                {{ $referralCode ? 'readonly' : '' }} />
                             @error('referral_code')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -582,7 +536,7 @@
 
                     <!-- Sign In Link -->
                     <div class="signup-text">
-                        Already have an account? 
+                        Already have an account?
                         <a href="{{ route('login') }}" class="signup-link">Sign in</a>
                     </div>
                 </form>
@@ -593,15 +547,16 @@
         <div class="login-right">
             <div class="bg-decoration bg-decoration-1"></div>
             <div class="bg-decoration bg-decoration-2"></div>
-            
+
             <div class="right-content">
                 <div class="right-logo">
                     <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}" />
                 </div>
-                
+
                 <h2 class="right-title">Start Trading Today</h2>
-                <p class="right-description">Join millions of traders worldwide. Trade cryptocurrencies with confidence on our secure platform.</p>
-                
+                <p class="right-description">Join millions of traders worldwide. Trade cryptocurrencies with confidence
+                    on our secure platform.</p>
+
                 <div class="features-list">
                     <div class="feature-item">
                         <div class="feature-check">
@@ -628,11 +583,11 @@
 
     <script>
         var hostUrl = "assets/";
-        
+
         function togglePassword(inputId, iconId) {
             const passwordInput = document.getElementById(inputId);
             const eyeIcon = document.getElementById(iconId);
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.classList.remove('fa-eye');

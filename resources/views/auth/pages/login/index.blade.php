@@ -6,7 +6,7 @@
     <title>STARS INVESMENT</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
+    <link rel="shortcut icon" href="{{ $appConfig['app_logo']['value'] }}" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
@@ -18,7 +18,7 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
+
         * {
             margin: 0;
             padding: 0;
@@ -68,8 +68,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .logo-icon i {
@@ -435,7 +442,8 @@
             <div class="login-form-wrapper">
                 <!-- Logo -->
                 <div class="logo-container">
-                    <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}" style="max-width: 150px; height: auto; margin-bottom: 24px;" />
+                    <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}"
+                        style="max-width: 150px; height: auto; margin-bottom: 24px;" />
                     <h1 class="login-title">Sign in to your Account</h1>
                     <p class="login-subtitle">Enter your credentials to access your account</p>
                 </div>
@@ -459,15 +467,9 @@
                         <label class="form-label">Username or Phone Number</label>
                         <div class="input-wrapper">
                             <i class="fas fa-user input-icon"></i>
-                            <input 
-                                type="text" 
-                                name="login" 
-                                placeholder="Enter username or phone"
-                                autocomplete="off" 
-                                value="{{ old('login') }}"
-                                class="form-input @error('login') is-invalid @enderror" 
-                                required 
-                            />
+                            <input type="text" name="login" placeholder="Enter username or phone"
+                                autocomplete="off" value="{{ old('login') }}"
+                                class="form-input @error('login') is-invalid @enderror" required />
                             @error('login')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -479,20 +481,10 @@
                         <label class="form-label">Password</label>
                         <div class="input-wrapper">
                             <i class="fas fa-lock input-icon"></i>
-                            <input 
-                                type="password" 
-                                name="password" 
-                                id="passwordInput"
-                                placeholder="Enter your password"
-                                autocomplete="off"
-                                class="form-input @error('password') is-invalid @enderror" 
-                                required 
-                            />
-                            <button 
-                                type="button" 
-                                class="password-toggle"
-                                onclick="togglePassword()"
-                            >
+                            <input type="password" name="password" id="passwordInput" placeholder="Enter your password"
+                                autocomplete="off" class="form-input @error('password') is-invalid @enderror"
+                                required />
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
                                 <i class="fas fa-eye" id="eyeIcon"></i>
                             </button>
                             @error('password')
@@ -520,7 +512,7 @@
 
                     <!-- Sign Up Link -->
                     <div class="signup-text">
-                        Don't have an account? 
+                        Don't have an account?
                         <a href="{{ route('register') }}" class="signup-link">Sign up</a>
                     </div>
                 </form>
@@ -530,7 +522,8 @@
                     <i class="fas fa-shield-alt security-icon"></i>
                     <div class="security-content">
                         <div class="security-title">Secure Connection</div>
-                        <div class="security-text">Your data is encrypted and protected with industry-standard security.</div>
+                        <div class="security-text">Your data is encrypted and protected with industry-standard security.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -540,15 +533,16 @@
         <div class="login-right">
             <div class="bg-decoration bg-decoration-1"></div>
             <div class="bg-decoration bg-decoration-2"></div>
-            
+
             <div class="right-content">
                 <div class="right-logo">
                     <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}" />
                 </div>
-                
+
                 <h2 class="right-title">Start Trading Today</h2>
-                <p class="right-description">Join millions of traders worldwide. Trade cryptocurrencies with confidence on our secure platform.</p>
-                
+                <p class="right-description">Join millions of traders worldwide. Trade cryptocurrencies with confidence
+                    on our secure platform.</p>
+
                 <div class="features-list">
                     <div class="feature-item">
                         <div class="feature-check">
@@ -575,11 +569,11 @@
 
     <script>
         var hostUrl = "assets/";
-        
+
         function togglePassword() {
             const passwordInput = document.getElementById('passwordInput');
             const eyeIcon = document.getElementById('eyeIcon');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.classList.remove('fa-eye');
