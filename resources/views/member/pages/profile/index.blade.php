@@ -58,7 +58,56 @@
                         <i class="bi bi-wallet2"></i>
                     </div>
                 </div>
+                <div class="mb-3"
+                    style="padding: 12px; background: {{ $todayPnl >= 0 ? 'rgba(40, 167, 69, 0.05)' : 'rgba(220, 53, 69, 0.05)' }}; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted d-block mb-1"
+                                style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="bi bi-graph-up-arrow me-1"></i>Today's PnL
+                            </small>
+                            <h4 class="mb-0 fw-bold {{ $todayPnl >= 0 ? 'text-success' : 'text-danger' }}">
+                                {{ $todayPnl >= 0 ? '+' : '' }}{{ number_format($todayPnl, 2) }} USDT
+                            </h4>
+                            <small class="text-muted" style="font-size: 11px;">
+                                {{ now()->format('d M Y') }} •
+                                {{ $todayStats['total_trades'] }} trade{{ $todayStats['total_trades'] != 1 ? 's' : '' }}
+                                @if ($todayStats['total_trades'] > 0)
+                                    • {{ number_format($todayStats['win_rate'], 1) }}% win rate
+                                @endif
+                            </small>
+                        </div>
+                        <div class="pnl-icon-wrapper {{ $todayPnl >= 0 ? 'positive' : 'negative' }}">
+                            <i class="bi bi-{{ $todayPnl >= 0 ? 'arrow-up-circle-fill' : 'arrow-down-circle-fill' }}"></i>
+                        </div>
+                    </div>
 
+                    @if ($todayStats['total_trades'] > 0)
+                        <!-- Trading Stats Detail -->
+                        <div class="mt-3 pt-3" style="border-top: 1px dashed rgba(255,255,255,0.1);">
+                            <div class="row g-2">
+                                <div class="col-4 text-center">
+                                    <small class="text-muted d-block" style="font-size: 10px;">TOTAL BET</small>
+                                    <span class="text-white fw-bold" style="font-size: 12px;">
+                                        {{ number_format($todayStats['total_bet_amount'], 0) }}
+                                    </span>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <small class="text-muted d-block" style="font-size: 10px;">WIN/LOSS</small>
+                                    <span class="text-white fw-bold" style="font-size: 12px;">
+                                        {{ $todayStats['win_count'] }}/{{ $todayStats['loss_count'] }}
+                                    </span>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <small class="text-muted d-block" style="font-size: 10px;">FEES</small>
+                                    <span class="text-warning fw-bold" style="font-size: 12px;">
+                                        {{ number_format($todayStats['total_fees'], 2) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
                 <!-- Current Balance Breakdown -->
                 <div class="mb-3"
                     style="padding: 12px; background: rgba(245, 166, 35, 0.05); border-radius: 8px; border: 1px solid var(--border-color);">

@@ -104,6 +104,76 @@ class User extends Authenticatable
         return $this->hasMany(TradingSignal::class, 'created_by');
     }
 
+    // ==================== TODAY'S PNL METHODS (NEW) ====================
+
+    /**
+     * Get today's PnL (Profit and Loss) from settled signals
+     * This is an accessor that can be accessed as $user->today_pnl
+     */
+    public function getTodayPnlAttribute()
+    {
+        return $this->signalParticipants()
+            ->where('status', 'settled')
+            ->whereDate('settled_at', today())
+            ->get()
+            ->sum(function ($participant) {
+                return $participant->net_result;
+            });
+    }
+
+    /**
+     * Get PnL for specific date
+     */
+    public function getPnlForDate($date)
+    {
+        return $this->signalParticipants()
+            ->where('status', 'settled')
+            ->whereDate('settled_at', $date)
+            ->get()
+            ->sum(function ($participant) {
+                return $participant->net_result;
+            });
+    }
+
+    /**
+     * Get today's trading statistics
+     */
+    public function getTodayTradingStats()
+    {
+        $todayParticipants = $this->signalParticipants()
+            ->where('status', 'settled')
+            ->whereDate('settled_at', today())
+            ->get();
+
+        $totalBetAmount = $todayParticipants->sum('bet_amount');
+        $totalProfitLoss = $todayParticipants->sum('profit_loss');
+        $totalFees = $todayParticipants->sum('fee_amount');
+        $netResult = $todayParticipants->sum(function ($p) {
+            return $p->net_result;
+        });
+
+        $winCount = $todayParticipants->filter(function ($p) {
+            return $p->profit_loss > 0;
+        })->count();
+
+        $lossCount = $todayParticipants->filter(function ($p) {
+            return $p->profit_loss <= 0;
+        })->count();
+
+        return [
+            'total_trades' => $todayParticipants->count(),
+            'total_bet_amount' => $totalBetAmount,
+            'total_profit_loss' => $totalProfitLoss,
+            'total_fees' => $totalFees,
+            'net_result' => $netResult,
+            'win_count' => $winCount,
+            'loss_count' => $lossCount,
+            'win_rate' => $todayParticipants->count() > 0
+                ? ($winCount / $todayParticipants->count()) * 100
+                : 0,
+        ];
+    }
+
     // ==================== BALANCE METHODS ====================
 
     /**
@@ -380,7 +450,6 @@ class User extends Authenticatable
             $this->verification->isSubmitted() &&
             !$this->verification->isVerified();
     }
-    // Add this to User model
 
     public function getMultiLevelReferralsAttribute()
     {
@@ -418,12 +487,12 @@ class User extends Authenticatable
                 ]);
             }
 
-            // Get IDs for next level
             $currentLevelIds = $referrals->pluck('referred_id')->toArray();
         }
 
         return $results;
     }
+
     public function getTotalMultiLevelReferralsAttribute()
     {
         return $this->multi_level_referrals->count();

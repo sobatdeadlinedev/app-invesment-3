@@ -20,6 +20,12 @@ class ProfileController extends Controller
         // Get balance breakdown for detailed info
         $balanceBreakdown = Transaction::getUserBalanceBreakdown(auth()->id());
 
+        // Get today's PnL (using accessor)
+        $todayPnl = $user->today_pnl;
+
+        // Get today's trading stats (optional, for additional info)
+        $todayStats = $user->getTodayTradingStats();
+
         // Get recent transactions for each type (limit to 5 for preview)
         $deposits = Transaction::forUser(auth()->id())
             ->deposit()
@@ -44,6 +50,8 @@ class ProfileController extends Controller
             'wallets',
             'userBalance',
             'balanceBreakdown',
+            'todayPnl',
+            'todayStats',
             'deposits',
             'withdrawals',
             'commissions'
