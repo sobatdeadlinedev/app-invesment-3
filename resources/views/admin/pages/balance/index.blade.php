@@ -38,7 +38,9 @@
                                 <th class="min-w-150px">Name</th>
                                 <th class="min-w-150px">Email</th>
                                 <th class="min-w-125px">Phone</th>
-                                <th class="text-end min-w-125px">Balance</th>
+                                <th class="text-end min-w-125px">Exchange Balance</th>
+                                <th class="text-end min-w-125px">Trade Balance</th>
+                                <th class="text-end min-w-125px">Total Balance</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 fw-semibold">
@@ -60,14 +62,26 @@
                                     </td>
                                     <td class="text-end">
                                         <span
-                                            class="badge badge-light-{{ $user->balance >= 0 ? 'success' : 'danger' }} fs-7 fw-bold px-4 py-3">
-                                            {{ number_format($user->balance, 2) }} USDT
+                                            class="badge badge-light-{{ $user->balance_breakdown['exchange_balance'] >= 0 ? 'success' : 'danger' }} fs-7 fw-bold px-4 py-3">
+                                            {{ number_format($user->balance_breakdown['exchange_balance'], 2) }} USDT
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span
+                                            class="badge badge-light-{{ $user->balance_breakdown['trade_balance'] >= 0 ? 'info' : 'danger' }} fs-7 fw-bold px-4 py-3">
+                                            {{ number_format($user->balance_breakdown['trade_balance'], 2) }} USDT
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span
+                                            class="badge badge-light-{{ $user->balance_breakdown['total_balance'] >= 0 ? 'primary' : 'danger' }} fs-7 fw-bold px-4 py-3">
+                                            {{ number_format($user->balance_breakdown['total_balance'], 2) }} USDT
                                         </span>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-10">
+                                    <td colspan="6" class="text-center py-10">
                                         <div class="text-gray-600">No users found</div>
                                     </td>
                                 </tr>

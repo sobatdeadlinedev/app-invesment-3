@@ -18,9 +18,9 @@ class BalanceController extends Controller
             ->orderBy('name')
             ->paginate(15);
 
-        // Calculate balance for each user
+        // Calculate balance breakdown for each user
         $users->each(function ($user) {
-            $user->balance = Transaction::getUserBalance($user->id);
+            $user->balance_breakdown = Transaction::getUserBalanceBreakdown($user->id);
         });
 
         return view('admin.pages.balance.index', compact('users'));
