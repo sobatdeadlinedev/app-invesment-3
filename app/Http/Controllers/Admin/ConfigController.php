@@ -16,7 +16,6 @@ class ConfigController extends Controller
             'app_logo' => Config::get('app_logo', ['value' => '']),
             'app_announcement' => Config::get('app_announcement', ['value' => '']),
             'app_wallet_address' => Config::get('app_wallet_address', ['name' => '', 'number' => '']),
-            'app_qr_code' => Config::get('app_qr_code', ['value' => '']),
         ];
 
         return view('admin.pages.config.index', compact('configs'));
@@ -30,7 +29,6 @@ class ConfigController extends Controller
             'wallet_name' => 'required|string|max:255',
             'wallet_number' => 'required|string|max:255',
             'app_logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
-            'app_qr_code' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
         try {
@@ -55,17 +53,6 @@ class ConfigController extends Controller
 
                 $logoUrl = $this->uploadFile($request->file('app_logo'), 'logo');
                 Config::set('app_logo', ['value' => $logoUrl]);
-            }
-
-            // Update QR Code
-            if ($request->hasFile('app_qr_code')) {
-                $oldQr = Config::get('app_qr_code', ['value' => '']);
-                if (!empty($oldQr['value'])) {
-                    $this->deleteOldFile($oldQr['value']);
-                }
-
-                $qrUrl = $this->uploadFile($request->file('app_qr_code'), 'qrcode');
-                Config::set('app_qr_code', ['value' => $qrUrl]);
             }
 
             return redirect()->route('admin.config.index')

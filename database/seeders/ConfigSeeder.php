@@ -28,13 +28,9 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'app_wallet_address',
                 'value' => [
-                    'name' => 'wallet address here',
+                    'name' => 'bep 20',
                     'number' => '1234567890'
                 ],
-            ],
-            [
-                'key' => 'app_qr_code',
-                'value' => ['value' => 'QR code image here'],
             ],
             [
                 'key' => 'app_email',

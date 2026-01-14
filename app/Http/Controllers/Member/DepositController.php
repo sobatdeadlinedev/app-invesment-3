@@ -22,18 +22,16 @@ class DepositController extends Controller
         $wallet = Config::get('app_wallet_address');
         $walletName = $wallet['name'];
         $walletNumber = $wallet['number'];
-        $qrCode = Config::get('app_qr_code')['value'] ?? null;
 
-        // Get user balance - UPDATED
+        // Get user balance
         $user = auth()->user();
         $exchangeBalance = $user->exchange_balance;
         $tradeBalance = $user->trade_balance;
-        $userBalance = $user->exchange_balance + $user->trade_balance; // Total balance untuk display
+        $userBalance = $user->exchange_balance + $user->trade_balance;
 
         return view('member.pages.deposit.index', compact(
             'walletNumber',
             'walletName',
-            'qrCode',
             'exchangeBalance',
             'tradeBalance',
             'userBalance'
@@ -47,12 +45,10 @@ class DepositController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:10',
-            'payment_method' => 'required|in:ewallet,qrcode',
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ], [
             'amount.required' => 'Jumlah deposit harus diisi',
             'amount.min' => 'Minimal deposit adalah 10 USDT',
-            'payment_method.required' => 'Metode pembayaran harus dipilih',
             'payment_proof.required' => 'Bukti transfer harus diupload',
             'payment_proof.image' => 'File harus berupa gambar',
             'payment_proof.mimes' => 'Format file harus jpeg, png, atau jpg',
@@ -70,24 +66,24 @@ class DepositController extends Controller
 
             $depositAmount = $request->amount;
 
-            // Create transaction - UPDATED: balance_type = 'exchange'
+            // Create transaction
             $transaction = Transaction::create([
                 'user_id' => auth()->id(),
                 'reference' => $reference,
                 'amount' => $depositAmount,
                 'total_amount' => $depositAmount,
                 'type' => 'deposit',
-                'balance_type' => 'exchange', // NEW - deposit masuk ke exchange
+                'balance_type' => 'exchange',
                 'wallet_id' => null,
                 'withdrawal_fee' => null,
                 'source_user_id' => null,
                 'status' => 'pending',
-                'payment_method' => $request->payment_method,
+                'payment_method' => 'ewallet',
                 'payment_proof' => $proofPath,
                 'approved_by' => null,
             ]);
 
-            // Kirim email notifikasi ke admin
+            // Send email notification to admin
             $this->sendAdminNotification($transaction);
 
             DB::commit();
@@ -141,7 +137,6 @@ class DepositController extends Controller
             ));
         } catch (\Exception $e) {
             Log::error('Failed to send admin notification email: ' . $e->getMessage());
-            // Don't throw exception, just log it
         }
     }
 

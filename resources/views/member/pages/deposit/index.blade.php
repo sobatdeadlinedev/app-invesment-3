@@ -78,7 +78,6 @@
                     enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="amount" id="form-amount">
-                    <input type="hidden" name="payment_method" id="form-payment-method" value="ewallet">
 
                     <!-- Amount Summary -->
                     <div class="card-dark shadow-sm p-3 mb-3">
@@ -88,98 +87,43 @@
                         </div>
                     </div>
 
-                    <!-- Payment Methods -->
-                    <div class="card-dark shadow-sm p-3 mb-3">
-                        <h6 class="text-white mb-3">Choose Payment Method</h6>
-
-                        <!-- E-Wallet Option -->
-                        <div class="payment-method-option" onclick="selectMethod('ewallet')">
-                            <input type="radio" name="payment_method_display" id="method-ewallet" class="payment-radio"
-                                checked>
-                            <label for="method-ewallet" class="payment-label">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="payment-icon ewallet">
-                                        <i class="bi bi-wallet2"></i>
-                                    </div>
-                                    <div>
-                                        <div class="text-white fw-bold mb-1" style="font-size: 14px;">E-Wallet</div>
-                                        <small class="text-muted">Transfer USDT via E-Wallet</small>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-
-                        <!-- QR Code Option -->
-                        <div class="payment-method-option" onclick="selectMethod('qrcode')">
-                            <input type="radio" name="payment_method_display" id="method-qrcode" class="payment-radio">
-                            <label for="method-qrcode" class="payment-label">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="payment-icon qrcode">
-                                        <i class="bi bi-qr-code"></i>
-                                    </div>
-                                    <div>
-                                        <div class="text-white fw-bold mb-1" style="font-size: 14px;">QR Code</div>
-                                        <small class="text-muted">Scan QR to pay with USDT</small>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
                     <!-- Payment Details: E-Wallet -->
-                    <div id="payment-details-ewallet" class="payment-details active">
-                        <div class="card-dark shadow-sm p-3 mb-3">
-                            <h6 class="text-white mb-3">USDT</h6>
-                            
-                            <!-- Jaringan -->
-                            <div class="payment-info-item">
-                                <div class="payment-info-row">
-                                    <span class="text-muted small payment-label">Jaringan</span>
-                                    <div class="payment-value-with-copy">
-                                        <span class="text-white fw-bold payment-value-text">{{ $walletNumber }}</span>
-                                        <button type="button" class="btn-copy-mini"
-                                            onclick="copyText('{{ $walletNumber }}')" title="Copy">
-                                            <i class="bi bi-clipboard"></i>
-                                        </button>
-                                    </div>
+                    <div class="card-dark shadow-sm p-3 mb-3">
+                        <h6 class="text-white mb-3">Transfer USDT to E-Wallet</h6>
+
+                        <!-- Jaringan -->
+                        <div class="payment-info-item">
+                            <div class="payment-info-row">
+                                <span class="text-muted small payment-label">Jaringan</span>
+                                <div class="payment-value-with-copy">
+                                    <span class="text-white fw-bold payment-value-text">{{ $walletNumber }}</span>
+                                    <button type="button" class="btn-copy-mini" onclick="copyText('{{ $walletNumber }}')"
+                                        title="Copy">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            
-                            <!-- Alamat Setoran - Fixed Responsive Layout -->
-                            <div class="payment-info-item">
-                                <div class="payment-info-row">
-                                    <span class="text-muted small payment-label">Alamat Setoran</span>
-                                    <div class="payment-value-with-copy">
-                                        <span class="text-white fw-bold payment-value-text wallet-address">{{ $walletName }}</span>
-                                        <button type="button" class="btn-copy-mini"
-                                            onclick="copyText('{{ $walletName }}')" title="Copy">
-                                            <i class="bi bi-clipboard"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="alert-info-box mt-3">
-                                <i class="bi bi-info-circle-fill me-2"></i>
-                                <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network TRC20
-                                    dan BEP 20. Lalu upload bukti transfer</span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Payment Details: QR Code -->
-                    <div id="payment-details-qrcode" class="payment-details">
-                        <div class="card-dark shadow-sm p-3 mb-3">
-                            <h6 class="text-white mb-3 text-center">Scan QR Code</h6>
-                            <div class="qr-code-container">
-                                <img src="{{ $qrCode }}" alt="QR Code" class="qr-code-image">
+                        <!-- Alamat Setoran -->
+                        <div class="payment-info-item">
+                            <div class="payment-info-row">
+                                <span class="text-muted small payment-label">Alamat Setoran</span>
+                                <div class="payment-value-with-copy">
+                                    <span
+                                        class="text-white fw-bold payment-value-text wallet-address">{{ $walletName }}</span>
+                                    <button type="button" class="btn-copy-mini" onclick="copyText('{{ $walletName }}')"
+                                        title="Copy">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="alert-info-box mt-3">
-                                <i class="bi bi-info-circle-fill me-2"></i>
-                                <span class="small">Scan QR code dengan aplikasi crypto wallet Anda (TRC20 Network) dan
-                                    upload
-                                    bukti transfer</span>
-                            </div>
+                        </div>
+
+                        <div class="alert-info-box mt-3">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network TRC20
+                                dan BEP 20. Lalu upload bukti transfer</span>
                         </div>
                     </div>
 
@@ -255,8 +199,8 @@
             padding: 12px 0;
         }
 
-        .payment-info-item:last-child {
-            padding-bottom: 0;
+        .payment-info-item:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .payment-info-row {
@@ -300,11 +244,11 @@
                 gap: 8px;
                 align-items: flex-start;
             }
-            
+
             .payment-label {
                 min-width: auto;
             }
-            
+
             .payment-value-with-copy {
                 width: 100%;
                 justify-content: space-between;
@@ -332,6 +276,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 12px;
+            flex-shrink: 0;
         }
 
         .btn-copy-mini:hover {
@@ -417,20 +362,6 @@
             document.getElementById('step-1-indicator').classList.remove('completed');
 
             document.querySelector('.scrollable-content').scrollTop = 0;
-        }
-
-        function selectMethod(method) {
-            document.getElementById('form-payment-method').value = method;
-
-            if (method === 'ewallet') {
-                document.getElementById('method-ewallet').checked = true;
-                document.getElementById('payment-details-ewallet').classList.add('active');
-                document.getElementById('payment-details-qrcode').classList.remove('active');
-            } else {
-                document.getElementById('method-qrcode').checked = true;
-                document.getElementById('payment-details-qrcode').classList.add('active');
-                document.getElementById('payment-details-ewallet').classList.remove('active');
-            }
         }
 
         function copyText(text) {

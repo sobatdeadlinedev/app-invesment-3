@@ -169,7 +169,7 @@
                             <div class="col-xl-9 fv-row">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Wallet Name</label>
+                                        <label class="form-label">Wallet Network</label>
                                         <input type="text" class="form-control form-control-solid" name="wallet_name"
                                             value="{{ old('wallet_name', $configs['app_wallet_address']['name']) }}"
                                             placeholder="e.g., BCA - John Doe" required />
@@ -183,59 +183,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <!--end::Row-->
-
-                        <!--begin::Row-->
-                        <div class="row mb-5">
-                            <!--begin::Col-->
-                            <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">QR Code</div>
-                            </div>
-                            <!--end::Col-->
-                            <!--begin::Col-->
-                            <div class="col-lg-8">
-                                <!--begin::Image input-->
-                                <div class="image-input image-input-outline" data-kt-image-input="true"
-                                    style="background-image: url('{{ asset('assets/media/svg/avatars/blank.svg') }}')">
-                                    <!--begin::Preview existing avatar-->
-                                    <div class="image-input-wrapper w-125px h-125px bgi-position-center"
-                                        style="background-size: 75%; background-image: url('{{ $configs['app_qr_code']['value'] ?: asset('assets/media/svg/brand-logos/volicity-9.svg') }}')">
-                                    </div>
-                                    <!--end::Preview existing avatar-->
-                                    <!--begin::Label-->
-                                    <label
-                                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow"
-                                        data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                        title="Change QR Code">
-                                        <i class="ki-outline ki-pencil fs-7"></i>
-                                        <!--begin::Inputs-->
-                                        <input type="file" name="app_qr_code" accept=".png, .jpg, .jpeg" />
-                                        <input type="hidden" name="qr_remove" />
-                                        <!--end::Inputs-->
-                                    </label>
-                                    <!--end::Label-->
-                                    <!--begin::Cancel-->
-                                    <span
-                                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow"
-                                        data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel">
-                                        <i class="ki-outline ki-cross fs-2"></i>
-                                    </span>
-                                    <!--end::Cancel-->
-                                    <!--begin::Remove-->
-                                    <span
-                                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow"
-                                        data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove">
-                                        <i class="ki-outline ki-cross fs-2"></i>
-                                    </span>
-                                    <!--end::Remove-->
-                                </div>
-                                <!--end::Image input-->
-                                <!--begin::Hint-->
-                                <div class="form-text">Allowed file types: png, jpg, jpeg. Max size: 2MB</div>
-                                <!--end::Hint-->
-                            </div>
-                            <!--end::Col-->
                         </div>
                         <!--end::Row-->
                     </div>
