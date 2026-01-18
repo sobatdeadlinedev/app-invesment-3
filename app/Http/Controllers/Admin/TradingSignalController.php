@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TradingSignal;
 use App\Models\SignalParticipant;
+use App\Models\SignalAllowedUser;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +15,7 @@ class TradingSignalController extends Controller
 {
     public function index()
     {
-        $signals = TradingSignal::with('creator')
+        $signals = TradingSignal::with(['creator', 'allowedUsers'])
             ->withCount('participants')
             ->latest()
             ->paginate(15);
@@ -24,7 +26,15 @@ class TradingSignalController extends Controller
     public function create()
     {
         $coins = TradingSignal::getAvailableCoins();
-        return view('admin.pages.signals.create', compact('coins'));
+
+        // FIXED: Get all users exclude admin using Spatie Permission
+        $users = User::whereDoesntHave('roles', function ($query) {
+            $query->where('name', 'admin');
+        })
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'phone']);
+
+        return view('admin.pages.signals.create', compact('coins', 'users'));
     }
 
     public function store(Request $request)
@@ -35,13 +45,28 @@ class TradingSignalController extends Controller
             'description' => 'nullable|string',
             'entry_price' => 'required|numeric|min:0',
             'target_price' => 'required|numeric|min:0',
+
+            // Bet configuration
+            'bet_type' => 'required|in:percentage,fixed',
+            'bet_value' => 'required|numeric|min:0.01',
+
+            // Access control
+            'is_public' => 'nullable|boolean',
+            'allowed_user_ids' => 'required_if:is_public,false|array',
+            'allowed_user_ids.*' => 'exists:users,id',
         ], [
             'entry_price.required' => 'Opening price is required',
             'target_price.required' => 'Settlement price is required',
+            'bet_type.required' => 'Bet type must be selected',
+            'bet_value.required' => 'Bet value is required',
+            'bet_value.min' => 'Bet value must be at least 0.01',
+            'allowed_user_ids.required_if' => 'You must select at least one user for private signal',
         ]);
 
         try {
             DB::beginTransaction();
+
+            $isPublic = $request->has('is_public') && $request->is_public;
 
             $signal = TradingSignal::create([
                 'title' => $request->title,
@@ -49,11 +74,28 @@ class TradingSignalController extends Controller
                 'description' => $request->description,
                 'entry_price' => $request->entry_price,
                 'target_price' => $request->target_price,
+                'bet_type' => $request->bet_type,
+                'bet_value' => $request->bet_value,
+                'is_public' => $isPublic,
                 'status' => 'open',
                 'created_by' => auth()->id(),
             ]);
 
+            // Jika private signal, simpan allowed users
+            if (!$isPublic && !empty($request->allowed_user_ids)) {
+                SignalAllowedUser::syncAllowedUsers($signal->id, $request->allowed_user_ids);
+            }
+
             DB::commit();
+
+            Log::info('Signal created', [
+                'signal_id' => $signal->id,
+                'title' => $signal->title,
+                'bet_type' => $signal->bet_type,
+                'bet_value' => $signal->bet_value,
+                'is_public' => $signal->is_public,
+                'allowed_users_count' => !$isPublic ? count($request->allowed_user_ids ?? []) : 'all',
+            ]);
 
             return redirect()
                 ->route('admin.signals.index')
@@ -67,7 +109,7 @@ class TradingSignalController extends Controller
 
     public function show($id)
     {
-        $signal = TradingSignal::with(['creator', 'participants.user'])
+        $signal = TradingSignal::with(['creator', 'participants.user', 'allowedUsers.user'])
             ->findOrFail($id);
 
         $totalParticipants = $signal->participants->count();
@@ -78,14 +120,22 @@ class TradingSignalController extends Controller
 
     public function edit($id)
     {
-        $signal = TradingSignal::findOrFail($id);
+        $signal = TradingSignal::with('allowedUsers')->findOrFail($id);
 
         if ($signal->status !== 'open') {
             return redirect()->route('admin.signals.index')->with('error', 'Cannot edit signal that is already closed or settled.');
         }
 
         $coins = TradingSignal::getAvailableCoins();
-        return view('admin.pages.signals.edit', compact('signal', 'coins'));
+
+        // FIXED: Get all users exclude admin using Spatie Permission
+        $users = User::whereDoesntHave('roles', function ($query) {
+            $query->where('name', 'admin');
+        })
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'phone']);
+
+        return view('admin.pages.signals.edit', compact('signal', 'coins', 'users'));
     }
 
     public function update(Request $request, $id)
@@ -102,13 +152,27 @@ class TradingSignalController extends Controller
             'description' => 'nullable|string',
             'entry_price' => 'required|numeric|min:0',
             'target_price' => 'required|numeric|min:0',
+
+            // Bet configuration
+            'bet_type' => 'required|in:percentage,fixed',
+            'bet_value' => 'required|numeric|min:0.01',
+
+            // Access control
+            'is_public' => 'nullable|boolean',
+            'allowed_user_ids' => 'required_if:is_public,false|array',
+            'allowed_user_ids.*' => 'exists:users,id',
         ], [
             'entry_price.required' => 'Opening price is required',
             'target_price.required' => 'Settlement price is required',
+            'bet_type.required' => 'Bet type must be selected',
+            'bet_value.required' => 'Bet value is required',
+            'allowed_user_ids.required_if' => 'You must select at least one user for private signal',
         ]);
 
         try {
             DB::beginTransaction();
+
+            $isPublic = $request->has('is_public') && $request->is_public;
 
             $signal->update([
                 'title' => $request->title,
@@ -116,9 +180,27 @@ class TradingSignalController extends Controller
                 'description' => $request->description,
                 'entry_price' => $request->entry_price,
                 'target_price' => $request->target_price,
+                'bet_type' => $request->bet_type,
+                'bet_value' => $request->bet_value,
+                'is_public' => $isPublic,
             ]);
 
+            // Sync allowed users
+            if (!$isPublic && !empty($request->allowed_user_ids)) {
+                SignalAllowedUser::syncAllowedUsers($signal->id, $request->allowed_user_ids);
+            } else if ($isPublic) {
+                // Jika diubah jadi public, hapus semua allowed users
+                SignalAllowedUser::where('signal_id', $signal->id)->delete();
+            }
+
             DB::commit();
+
+            Log::info('Signal updated', [
+                'signal_id' => $signal->id,
+                'bet_type' => $signal->bet_type,
+                'bet_value' => $signal->bet_value,
+                'is_public' => $signal->is_public,
+            ]);
 
             return redirect()->route('admin.signals.show', $signal->id)->with('success', 'Signal updated successfully.');
         } catch (\Exception $e) {
@@ -137,17 +219,10 @@ class TradingSignalController extends Controller
             'signal_id' => $id,
             'request_data' => $request->all(),
             'user_id' => auth()->id(),
-            'timestamp' => now(),
         ]);
 
         try {
             $signal = TradingSignal::findOrFail($id);
-
-            Log::info('Signal found', [
-                'signal_id' => $signal->id,
-                'current_status' => $signal->status,
-                'title' => $signal->title,
-            ]);
 
             if ($signal->status !== 'open') {
                 Log::warning('Signal status invalid', [
@@ -160,8 +235,6 @@ class TradingSignalController extends Controller
                     ->with('error', 'Signal is not open or already processed. Current status: ' . $signal->status);
             }
 
-            Log::info('Validating request data');
-
             $validated = $request->validate([
                 'result' => 'required|in:call,put,win,loss',
                 'rate_of_return' => 'required|numeric|min:0|max:100',
@@ -173,8 +246,6 @@ class TradingSignalController extends Controller
                 'rate_of_return.max' => 'Win rate maximum 100%',
             ]);
 
-            Log::info('Validation passed', ['validated_data' => $validated]);
-
             $resultForDb = $request->result;
             if ($request->result === 'call') {
                 $resultForDb = 'win';
@@ -182,39 +253,17 @@ class TradingSignalController extends Controller
                 $resultForDb = 'loss';
             }
 
-            Log::info('Result converted', [
-                'original' => $request->result,
-                'for_database' => $resultForDb,
-            ]);
-
             DB::beginTransaction();
-            Log::info('Database transaction started');
-
-            Log::info('Calling closeSignal method', [
-                'result' => $resultForDb,
-                'rate_of_return' => $request->rate_of_return,
-            ]);
 
             // Call closeSignal method - opened_at akan diset di dalam method ini
             $signal->closeSignal($resultForDb, $request->rate_of_return);
 
-            Log::info('closeSignal method completed', [
-                'signal_id' => $signal->id,
-                'new_status' => $signal->fresh()->status,
-                'result' => $signal->fresh()->result,
-                'rate_of_return' => $signal->fresh()->rate_of_return,
-                'opened_at' => $signal->fresh()->opened_at,
-            ]);
-
             DB::commit();
-            Log::info('Database transaction committed');
 
             Log::info('=== CLOSE SIGNAL SUCCESS ===', [
                 'signal_id' => $signal->id,
                 'result' => strtoupper($resultForDb),
-                'display_as' => strtoupper($request->result),
                 'rate_of_return' => $request->rate_of_return,
-                'opened_at' => $signal->fresh()->opened_at,
             ]);
 
             $displayLabel = in_array($request->result, ['call', 'put'])
@@ -236,15 +285,13 @@ class TradingSignalController extends Controller
             Log::error('=== CLOSE SIGNAL FAILED ===', [
                 'signal_id' => $id,
                 'error_message' => $e->getMessage(),
-                'error_file' => $e->getFile(),
-                'error_line' => $e->getLine(),
                 'stack_trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Failed to close signal: ' . $e->getMessage() . ' (Check logs for details)');
+                ->with('error', 'Failed to close signal: ' . $e->getMessage());
         }
     }
 
@@ -276,93 +323,40 @@ class TradingSignalController extends Controller
 
             foreach ($signal->participants as $participant) {
                 if ($participant->isSettled()) {
-                    Log::info('Participant already settled, skipping', [
-                        'participant_id' => $participant->id,
-                        'user_id' => $participant->user_id,
-                    ]);
                     continue;
                 }
 
                 $user = $participant->user;
                 $betAmount = $participant->bet_amount;
-                $originalJoinedAt = $participant->joined_at;
 
-                Log::info('START - joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                ]);
-
-                // STEP 1: Unlock balance
+                // Unlock balance
                 $user->unlockBalance($betAmount);
-                Log::info('AFTER unlockBalance - joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                ]);
 
-                // STEP 2: Calculate reward
+                // Calculate reward
                 $reward = $betAmount * ($signal->rate_of_return / 100);
-                Log::info('AFTER calculate reward - joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                ]);
 
-                // STEP 3: Add reward
+                // Add reward to trade balance
                 $user->addTradeBalance($reward);
-                Log::info('AFTER addTradeBalance - joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                ]);
 
-                // STEP 4: Add volume
+                // Add to achieved volume
                 $user->addAchievedVolume($betAmount);
-                Log::info('AFTER addAchievedVolume - joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                ]);
 
-                // STEP 5: Update participant
-                Log::info('BEFORE DB update - joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                ]);
-
-                DB::table('signal_participants')
-                    ->where('id', $participant->id)
-                    ->update([
-                        'profit_loss' => $reward,
-                        'fee_amount' => 0,
-                        'status' => 'settled',
-                        'settled_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-
-                Log::info('AFTER DB update - joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                ]);
-
-                // STEP 6: Restore joined_at
-                DB::table('signal_participants')
-                    ->where('id', $participant->id)
-                    ->update([
-                        'joined_at' => $originalJoinedAt,
-                    ]);
-
-                Log::info('AFTER restore joined_at', [
-                    'participant_id' => $participant->id,
-                    'joined_at' => $participant->fresh()->joined_at,
-                    'original_joined_at' => $originalJoinedAt,
+                // Update participant - boot method akan protect joined_at
+                $participant->update([
+                    'profit_loss' => $reward,
+                    'fee_amount' => 0,
+                    'status' => 'settled',
+                    'settled_at' => now(),
                 ]);
 
                 $settledCount++;
                 $totalRewards += $reward;
 
-                $participant->refresh();
-
-                Log::info('FINAL - joined_at', [
+                Log::info('Participant settled', [
                     'participant_id' => $participant->id,
-                    'joined_at' => $participant->joined_at,
-                    'status' => $participant->status,
+                    'user_id' => $user->id,
+                    'bet_amount' => $betAmount,
+                    'reward' => $reward,
                 ]);
             }
 
@@ -386,16 +380,15 @@ class TradingSignalController extends Controller
             Log::error('=== SETTLE SIGNAL FAILED ===', [
                 'signal_id' => $signal->id,
                 'error_message' => $e->getMessage(),
-                'error_file' => $e->getFile(),
-                'error_line' => $e->getLine(),
                 'stack_trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('error', 'Failed to settle signal: ' . $e->getMessage() . ' (Check logs for details)');
+                ->with('error', 'Failed to settle signal: ' . $e->getMessage());
         }
     }
+
     public function destroy($id)
     {
         $signal = TradingSignal::withCount('participants')->findOrFail($id);

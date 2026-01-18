@@ -96,6 +96,9 @@
                     @php
                         // Check if signal is pending
                         $isPending = $signal->result === 'pending' || $signal->result === null;
+
+                        // UPDATED: Get bet amount preview from signal
+                        $betAmountPreview = $signal->betAmountPreview ?? 0;
                     @endphp
 
                     <div class="coin-list-item">
@@ -113,6 +116,36 @@
                                 <span class="badge badge-success" style="font-size: 10px;">
                                     <i class="bi bi-circle-fill" style="font-size: 6px;"></i> OPEN
                                 </span>
+                            </div>
+
+                            <!-- UPDATED: Show bet config & preview -->
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <small class="text-muted d-block" style="font-size: 10px;">Bet Type</small>
+                                    <small class="text-white fw-bold">
+                                        @if ($signal->bet_type == 'percentage')
+                                            <span class="badge badge-light-primary" style="font-size: 9px;">
+                                                {{ number_format($signal->bet_value, 2) }}%
+                                            </span>
+                                        @else
+                                            <span class="badge badge-light-info" style="font-size: 9px;">
+                                                {{ number_format($signal->bet_value, 2) }} USDT
+                                            </span>
+                                        @endif
+                                    </small>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block" style="font-size: 10px;">Your Bet</small>
+                                    <small class="text-gold fw-bold">
+                                        $ {{ number_format($betAmountPreview, 2) }}
+                                    </small>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block" style="font-size: 10px;">Participants</small>
+                                    <small class="text-white fw-bold">
+                                        {{ $signal->participants_count }}
+                                    </small>
+                                </div>
                             </div>
 
                             <div class="row g-2">
@@ -148,7 +181,7 @@
                                     <a href="{{ route('member.invest.detail', ['signal_id' => $signal->id]) }}"
                                         class="btn btn-sm"
                                         style="background: linear-gradient(135deg, #f5a623 0%, #f7b733 100%); 
-                                          color: white; font-size: 11px; padding: 4px 12px;">
+                              color: white; font-size: 11px; padding: 4px 12px;">
                                         <i class="bi bi-eye me-1"></i>View Detail
                                     </a>
                                 @endif
@@ -171,8 +204,11 @@
                         <h6 class="text-white mb-1" style="font-size: 13px;">How It Works</h6>
                         <ul class="small text-muted mb-0 ps-3" style="font-size: 12px;">
                             <li>View signal details before joining</li>
-                            <li>Bet amount is 1% of your Trade Balance</li>
-                            <li>Minimum $ 100.00 available balance required</li>
+                            <li>Bet amount varies by signal: <strong>percentage-based</strong> or <strong>fixed
+                                    amount</strong></li>
+                            <li>Percentage signals: bet = % of your Trade Balance</li>
+                            <li>Fixed signals: same bet amount for all users</li>
+                            <li>Minimum $ 100.00 available balance required (for percentage signals)</li>
                             <li>Your bet will be locked until settlement</li>
                             <li><strong class="text-success">You always win rewards!</strong> No losses, no fees</li>
                         </ul>
