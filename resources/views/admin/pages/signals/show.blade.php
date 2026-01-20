@@ -444,10 +444,10 @@
                     <div class="modal-body">
                         <div class="mb-5">
                             <label class="form-label required">Result</label>
-                            <select name="result" class="form-select" required>
+                            <select name="admin_choice" class="form-select" required>
                                 <option value="">Select Result</option>
-                                <option value="win">Call</option>
-                                <option value="loss">Put</option>
+                                <option value="call">Call (Price UP ↑)</option>
+                                <option value="put">Put (Price DOWN ↓)</option>
                             </select>
                         </div>
                         <div class="mb-5">

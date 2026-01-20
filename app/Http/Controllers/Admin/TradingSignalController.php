@@ -27,7 +27,6 @@ class TradingSignalController extends Controller
     {
         $coins = TradingSignal::getAvailableCoins();
 
-        // FIXED: Get all users exclude admin using Spatie Permission
         $users = User::whereDoesntHave('roles', function ($query) {
             $query->where('name', 'admin');
         })
@@ -45,22 +44,11 @@ class TradingSignalController extends Controller
             'description' => 'nullable|string',
             'entry_price' => 'required|numeric|min:0',
             'target_price' => 'required|numeric|min:0',
-
-            // Bet configuration
             'bet_type' => 'required|in:percentage,fixed',
             'bet_value' => 'required|numeric|min:0.01',
-
-            // Access control
             'is_public' => 'nullable|boolean',
             'allowed_user_ids' => 'required_if:is_public,false|array',
             'allowed_user_ids.*' => 'exists:users,id',
-        ], [
-            'entry_price.required' => 'Opening price is required',
-            'target_price.required' => 'Settlement price is required',
-            'bet_type.required' => 'Bet type must be selected',
-            'bet_value.required' => 'Bet value is required',
-            'bet_value.min' => 'Bet value must be at least 0.01',
-            'allowed_user_ids.required_if' => 'You must select at least one user for private signal',
         ]);
 
         try {
@@ -81,7 +69,6 @@ class TradingSignalController extends Controller
                 'created_by' => auth()->id(),
             ]);
 
-            // Jika private signal, simpan allowed users
             if (!$isPublic && !empty($request->allowed_user_ids)) {
                 SignalAllowedUser::syncAllowedUsers($signal->id, $request->allowed_user_ids);
             }
@@ -91,10 +78,8 @@ class TradingSignalController extends Controller
             Log::info('Signal created', [
                 'signal_id' => $signal->id,
                 'title' => $signal->title,
-                'bet_type' => $signal->bet_type,
-                'bet_value' => $signal->bet_value,
-                'is_public' => $signal->is_public,
-                'allowed_users_count' => !$isPublic ? count($request->allowed_user_ids ?? []) : 'all',
+                'entry_price' => $signal->entry_price,
+                'target_price' => $signal->target_price,
             ]);
 
             return redirect()
@@ -128,7 +113,6 @@ class TradingSignalController extends Controller
 
         $coins = TradingSignal::getAvailableCoins();
 
-        // FIXED: Get all users exclude admin using Spatie Permission
         $users = User::whereDoesntHave('roles', function ($query) {
             $query->where('name', 'admin');
         })
@@ -152,21 +136,11 @@ class TradingSignalController extends Controller
             'description' => 'nullable|string',
             'entry_price' => 'required|numeric|min:0',
             'target_price' => 'required|numeric|min:0',
-
-            // Bet configuration
             'bet_type' => 'required|in:percentage,fixed',
             'bet_value' => 'required|numeric|min:0.01',
-
-            // Access control
             'is_public' => 'nullable|boolean',
             'allowed_user_ids' => 'required_if:is_public,false|array',
             'allowed_user_ids.*' => 'exists:users,id',
-        ], [
-            'entry_price.required' => 'Opening price is required',
-            'target_price.required' => 'Settlement price is required',
-            'bet_type.required' => 'Bet type must be selected',
-            'bet_value.required' => 'Bet value is required',
-            'allowed_user_ids.required_if' => 'You must select at least one user for private signal',
         ]);
 
         try {
@@ -185,22 +159,13 @@ class TradingSignalController extends Controller
                 'is_public' => $isPublic,
             ]);
 
-            // Sync allowed users
             if (!$isPublic && !empty($request->allowed_user_ids)) {
                 SignalAllowedUser::syncAllowedUsers($signal->id, $request->allowed_user_ids);
             } else if ($isPublic) {
-                // Jika diubah jadi public, hapus semua allowed users
                 SignalAllowedUser::where('signal_id', $signal->id)->delete();
             }
 
             DB::commit();
-
-            Log::info('Signal updated', [
-                'signal_id' => $signal->id,
-                'bet_type' => $signal->bet_type,
-                'bet_value' => $signal->bet_value,
-                'is_public' => $signal->is_public,
-            ]);
 
             return redirect()->route('admin.signals.show', $signal->id)->with('success', 'Signal updated successfully.');
         } catch (\Exception $e) {
@@ -211,49 +176,105 @@ class TradingSignalController extends Controller
     }
 
     /**
-     * Close signal - opened_at akan diset di method closeSignal()
+     * Close signal - Admin memilih CALL atau PUT
+     * System akan bandingkan dengan kondisi harga sebenarnya
      */
     public function close(Request $request, $id)
     {
+        Log::info('=== CLOSE SIGNAL START ===', [
+            'signal_id' => $id,
+            'request_data' => $request->all(),
+            'user_id' => auth()->id(),
+        ]);
+
         try {
             $signal = TradingSignal::findOrFail($id);
 
             if ($signal->status !== 'open') {
+                Log::warning('Signal status invalid', [
+                    'signal_id' => $signal->id,
+                    'status' => $signal->status,
+                ]);
+
                 return redirect()
                     ->route('admin.signals.index')
-                    ->with('error', 'Signal is not open.');
+                    ->with('error', 'Signal is not open. Current status: ' . $signal->status);
             }
 
             $validated = $request->validate([
+                'admin_choice' => 'required|in:call,put',
                 'rate_of_return' => 'required|numeric|min:0|max:100',
+            ], [
+                'admin_choice.required' => 'Admin must choose CALL or PUT',
+                'admin_choice.in' => 'Choice must be CALL or PUT',
+                'rate_of_return.required' => 'Win rate must be filled',
+                'rate_of_return.min' => 'Win rate minimum 0%',
+                'rate_of_return.max' => 'Win rate maximum 100%',
             ]);
 
             DB::beginTransaction();
 
-            // Auto-detect result berdasarkan price
-            if ($signal->entry_price < $signal->target_price) {
-                $result = 'win'; // CALL WIN, PUT LOSS
-            } else {
-                $result = 'loss'; // PUT WIN, CALL LOSS
-            }
+            // Tentukan kondisi harga sebenarnya
+            $actualResult = ($signal->entry_price < $signal->target_price) ? 'call' : 'put';
 
+            // Admin choice
+            $adminChoice = $request->admin_choice;
+
+            // Apakah admin benar?
+            $isAdminCorrect = ($adminChoice === $actualResult);
+
+            // Result untuk database (win = user menang, loss = user kalah)
+            $result = $isAdminCorrect ? 'win' : 'loss';
+
+            // Close signal dengan result
             $signal->closeSignal($result, $request->rate_of_return);
 
             DB::commit();
 
-            $displayResult = $result === 'win' ? 'CALL WIN' : 'PUT WIN';
+            Log::info('=== CLOSE SIGNAL SUCCESS ===', [
+                'signal_id' => $signal->id,
+                'entry_price' => $signal->entry_price,
+                'target_price' => $signal->target_price,
+                'actual_result' => strtoupper($actualResult),
+                'admin_choice' => strtoupper($adminChoice),
+                'is_admin_correct' => $isAdminCorrect,
+                'user_result' => $result === 'win' ? 'USERS WIN' : 'USERS LOSE',
+                'rate_of_return' => $request->rate_of_return,
+            ]);
+
+            $priceDirection = $actualResult === 'call' ? 'UP (CALL)' : 'DOWN (PUT)';
+            $adminChoiceText = strtoupper($adminChoice);
+            $userOutcome = $isAdminCorrect ? 'USERS WIN' : 'USERS LOSE';
 
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('success', "Signal closed as {$displayResult} with {$request->rate_of_return}% win rate.");
+                ->with('success', "Signal closed! Price went {$priceDirection}. Admin chose {$adminChoiceText}. Result: {$userOutcome} with {$request->rate_of_return}% rate.");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'signal_id' => $id,
+            ]);
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Failed to close signal: ' . $e->getMessage());
+
+            Log::error('=== CLOSE SIGNAL FAILED ===', [
+                'signal_id' => $id,
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Failed to close signal: ' . $e->getMessage());
         }
     }
 
     /**
-     * Settle signal - closed_at akan diset di method markAsSettled()
+     * Settle signal
+     * - result = 'win' → Users menang (get profit)
+     * - result = 'loss' → Users kalah (lose bet amount)
      */
     public function settle($id)
     {
@@ -262,19 +283,26 @@ class TradingSignalController extends Controller
         $signal = TradingSignal::with('participants.user')->findOrFail($id);
 
         if ($signal->status !== 'closed') {
+            Log::warning('Signal not closed yet', [
+                'signal_id' => $signal->id,
+                'status' => $signal->status,
+            ]);
+
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('error', 'Signal must be closed before settling.');
+                ->with('error', 'Signal must be closed before settling. Current status: ' . $signal->status);
         }
 
         try {
             DB::beginTransaction();
 
             $settledCount = 0;
-            $winnersCount = 0;
-            $losersCount = 0;
             $totalRewards = 0;
             $totalLosses = 0;
+
+            // Karena semua user follow signal admin
+            // Maka semua user punya fate yang sama (menang semua atau kalah semua)
+            $usersWin = ($signal->result === 'win');
 
             foreach ($signal->participants as $participant) {
                 if ($participant->isSettled()) {
@@ -284,12 +312,8 @@ class TradingSignalController extends Controller
                 $user = $participant->user;
                 $betAmount = $participant->bet_amount;
 
-                // Cek apakah participant menang atau kalah
-                // signal->result: 'win' = CALL WIN, 'loss' = PUT WIN
-                $isWinner = ($participant->prediction === $signal->result);
-
-                if ($isWinner) {
-                    // MENANG
+                if ($usersWin) {
+                    // USERS MENANG (Admin pilih benar)
                     // 1. Unlock bet amount (kembalikan saldo bet)
                     $user->unlockBalance($betAmount);
 
@@ -299,9 +323,7 @@ class TradingSignalController extends Controller
                     // 3. Tambahkan profit ke trade balance
                     $user->addTradeBalance($profit);
 
-                    $profitLoss = $profit; // Profit saja (bet amount sudah dikembalikan)
-
-                    $winnersCount++;
+                    $profitLoss = $profit; // Profit saja (bet sudah dikembalikan)
                     $totalRewards += $profit;
 
                     Log::info('Participant WON', [
@@ -309,16 +331,13 @@ class TradingSignalController extends Controller
                         'user_id' => $user->id,
                         'bet_amount' => $betAmount,
                         'profit' => $profit,
-                        'prediction' => $participant->prediction,
                     ]);
                 } else {
-                    // KALAH
+                    // USERS KALAH (Admin pilih salah)
                     // Bet amount tetap locked (hilang)
                     // Tidak unlock balance, tidak dapat apa-apa
 
                     $profitLoss = -$betAmount; // Loss
-
-                    $losersCount++;
                     $totalLosses += $betAmount;
 
                     Log::info('Participant LOST', [
@@ -326,7 +345,6 @@ class TradingSignalController extends Controller
                         'user_id' => $user->id,
                         'bet_amount' => $betAmount,
                         'loss' => $betAmount,
-                        'prediction' => $participant->prediction,
                     ]);
                 }
 
@@ -352,21 +370,29 @@ class TradingSignalController extends Controller
             Log::info('=== SETTLE SIGNAL SUCCESS ===', [
                 'signal_id' => $signal->id,
                 'total_settled' => $settledCount,
-                'winners' => $winnersCount,
-                'losers' => $losersCount,
+                'users_outcome' => $usersWin ? 'ALL WIN' : 'ALL LOSE',
                 'total_rewards' => $totalRewards,
                 'total_losses' => $totalLosses,
             ]);
 
-            return redirect()
-                ->route('admin.signals.show', $signal->id)
-                ->with('success', "Signal settled! Winners: {$winnersCount} (Total rewards: " . number_format($totalRewards, 2) . " USDT) | Losers: {$losersCount} (Total losses: " . number_format($totalLosses, 2) . " USDT)");
+            if ($usersWin) {
+                return redirect()
+                    ->route('admin.signals.show', $signal->id)
+                    ->with('success', "Signal settled! All {$settledCount} participants WON. Total rewards: " . number_format($totalRewards, 2) . " USDT.");
+            } else {
+                return redirect()
+                    ->route('admin.signals.show', $signal->id)
+                    ->with('success', "Signal settled! All {$settledCount} participants LOST. Total losses: " . number_format($totalLosses, 2) . " USDT.");
+            }
         } catch (\Exception $e) {
             DB::rollBack();
+
             Log::error('=== SETTLE SIGNAL FAILED ===', [
                 'signal_id' => $signal->id,
-                'error' => $e->getMessage(),
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString(),
             ]);
+
             return redirect()
                 ->route('admin.signals.show', $signal->id)
                 ->with('error', 'Failed to settle signal: ' . $e->getMessage());
