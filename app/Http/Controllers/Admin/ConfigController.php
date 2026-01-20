@@ -15,7 +15,8 @@ class ConfigController extends Controller
             'app_name' => Config::get('app_name', ['value' => '']),
             'app_logo' => Config::get('app_logo', ['value' => '']),
             'app_announcement' => Config::get('app_announcement', ['value' => '']),
-            'app_wallet_address' => Config::get('app_wallet_address', ['name' => '', 'number' => '']),
+            'app_wallet_trc20' => Config::get('app_wallet_trc20', ['name' => 'TRON Network (TRC20)', 'address' => '']),
+            'app_wallet_bep20' => Config::get('app_wallet_bep20', ['name' => 'Binance Smart Chain (BEP20)', 'address' => '']),
         ];
 
         return view('admin.pages.config.index', compact('configs'));
@@ -26,8 +27,8 @@ class ConfigController extends Controller
         $request->validate([
             'app_name' => 'required|string|max:255',
             'app_announcement' => 'nullable|string',
-            'wallet_name' => 'required|string|max:255',
-            'wallet_number' => 'required|string|max:255',
+            'wallet_trc20_address' => 'required|string|max:255',
+            'wallet_bep20_address' => 'required|string|max:255',
             'app_logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
@@ -38,10 +39,16 @@ class ConfigController extends Controller
             // Update App Announcement
             Config::set('app_announcement', ['value' => $request->app_announcement]);
 
-            // Update Wallet Address
-            Config::set('app_wallet_address', [
-                'name' => $request->wallet_name,
-                'number' => $request->wallet_number
+            // Update Wallet TRC20
+            Config::set('app_wallet_trc20', [
+                'name' => 'TRON Network (TRC20)',
+                'address' => $request->wallet_trc20_address
+            ]);
+
+            // Update Wallet BEP20
+            Config::set('app_wallet_bep20', [
+                'name' => 'Binance Smart Chain (BEP20)',
+                'address' => $request->wallet_bep20_address
             ]);
 
             // Update App Logo
@@ -64,37 +71,22 @@ class ConfigController extends Controller
         }
     }
 
-    /**
-     * Upload file and return full URL
-     */
     private function uploadFile($file, $prefix)
     {
         $filename = $prefix . '_' . time() . '.' . $file->getClientOriginalExtension();
-
-        // Store to storage/app/public/configs
         $path = $file->storeAs('configs', $filename, 'public');
-
-        // Generate full URL using Storage facade
         return Storage::url($path);
     }
 
-    /**
-     * Delete old file from storage
-     */
     private function deleteOldFile($url)
     {
         try {
-            // Extract path from URL
-            // URL format: http://domain.com/storage/configs/logo_123.jpg
-            // We need: configs/logo_123.jpg
-
             $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
-
             if (Storage::disk('public')->exists($path)) {
                 Storage::disk('public')->delete($path);
             }
         } catch (\Exception $e) {
-            // Silent fail - file might not exist
+            // Silent fail
         }
     }
 }

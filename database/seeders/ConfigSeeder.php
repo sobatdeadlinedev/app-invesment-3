@@ -7,9 +7,6 @@ use Illuminate\Database\Seeder;
 
 class ConfigSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $configs = [
@@ -25,11 +22,20 @@ class ConfigSeeder extends Seeder
                 'key' => 'app_announcement',
                 'value' => ['value' => ''],
             ],
+            // Wallet TRC20
             [
-                'key' => 'app_wallet_address',
+                'key' => 'app_wallet_trc20',
                 'value' => [
-                    'name' => 'bep 20',
-                    'number' => '1234567890'
+                    'name' => 'TRON Network (TRC20)',
+                    'address' => ''
+                ],
+            ],
+            // Wallet BEP20
+            [
+                'key' => 'app_wallet_bep20',
+                'value' => [
+                    'name' => 'Binance Smart Chain (BEP20)',
+                    'address' => ''
                 ],
             ],
             [

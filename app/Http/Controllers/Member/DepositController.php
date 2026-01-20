@@ -19,9 +19,9 @@ class DepositController extends Controller
      */
     public function index()
     {
-        $wallet = Config::get('app_wallet_address');
-        $walletName = $wallet['name'];
-        $walletNumber = $wallet['number'];
+        // Get both wallet types
+        $walletTrc20 = Config::get('app_wallet_trc20', ['name' => 'TRON Network (TRC20)', 'address' => '']);
+        $walletBep20 = Config::get('app_wallet_bep20', ['name' => 'Binance Smart Chain (BEP20)', 'address' => '']);
 
         // Get user balance
         $user = auth()->user();
@@ -30,8 +30,8 @@ class DepositController extends Controller
         $userBalance = $user->exchange_balance + $user->trade_balance;
 
         return view('member.pages.deposit.index', compact(
-            'walletNumber',
-            'walletName',
+            'walletTrc20',
+            'walletBep20',
             'exchangeBalance',
             'tradeBalance',
             'userBalance'
@@ -45,10 +45,13 @@ class DepositController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:10',
+            'wallet_type' => 'required|in:trc20,bep20',
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ], [
             'amount.required' => 'Jumlah deposit harus diisi',
             'amount.min' => 'Minimal deposit adalah 10 USDT',
+            'wallet_type.required' => 'Pilih tipe jaringan',
+            'wallet_type.in' => 'Tipe jaringan tidak valid',
             'payment_proof.required' => 'Bukti transfer harus diupload',
             'payment_proof.image' => 'File harus berupa gambar',
             'payment_proof.mimes' => 'Format file harus jpeg, png, atau jpg',
@@ -66,6 +69,9 @@ class DepositController extends Controller
 
             $depositAmount = $request->amount;
 
+            // Get wallet type label for payment method
+            $walletTypeLabel = $request->wallet_type === 'trc20' ? 'TRC20 (TRON)' : 'BEP20 (BSC)';
+
             // Create transaction
             $transaction = Transaction::create([
                 'user_id' => auth()->id(),
@@ -78,7 +84,7 @@ class DepositController extends Controller
                 'withdrawal_fee' => null,
                 'source_user_id' => null,
                 'status' => 'pending',
-                'payment_method' => 'ewallet',
+                'payment_method' => $walletTypeLabel, // Store wallet type as payment method
                 'payment_proof' => $proofPath,
                 'approved_by' => null,
             ]);

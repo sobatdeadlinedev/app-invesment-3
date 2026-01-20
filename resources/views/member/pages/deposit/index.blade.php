@@ -66,6 +66,38 @@
                     </div>
                 </div>
 
+                <!-- Wallet Type Selection -->
+                <div class="card-dark shadow-sm p-3 mb-3">
+                    <h6 class="text-white mb-3">Select Network</h6>
+                    <div class="wallet-type-selection">
+                        <div class="wallet-type-option" onclick="selectWalletType('trc20')">
+                            <input type="radio" name="wallet_type_display" id="wallet-trc20" value="trc20" checked>
+                            <label for="wallet-trc20" class="wallet-type-label">
+                                <div class="wallet-type-header">
+                                    <i class="bi bi-circle-fill me-2"></i>
+                                    <span class="fw-bold">TRC20</span>
+                                </div>
+                                <div class="wallet-type-details">
+                                    <small class="text-muted">TRON Network</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="wallet-type-option" onclick="selectWalletType('bep20')">
+                            <input type="radio" name="wallet_type_display" id="wallet-bep20" value="bep20">
+                            <label for="wallet-bep20" class="wallet-type-label">
+                                <div class="wallet-type-header">
+                                    <i class="bi bi-circle-fill me-2"></i>
+                                    <span class="fw-bold">BEP20</span>
+                                </div>
+                                <div class="wallet-type-details">
+                                    <small class="text-muted">Binance Smart Chain</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Continue Button -->
                 <button class="btn btn-gold w-100" type="button" onclick="goToStep2()">
                     Continue <i class="bi bi-arrow-right ms-2"></i>
@@ -78,6 +110,7 @@
                     enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="amount" id="form-amount">
+                    <input type="hidden" name="wallet_type" id="form-wallet-type" value="trc20">
 
                     <!-- Amount Summary -->
                     <div class="card-dark shadow-sm p-3 mb-3">
@@ -96,8 +129,9 @@
                             <div class="payment-info-row">
                                 <span class="text-muted small payment-label">Jaringan</span>
                                 <div class="payment-value-with-copy">
-                                    <span class="text-white fw-bold payment-value-text">{{ $walletNumber }}</span>
-                                    <button type="button" class="btn-copy-mini" onclick="copyText('{{ $walletNumber }}')"
+                                    <span class="text-white fw-bold payment-value-text"
+                                        id="display-network-name">{{ $walletTrc20['name'] }}</span>
+                                    <button type="button" class="btn-copy-mini" onclick="copyNetworkName()"
                                         title="Copy">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
@@ -110,9 +144,9 @@
                             <div class="payment-info-row">
                                 <span class="text-muted small payment-label">Alamat Setoran</span>
                                 <div class="payment-value-with-copy">
-                                    <span
-                                        class="text-white fw-bold payment-value-text wallet-address">{{ $walletName }}</span>
-                                    <button type="button" class="btn-copy-mini" onclick="copyText('{{ $walletName }}')"
+                                    <span class="text-white fw-bold payment-value-text wallet-address"
+                                        id="display-wallet-address">{{ $walletTrc20['address'] }}</span>
+                                    <button type="button" class="btn-copy-mini" onclick="copyWalletAddress()"
                                         title="Copy">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
@@ -122,8 +156,8 @@
 
                         <div class="alert-info-box mt-3">
                             <i class="bi bi-info-circle-fill me-2"></i>
-                            <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network TRC20
-                                dan BEP 20. Lalu upload bukti transfer</span>
+                            <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network yang dipilih
+                                (<span id="display-network-type">TRC20</span>). Lalu upload bukti transfer</span>
                         </div>
                     </div>
 
@@ -192,6 +226,66 @@
 
         .btn-history i {
             font-size: 14px;
+        }
+
+        /* Wallet Type Selection */
+        .wallet-type-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wallet-type-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .wallet-type-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .wallet-type-label {
+            display: block;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0;
+        }
+
+        .wallet-type-option input[type="radio"]:checked+.wallet-type-label {
+            background: rgba(245, 166, 35, 0.1);
+            border-color: var(--gold-color);
+        }
+
+        .wallet-type-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(245, 166, 35, 0.5);
+        }
+
+        .wallet-type-header {
+            display: flex;
+            align-items: center;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .wallet-type-header i {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            transition: color 0.3s ease;
+        }
+
+        .wallet-type-option input[type="radio"]:checked+.wallet-type-label .wallet-type-header i {
+            color: var(--gold-color);
+        }
+
+        .wallet-type-details {
+            padding-left: 18px;
         }
 
         /* Payment Info Responsive Layout */
@@ -307,6 +401,19 @@
 
     <script>
         let selectedFile = null;
+        let selectedWalletType = 'trc20';
+
+        // Wallet data from backend
+        const walletData = {
+            trc20: {
+                name: '{{ $walletTrc20['name'] }}',
+                address: '{{ $walletTrc20['address'] }}'
+            },
+            bep20: {
+                name: '{{ $walletBep20['name'] }}',
+                address: '{{ $walletBep20['address'] }}'
+            }
+        };
 
         // Show alert messages
         @if (session('success'))
@@ -325,6 +432,11 @@
             document.getElementById('deposit-amount').value = amount;
         }
 
+        function selectWalletType(type) {
+            selectedWalletType = type;
+            document.getElementById('wallet-' + type).checked = true;
+        }
+
         function goToStep2() {
             const amount = document.getElementById('deposit-amount').value;
             if (!amount || amount <= 0) {
@@ -336,9 +448,19 @@
                 return;
             }
 
-            // Update summary
+            // Get selected wallet type
+            const walletType = document.querySelector('input[name="wallet_type_display"]:checked').value;
+
+            // Update form data
             document.getElementById('summary-amount').textContent = parseFloat(amount).toFixed(2) + ' USDT';
             document.getElementById('form-amount').value = amount;
+            document.getElementById('form-wallet-type').value = walletType;
+
+            // Update payment details based on selected wallet
+            const wallet = walletData[walletType];
+            document.getElementById('display-network-name').textContent = wallet.name;
+            document.getElementById('display-wallet-address').textContent = wallet.address;
+            document.getElementById('display-network-type').textContent = walletType.toUpperCase();
 
             // Switch steps
             document.getElementById('step-1').classList.remove('active');
@@ -362,6 +484,16 @@
             document.getElementById('step-1-indicator').classList.remove('completed');
 
             document.querySelector('.scrollable-content').scrollTop = 0;
+        }
+
+        function copyNetworkName() {
+            const text = document.getElementById('display-network-name').textContent;
+            copyText(text);
+        }
+
+        function copyWalletAddress() {
+            const text = document.getElementById('display-wallet-address').textContent;
+            copyText(text);
         }
 
         function copyText(text) {

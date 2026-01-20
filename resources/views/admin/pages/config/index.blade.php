@@ -158,30 +158,38 @@
                         </div>
                         <!--end::Row-->
 
-                        <!--begin::Row-->
+                        <!--begin::Row - Wallet TRC20-->
                         <div class="row mb-8">
                             <!--begin::Col-->
                             <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Wallet Address</div>
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Wallet TRC20</div>
                             </div>
                             <!--end::Col-->
                             <!--begin::Col-->
                             <div class="col-xl-9 fv-row">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Wallet Network</label>
-                                        <input type="text" class="form-control form-control-solid" name="wallet_name"
-                                            value="{{ old('wallet_name', $configs['app_wallet_address']['name']) }}"
-                                            placeholder="e.g., BCA - John Doe" required />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Wallet Number</label>
-                                        <input type="text" class="form-control form-control-solid"
-                                            name="wallet_number"
-                                            value="{{ old('wallet_number', $configs['app_wallet_address']['number']) }}"
-                                            placeholder="e.g., 1234567890" required />
-                                    </div>
-                                </div>
+                                <label class="form-label">TRON Network Address (TRC20)</label>
+                                <input type="text" class="form-control form-control-solid" name="wallet_trc20_address"
+                                    value="{{ old('wallet_trc20_address', $configs['app_wallet_trc20']['address']) }}"
+                                    placeholder="e.g., TXYZa1b2c3d4e5f6g7h8i9j0..." required />
+                                <div class="form-text">Alamat wallet TRON (TRC20) untuk menerima deposit</div>
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!--begin::Row - Wallet BEP20-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Wallet BEP20</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <label class="form-label">Binance Smart Chain Address (BEP20)</label>
+                                <input type="text" class="form-control form-control-solid" name="wallet_bep20_address"
+                                    value="{{ old('wallet_bep20_address', $configs['app_wallet_bep20']['address']) }}"
+                                    placeholder="e.g., 0x1234567890abcdef..." required />
+                                <div class="form-text">Alamat wallet BSC (BEP20) untuk menerima deposit</div>
                             </div>
                         </div>
                         <!--end::Row-->
