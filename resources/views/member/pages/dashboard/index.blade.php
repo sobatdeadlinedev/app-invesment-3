@@ -3,7 +3,12 @@
     <!-- Scrollable Content Area -->
     <div class="scrollable-content">
         <div class="content-section">
-            <h5 class="text-white mb-3">Halo, {{ $user->username }}</h5>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" data-tab="digital">Digital Currency</button>
+                <button class="tab-btn" data-tab="forex">Forex</button>
+                <button class="tab-btn" data-tab="precious">Precious metals</button>
+            </div>
 
             @if ($announcement && !empty($announcement))
                 <!-- Announcement Card -->
@@ -21,7 +26,7 @@
             @endif
 
             <!-- Card 1: Balance -->
-            <div class="card-dark shadow-sm p-3 mb-3">
+            {{-- <div class="card-dark shadow-sm p-3 mb-3">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 small">Total Balance</p>
@@ -31,7 +36,7 @@
                         <i class="bi bi-wallet2"></i>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             {{-- <!-- Card 2: Referral Code & Link -->
             <div class="card-dark shadow-sm p-3 mb-3">
@@ -65,7 +70,7 @@
             </div> --}}
 
             <!-- Card 3: Market Overview with Real-Time Prices -->
-            <div class="card-dark shadow-sm p-0 mb-3">
+            <div class="card-dark shadow-sm p-0 mb-3 mt-5">
                 <div class="p-3" style="border-bottom: 1px solid var(--border-color);">
                     <div class="d-flex align-items-center justify-content-between">
                         <h6 class="text-white mb-0">Market Overview</h6>

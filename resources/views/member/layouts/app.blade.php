@@ -10,17 +10,34 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Mobile-First Design with Jhonson Investment Theme */
+        /* Mobile-First Design with Light Theme - Soft White, Charcoal Black, Gold */
         :root {
-            --primary-dark: #1a1d3f;
-            --secondary-dark: #252850;
-            --card-dark: #2d3158;
-            --gold-color: #f5a623;
-            --gold-hover: #e69500;
-            --blue-color: #3bb5e8;
-            --blue-dark: #2a8ab8;
-            --text-muted: #a5a8c4;
-            --border-color: #3d4170;
+            /* Base Colors dari Palette */
+            --soft-white: #F5F5F5;
+            --charcoal-black: #212121;
+            --gold: #A97E00;
+
+            /* Primary & Background - LIGHT THEME */
+            --primary-light: #F5F5F5;
+            /* Soft White untuk background utama */
+            --secondary-light: #EBEBEB;
+            /* Soft white lebih gelap */
+            --card-light: #FFFFFF;
+            /* Pure white untuk card */
+
+            /* Gold Colors */
+            --gold-color: #A97E00;
+            --gold-hover: #8a6600;
+
+            /* Text Colors - untuk light theme */
+            --text-primary: #212121;
+            /* Charcoal untuk text utama */
+            --text-secondary: #424242;
+            /* Charcoal lebih terang */
+            --text-muted: #666666;
+            /* Abu-abu untuk text secondary */
+            --border-color: #D1D1D1;
+            /* Border abu-abu terang */
         }
 
         * {
@@ -28,7 +45,7 @@
         }
 
         body {
-            background-color: var(--primary-dark);
+            background-color: var(--primary-light);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 0;
@@ -36,16 +53,16 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            color: #ffffff;
+            color: var(--text-primary);
         }
 
         /* Mobile Container */
         .mobile-container {
             width: 425px;
             height: 100vh;
-            background-color: var(--primary-dark);
+            background-color: var(--primary-light);
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -56,7 +73,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: linear-gradient(135deg, #2d3158 0%, #252850 100%);
+            background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
             border-bottom: 2px solid var(--border-color);
             padding: 15px 20px 12px 20px;
         }
@@ -84,6 +101,7 @@
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid var(--border-color);
         }
 
         .user-info {
@@ -143,14 +161,15 @@
 
         /* Cards */
         .card-dark {
-            background-color: var(--card-dark);
+            background-color: var(--card-light);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            transition: box-shadow 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .card-dark:hover {
-            box-shadow: 0 4px 12px rgba(218, 165, 32, 0.15);
+            box-shadow: 0 4px 12px rgba(169, 126, 0, 0.15);
+            border-color: rgba(169, 126, 0, 0.3);
         }
 
         /* Gold Theme Colors */
@@ -165,7 +184,7 @@
         .btn-gold {
             background-color: var(--gold-color);
             border-color: var(--gold-color);
-            color: #000;
+            color: #fff;
             font-weight: 600;
             transition: all 0.2s ease;
             border-radius: 8px;
@@ -174,7 +193,9 @@
         .btn-gold:hover {
             background-color: var(--gold-hover);
             border-color: var(--gold-hover);
-            color: #000;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(169, 126, 0, 0.3);
         }
 
         /* Text Colors */
@@ -183,7 +204,7 @@
         }
 
         .text-white {
-            color: #ffffff !important;
+            color: var(--text-primary) !important;
         }
 
         /* Fixed Bottom Navigation */
@@ -191,7 +212,7 @@
             position: sticky;
             bottom: 0;
             width: 100%;
-            background: linear-gradient(135deg, #2d3158, #252850);
+            background: linear-gradient(135deg, #FFFFFF, #F5F5F5);
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
@@ -212,16 +233,17 @@
         }
 
         .nav-item:hover {
-            color: var(--blue-color);
+            color: var(--gold-color);
+            background: rgba(169, 126, 0, 0.05);
         }
 
         .nav-item.active {
-            color: var(--blue-color);
+            color: var(--gold-color);
             font-weight: 600;
         }
 
         .nav-item.active i {
-            color: var(--blue-color);
+            color: var(--gold-color);
         }
 
         .nav-item span {
@@ -232,7 +254,7 @@
         /* Responsive for larger screens */
         @media (min-width: 768px) {
             body {
-                background: linear-gradient(135deg, #1a1d3f 0%, #252850 100%);
+                background: linear-gradient(135deg, #F5F5F5 0%, #FFFFFF 100%);
             }
 
             .mobile-container {
@@ -241,18 +263,16 @@
             }
         }
 
-        /* Team Page Styles - Tambahkan ke CSS utama */
-
         /* Team Icon Wrapper */
         .team-icon-wrapper {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(169, 126, 0, 0.1) 0%, rgba(169, 126, 0, 0.05) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            border: 1px solid rgba(169, 126, 0, 0.3);
         }
 
         .team-icon-wrapper i {
@@ -268,7 +288,7 @@
         }
 
         .team-member-item:hover {
-            background-color: rgba(245, 166, 35, 0.05);
+            background-color: rgba(169, 126, 0, 0.05);
         }
 
         .team-member-item:last-child {
@@ -279,7 +299,7 @@
         .team-avatar {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--card-dark) 100%);
+            background: linear-gradient(135deg, var(--secondary-light) 0%, var(--card-light) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -312,29 +332,11 @@
             color: #6c757d;
         }
 
-        /* Responsive adjustments for team page */
-        @media (max-width: 375px) {
-            .team-member-item {
-                padding: 14px 16px;
-            }
-
-            .team-avatar {
-                width: 40px;
-                height: 40px;
-            }
-
-            .team-avatar i {
-                font-size: 24px;
-            }
-        }
-
-        /* Profile Page Styles - Tambahkan ke CSS utama */
-
         /* Profile Avatar Large */
         .profile-avatar-large {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--card-dark) 100%);
+            background: linear-gradient(135deg, var(--secondary-light) 0%, var(--card-light) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -352,12 +354,12 @@
         .balance-icon-wrapper {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(169, 126, 0, 0.1) 0%, rgba(169, 126, 0, 0.05) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            border: 1px solid rgba(169, 126, 0, 0.3);
         }
 
         .balance-icon-wrapper i {
@@ -378,13 +380,13 @@
         .btn-outline-gold:hover {
             background-color: var(--gold-color);
             border-color: var(--gold-color);
-            color: #000;
+            color: #fff;
         }
 
         /* Badge Count */
         .badge-count {
-            background: rgba(245, 166, 35, 0.15);
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            background: rgba(169, 126, 0, 0.15);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             color: var(--gold-color);
             padding: 4px 10px;
             border-radius: 12px;
@@ -400,7 +402,7 @@
         }
 
         .bank-list-item:hover {
-            background-color: rgba(245, 166, 35, 0.05);
+            background-color: rgba(169, 126, 0, 0.05);
         }
 
         .bank-list-item:last-of-type {
@@ -411,12 +413,12 @@
         .bank-icon-circle {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(169, 126, 0, 0.1) 0%, rgba(169, 126, 0, 0.05) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             flex-shrink: 0;
         }
 
@@ -441,17 +443,17 @@
         }
 
         .btn-bank-edit {
-            background: rgba(59, 181, 232, 0.1);
-            border-color: rgba(59, 181, 232, 0.3);
+            background: rgba(169, 126, 0, 0.1);
+            border-color: rgba(169, 126, 0, 0.3);
         }
 
         .btn-bank-edit:hover {
-            background: rgba(59, 181, 232, 0.2);
-            border-color: rgba(59, 181, 232, 0.5);
+            background: rgba(169, 126, 0, 0.2);
+            border-color: rgba(169, 126, 0, 0.5);
         }
 
         .btn-bank-edit i {
-            color: var(--blue-color);
+            color: var(--gold-color);
             font-size: 13px;
         }
 
@@ -470,70 +472,16 @@
             font-size: 13px;
         }
 
-        /* Responsive adjustments for profile page */
-        @media (max-width: 375px) {
-            .profile-avatar-large {
-                width: 50px;
-                height: 50px;
-            }
-
-            .profile-avatar-large i {
-                font-size: 32px;
-            }
-
-            .balance-icon-wrapper {
-                width: 50px;
-                height: 50px;
-            }
-
-            .balance-icon-wrapper i {
-                font-size: 24px;
-            }
-
-            .bank-icon-circle {
-                width: 40px;
-                height: 40px;
-            }
-
-            .bank-icon-circle i {
-                font-size: 18px;
-            }
-
-            .btn-bank-action {
-                width: 28px;
-                height: 28px;
-            }
-        }
-
-        /* Dashboard Page Styles - Tambahkan ke CSS utama */
-
-        /* Balance Icon Wrapper */
-        .balance-icon-wrapper {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(245, 166, 35, 0.3);
-        }
-
-        .balance-icon-wrapper i {
-            font-size: 28px;
-            color: var(--gold-color);
-        }
-
         /* Referral Icon Small */
         .referral-icon-small {
             width: 24px;
             height: 24px;
-            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(169, 126, 0, 0.1) 0%, rgba(169, 126, 0, 0.05) 100%);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             flex-shrink: 0;
         }
 
@@ -553,8 +501,8 @@
 
         /* Copy Button Small */
         .btn-copy-small {
-            background: rgba(245, 166, 35, 0.15);
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            background: rgba(169, 126, 0, 0.15);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             border-radius: 6px;
             width: 32px;
             height: 32px;
@@ -568,8 +516,8 @@
         }
 
         .btn-copy-small:hover {
-            background: rgba(245, 166, 35, 0.25);
-            border-color: rgba(245, 166, 35, 0.5);
+            background: rgba(169, 126, 0, 0.25);
+            border-color: rgba(169, 126, 0, 0.5);
         }
 
         .btn-copy-small i {
@@ -605,7 +553,7 @@
         }
 
         .market-coin-item:hover {
-            background-color: rgba(245, 166, 35, 0.05);
+            background-color: rgba(169, 126, 0, 0.05);
         }
 
         .market-coin-item:last-child {
@@ -613,150 +561,6 @@
         }
 
         /* Coin Icon */
-        .coin-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            border: 1px solid;
-        }
-
-        .coin-icon i {
-            font-size: 20px;
-        }
-
-        /* Coin specific colors */
-        .coin-icon.btc {
-            background: rgba(247, 147, 26, 0.15);
-            border-color: rgba(247, 147, 26, 0.3);
-        }
-
-        .coin-icon.btc i {
-            color: #f7931a;
-        }
-
-        .coin-icon.eth {
-            background: rgba(98, 126, 234, 0.15);
-            border-color: rgba(98, 126, 234, 0.3);
-        }
-
-        .coin-icon.eth i {
-            color: #627eea;
-        }
-
-        .coin-icon.doge {
-            background: rgba(186, 155, 70, 0.15);
-            border-color: rgba(186, 155, 70, 0.3);
-        }
-
-        .coin-icon.doge i {
-            color: #ba9b46;
-        }
-
-        .coin-icon.bnb {
-            background: rgba(243, 186, 47, 0.15);
-            border-color: rgba(243, 186, 47, 0.3);
-        }
-
-        .coin-icon.bnb i {
-            color: #f3ba2f;
-        }
-
-        .coin-icon.sol {
-            background: rgba(20, 241, 149, 0.15);
-            border-color: rgba(20, 241, 149, 0.3);
-        }
-
-        .coin-icon.sol i {
-            color: #14f195;
-        }
-
-        /* Price Change */
-        .price-change {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        .price-change.positive {
-            color: #28a745;
-            background: rgba(40, 167, 69, 0.1);
-        }
-
-        .price-change.negative {
-            color: #dc3545;
-            background: rgba(220, 53, 69, 0.1);
-        }
-
-        /* Responsive adjustments for dashboard */
-        @media (max-width: 375px) {
-            .balance-icon-wrapper {
-                width: 50px;
-                height: 50px;
-            }
-
-            .balance-icon-wrapper i {
-                font-size: 24px;
-            }
-
-            .referral-icon-wrapper {
-                width: 45px;
-                height: 45px;
-            }
-
-            .referral-icon-wrapper i {
-                font-size: 20px;
-            }
-
-            .referral-code-display {
-                font-size: 14px;
-            }
-
-            .btn-copy-small {
-                width: 28px;
-                height: 28px;
-            }
-
-            .btn-copy-small i {
-                font-size: 12px;
-            }
-
-            .coin-icon {
-                width: 36px;
-                height: 36px;
-            }
-
-            .coin-icon i {
-                font-size: 18px;
-            }
-        }
-
-        /* Invest Pages Styles - Tambahkan ke CSS utama */
-
-        /* Coin List Item */
-        .coin-list-item {
-            display: block;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.2s ease;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .coin-list-item:hover {
-            background-color: rgba(245, 166, 35, 0.05);
-        }
-
-        .coin-list-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Coin Icon (if not already defined) */
         .coin-icon {
             width: 40px;
             height: 40px;
@@ -846,15 +650,31 @@
             background: rgba(220, 53, 69, 0.1);
         }
 
-        /* === DETAIL PAGE STYLES === */
+        /* Coin List Item */
+        .coin-list-item {
+            display: block;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .coin-list-item:hover {
+            background-color: rgba(169, 126, 0, 0.05);
+        }
+
+        .coin-list-item:last-child {
+            border-bottom: none;
+        }
 
         /* Back Button */
         .btn-back {
             display: inline-flex;
             align-items: center;
             padding: 8px 16px;
-            background: rgba(245, 166, 35, 0.1);
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            background: rgba(169, 126, 0, 0.1);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             border-radius: 8px;
             color: var(--gold-color);
             text-decoration: none;
@@ -864,8 +684,8 @@
         }
 
         .btn-back:hover {
-            background: rgba(245, 166, 35, 0.2);
-            border-color: rgba(245, 166, 35, 0.5);
+            background: rgba(169, 126, 0, 0.2);
+            border-color: rgba(169, 126, 0, 0.5);
             color: var(--gold-color);
         }
 
@@ -921,8 +741,8 @@
 
         .timeframe-pill {
             padding: 4px 12px;
-            background: rgba(245, 166, 35, 0.1);
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            background: rgba(169, 126, 0, 0.1);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             border-radius: 6px;
             color: var(--text-muted);
             font-size: 12px;
@@ -932,13 +752,13 @@
         }
 
         .timeframe-pill:hover {
-            background: rgba(245, 166, 35, 0.15);
+            background: rgba(169, 126, 0, 0.15);
         }
 
         .timeframe-pill.active {
             background: var(--gold-color);
             border-color: var(--gold-color);
-            color: #000;
+            color: #fff;
         }
 
         /* Chart Container */
@@ -949,11 +769,11 @@
 
         /* Form Control Dark */
         .form-control-dark {
-            background: rgba(245, 166, 35, 0.05);
+            background: rgba(169, 126, 0, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px 16px;
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 16px;
             font-weight: 600;
             width: 100%;
@@ -963,7 +783,7 @@
         .form-control-dark:focus {
             outline: none;
             border-color: var(--gold-color);
-            background: rgba(245, 166, 35, 0.1);
+            background: rgba(169, 126, 0, 0.1);
         }
 
         .form-control-dark::placeholder {
@@ -979,8 +799,8 @@
 
         .quick-amount-btn {
             padding: 10px;
-            background: rgba(245, 166, 35, 0.1);
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            background: rgba(169, 126, 0, 0.1);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             border-radius: 6px;
             color: var(--gold-color);
             font-size: 13px;
@@ -990,7 +810,7 @@
         }
 
         .quick-amount-btn:hover {
-            background: rgba(245, 166, 35, 0.2);
+            background: rgba(169, 126, 0, 0.2);
             border-color: var(--gold-color);
         }
 
@@ -1003,7 +823,7 @@
 
         .duration-btn {
             padding: 12px;
-            background: rgba(245, 166, 35, 0.05);
+            background: rgba(169, 126, 0, 0.05);
             border: 2px solid var(--border-color);
             border-radius: 8px;
             cursor: pointer;
@@ -1012,17 +832,17 @@
         }
 
         .duration-btn:hover {
-            background: rgba(245, 166, 35, 0.1);
-            border-color: rgba(245, 166, 35, 0.5);
+            background: rgba(169, 126, 0, 0.1);
+            border-color: rgba(169, 126, 0, 0.5);
         }
 
         .duration-btn.active {
-            background: rgba(245, 166, 35, 0.15);
+            background: rgba(169, 126, 0, 0.15);
             border-color: var(--gold-color);
         }
 
         .duration-time {
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 14px;
             font-weight: 700;
             margin-bottom: 4px;
@@ -1038,7 +858,7 @@
         .btn-call {
             background: linear-gradient(135deg, var(--gold-color) 0%, var(--gold-hover) 100%);
             border: none;
-            color: #000;
+            color: #fff;
             font-weight: 700;
             font-size: 16px;
             padding: 14px 20px;
@@ -1049,13 +869,13 @@
         .btn-call:hover {
             background: linear-gradient(135deg, var(--gold-hover) 0%, var(--gold-color) 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 166, 35, 0.4);
+            box-shadow: 0 4px 12px rgba(169, 126, 0, 0.4);
         }
 
         .btn-put {
-            background: linear-gradient(135deg, var(--blue-color) 0%, var(--blue-dark) 100%);
+            background: linear-gradient(135deg, var(--gold-color) 0%, var(--gold-hover) 100%);
             border: none;
-            color: #ffffff;
+            color: #fff;
             font-weight: 700;
             font-size: 16px;
             padding: 14px 20px;
@@ -1064,38 +884,10 @@
         }
 
         .btn-put:hover {
-            background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-color) 100%);
+            background: linear-gradient(135deg, var(--gold-hover) 0%, var(--gold-color) 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 181, 232, 0.4);
+            box-shadow: 0 4px 12px rgba(169, 126, 0, 0.4);
         }
-
-        /* Responsive */
-        @media (max-width: 375px) {
-            .coin-icon-large {
-                width: 50px;
-                height: 50px;
-            }
-
-            .coin-icon-large i {
-                font-size: 28px;
-            }
-
-            .chart-container {
-                height: 200px;
-            }
-
-            .amount-quick-select {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 6px;
-            }
-
-            .quick-amount-btn {
-                padding: 8px;
-                font-size: 12px;
-            }
-        }
-
-        /* Deposit Page Styles - Tambahkan ke CSS utama */
 
         /* Step Indicator */
         .step-indicator {
@@ -1116,7 +908,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(245, 166, 35, 0.1);
+            background: rgba(169, 126, 0, 0.1);
             border: 2px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -1130,7 +922,7 @@
         .step-item.active .step-circle {
             background: var(--gold-color);
             border-color: var(--gold-color);
-            color: #000;
+            color: #fff;
         }
 
         .step-item.completed .step-circle {
@@ -1215,7 +1007,7 @@
         .payment-label {
             display: block;
             padding: 16px;
-            background: rgba(245, 166, 35, 0.05);
+            background: rgba(169, 126, 0, 0.05);
             border: 2px solid var(--border-color);
             border-radius: 8px;
             cursor: pointer;
@@ -1223,12 +1015,12 @@
         }
 
         .payment-radio:checked+.payment-label {
-            background: rgba(245, 166, 35, 0.15);
+            background: rgba(169, 126, 0, 0.15);
             border-color: var(--gold-color);
         }
 
         .payment-label:hover {
-            background: rgba(245, 166, 35, 0.1);
+            background: rgba(169, 126, 0, 0.1);
         }
 
         /* Payment Icon */
@@ -1257,12 +1049,12 @@
         }
 
         .payment-icon.qrcode {
-            background: rgba(59, 181, 232, 0.15);
-            border-color: rgba(59, 181, 232, 0.3);
+            background: rgba(169, 126, 0, 0.15);
+            border-color: rgba(169, 126, 0, 0.3);
         }
 
         .payment-icon.qrcode i {
-            color: var(--blue-color);
+            color: var(--gold-color);
         }
 
         /* Payment Details */
@@ -1288,8 +1080,8 @@
 
         /* Copy Button Mini */
         .btn-copy-mini {
-            background: rgba(245, 166, 35, 0.15);
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            background: rgba(169, 126, 0, 0.15);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             border-radius: 4px;
             width: 28px;
             height: 28px;
@@ -1302,8 +1094,8 @@
         }
 
         .btn-copy-mini:hover {
-            background: rgba(245, 166, 35, 0.25);
-            border-color: rgba(245, 166, 35, 0.5);
+            background: rgba(169, 126, 0, 0.25);
+            border-color: rgba(169, 126, 0, 0.5);
         }
 
         .btn-copy-mini i {
@@ -1313,11 +1105,11 @@
 
         /* Alert Info Box */
         .alert-info-box {
-            background: rgba(59, 181, 232, 0.1);
-            border: 1px solid rgba(59, 181, 232, 0.3);
+            background: rgba(169, 126, 0, 0.1);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             border-radius: 8px;
             padding: 10px 12px;
-            color: var(--blue-color);
+            color: var(--gold-color);
             font-size: 12px;
             display: flex;
             align-items: center;
@@ -1354,7 +1146,7 @@
 
         .upload-area:hover {
             border-color: var(--gold-color);
-            background: rgba(245, 166, 35, 0.05);
+            background: rgba(169, 126, 0, 0.05);
         }
 
         .upload-icon {
@@ -1370,35 +1162,6 @@
             border-radius: 8px;
             object-fit: contain;
         }
-
-        /* Responsive */
-        @media (max-width: 375px) {
-            .step-circle {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .step-line {
-                width: 60px;
-            }
-
-            .qr-code-image {
-                width: 180px;
-                height: 180px;
-            }
-
-            .payment-icon {
-                width: 40px;
-                height: 40px;
-            }
-
-            .payment-icon i {
-                font-size: 20px;
-            }
-        }
-
-        /* Withdraw Page Styles - Tambahkan ke CSS utama */
 
         /* Withdraw Bank Option */
         .withdraw-bank-option {
@@ -1427,11 +1190,11 @@
         }
 
         .bank-option-label:hover {
-            background: rgba(245, 166, 35, 0.05);
+            background: rgba(169, 126, 0, 0.05);
         }
 
         .bank-radio:checked+.bank-option-label {
-            background: rgba(245, 166, 35, 0.1);
+            background: rgba(169, 126, 0, 0.1);
         }
 
         /* Radio Check Icon */
@@ -1454,98 +1217,15 @@
             color: var(--gold-color);
         }
 
-        /* Bank Icon Circle (if not already defined) */
-        .bank-icon-circle {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(245, 166, 35, 0.3);
-            flex-shrink: 0;
-        }
-
-        .bank-icon-circle i {
-            font-size: 20px;
-            color: var(--gold-color);
-        }
-
-        /* Input with Icon (if not already defined) */
-        .input-with-icon {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gold-color);
-            font-size: 18px;
-            font-weight: 700;
-            pointer-events: none;
-        }
-
-        .form-control-dark.with-icon {
-            padding-left: 40px;
-        }
-
-        /* Amount Quick Select (if not already defined) */
-        .amount-quick-select {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .quick-amount-btn {
-            padding: 10px;
-            background: rgba(245, 166, 35, 0.1);
-            border: 1px solid rgba(245, 166, 35, 0.3);
-            border-radius: 6px;
-            color: var(--gold-color);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .quick-amount-btn:hover {
-            background: rgba(245, 166, 35, 0.2);
-            border-color: var(--gold-color);
-        }
-
-        /* Responsive */
-        @media (max-width: 375px) {
-            .bank-icon-circle {
-                width: 40px;
-                height: 40px;
-            }
-
-            .bank-icon-circle i {
-                font-size: 18px;
-            }
-
-            .radio-check i {
-                font-size: 20px;
-            }
-
-            .quick-amount-btn {
-                padding: 8px;
-                font-size: 12px;
-            }
-        }
-
         .verification-icon-small {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(169, 126, 0, 0.1) 0%, rgba(169, 126, 0, 0.05) 100%);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             flex-shrink: 0;
         }
 
@@ -1560,11 +1240,11 @@
 
         /* Improved Dropdown Styling */
         .form-control-dark-select {
-            background: rgba(245, 166, 35, 0.05);
+            background: rgba(169, 126, 0, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px 16px;
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 14px;
             font-weight: 600;
             width: 100%;
@@ -1572,7 +1252,7 @@
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23f5a623' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23A97E00' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 12px center;
             background-size: 16px;
@@ -1582,8 +1262,8 @@
         .form-control-dark-select:focus {
             outline: none;
             border-color: var(--gold-color);
-            background-color: rgba(245, 166, 35, 0.1);
-            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+            background-color: rgba(169, 126, 0, 0.1);
+            box-shadow: 0 0 0 3px rgba(169, 126, 0, 0.1);
         }
 
         .form-control-dark-select.is-invalid {
@@ -1591,19 +1271,19 @@
         }
 
         .form-control-dark-select option {
-            background-color: #2d3158 !important;
-            color: #ffffff !important;
+            background-color: #FFFFFF !important;
+            color: var(--text-primary) !important;
             padding: 12px;
             font-size: 14px;
         }
 
         .form-control-dark-select option:hover {
-            background-color: rgba(245, 166, 35, 0.2) !important;
+            background-color: rgba(169, 126, 0, 0.1) !important;
         }
 
         .form-control-dark-select option:checked {
             background: linear-gradient(135deg, var(--gold-color) 0%, var(--gold-hover) 100%) !important;
-            color: #000 !important;
+            color: #fff !important;
             font-weight: 700;
         }
 
@@ -1614,14 +1294,6 @@
         .form-control-dark-select option:disabled {
             color: var(--text-muted) !important;
             opacity: 0.5;
-        }
-
-        /* Better dropdown for mobile */
-        @media (max-width: 480px) {
-            .form-control-dark-select {
-                font-size: 16px;
-                /* Prevents zoom on iOS */
-            }
         }
 
         .preview-container {
@@ -1654,8 +1326,8 @@
             align-items: center;
             gap: 6px;
             padding: 6px 12px;
-            background: rgba(245, 166, 35, 0.1);
-            border: 1px solid rgba(245, 166, 35, 0.3);
+            background: rgba(169, 126, 0, 0.1);
+            border: 1px solid rgba(169, 126, 0, 0.3);
             border-radius: 6px;
             color: var(--gold-color);
             font-size: 12px;
@@ -1665,7 +1337,7 @@
         }
 
         .btn-verification-link:hover {
-            background: rgba(245, 166, 35, 0.2);
+            background: rgba(169, 126, 0, 0.2);
             border-color: var(--gold-color);
             color: var(--gold-color);
             text-decoration: none;
@@ -1673,6 +1345,217 @@
 
         .btn-verification-link i {
             font-size: 14px;
+        }
+
+        /* Referral Link Display */
+        .referral-link-display {
+            background: rgba(169, 126, 0, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-family: monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 375px) {
+            .team-member-item {
+                padding: 14px 16px;
+            }
+
+            .team-avatar {
+                width: 40px;
+                height: 40px;
+            }
+
+            .team-avatar i {
+                font-size: 24px;
+            }
+
+            .profile-avatar-large {
+                width: 50px;
+                height: 50px;
+            }
+
+            .profile-avatar-large i {
+                font-size: 32px;
+            }
+
+            .balance-icon-wrapper {
+                width: 50px;
+                height: 50px;
+            }
+
+            .balance-icon-wrapper i {
+                font-size: 24px;
+            }
+
+            .bank-icon-circle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .bank-icon-circle i {
+                font-size: 18px;
+            }
+
+            .btn-bank-action {
+                width: 28px;
+                height: 28px;
+            }
+
+            .referral-icon-wrapper {
+                width: 45px;
+                height: 45px;
+            }
+
+            .referral-icon-wrapper i {
+                font-size: 20px;
+            }
+
+            .referral-code-display {
+                font-size: 14px;
+            }
+
+            .btn-copy-small {
+                width: 28px;
+                height: 28px;
+            }
+
+            .btn-copy-small i {
+                font-size: 12px;
+            }
+
+            .coin-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .coin-icon i {
+                font-size: 18px;
+            }
+
+            .coin-icon-large {
+                width: 50px;
+                height: 50px;
+            }
+
+            .coin-icon-large i {
+                font-size: 28px;
+            }
+
+            .chart-container {
+                height: 200px;
+            }
+
+            .amount-quick-select {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+
+            .quick-amount-btn {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .step-circle {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            .step-line {
+                width: 60px;
+            }
+
+            .qr-code-image {
+                width: 180px;
+                height: 180px;
+            }
+
+            .payment-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .payment-icon i {
+                font-size: 20px;
+            }
+
+            .radio-check i {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-control-dark-select {
+                font-size: 16px;
+            }
+        }
+
+        /* Header Icon Buttons */
+        .btn-header-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--charcoal-black);
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-header-icon:hover {
+            background: var(--gold-color);
+        }
+
+        .btn-header-icon i {
+            color: #FFFFFF;
+            font-size: 20px;
+        }
+
+        .btn-header-icon:hover i {
+            color: var(--charcoal-black);
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            background: var(--charcoal-black);
+            padding: 6px;
+            border-radius: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            color: #999;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #FFF;
+        }
+
+        .tab-btn.active {
+            background: var(--gold-color);
+            color: var(--charcoal-black);
         }
     </style>
 </head>

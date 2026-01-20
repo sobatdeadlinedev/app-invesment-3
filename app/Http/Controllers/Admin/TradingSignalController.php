@@ -23,6 +23,7 @@ class TradingSignalController extends Controller
         return view('admin.pages.signals.index', compact('signals'));
     }
 
+
     public function create()
     {
         $coins = TradingSignal::getAvailableCoins();

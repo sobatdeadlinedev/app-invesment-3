@@ -1,19 +1,18 @@
 <!-- Fixed Header -->
 <div class="fixed-header">
     <div class="header-grid">
-        <!-- Left: App Logo -->
+        <!-- Left: Globe Icon Button -->
         <div class="header-left">
-            <img src="{{ $appConfig['app_logo']['value'] }}" alt="App Logo" class="app-logo">
+            <button class="btn-header-icon" title="Language">
+                <i class="bi bi-globe"></i>
+            </button>
         </div>
 
-        <!-- Right: Logout -->
+        <!-- Right: Profile/Notification Icon -->
         <div class="header-right">
-            <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: inline;">
-                @csrf
-                <button type="submit" class="btn-logout" title="Logout">
-                    <i class="bi bi-box-arrow-right"></i>
-                </button>
-            </form>
+            <button class="btn-header-icon" title="Profile">
+                <i class="bi bi-person-circle"></i>
+            </button>
         </div>
     </div>
 </div>
