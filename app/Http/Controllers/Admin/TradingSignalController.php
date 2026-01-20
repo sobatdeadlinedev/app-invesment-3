@@ -215,83 +215,40 @@ class TradingSignalController extends Controller
      */
     public function close(Request $request, $id)
     {
-        Log::info('=== CLOSE SIGNAL START ===', [
-            'signal_id' => $id,
-            'request_data' => $request->all(),
-            'user_id' => auth()->id(),
-        ]);
-
         try {
             $signal = TradingSignal::findOrFail($id);
 
             if ($signal->status !== 'open') {
-                Log::warning('Signal status invalid', [
-                    'signal_id' => $signal->id,
-                    'status' => $signal->status,
-                ]);
-
                 return redirect()
                     ->route('admin.signals.index')
-                    ->with('error', 'Signal is not open or already processed. Current status: ' . $signal->status);
+                    ->with('error', 'Signal is not open.');
             }
 
             $validated = $request->validate([
-                'result' => 'required|in:call,put,win,loss',
                 'rate_of_return' => 'required|numeric|min:0|max:100',
-            ], [
-                'result.required' => 'Result must be selected',
-                'result.in' => 'Result must be Call, Put, Win, or Loss',
-                'rate_of_return.required' => 'Win rate must be filled',
-                'rate_of_return.min' => 'Win rate minimum 0%',
-                'rate_of_return.max' => 'Win rate maximum 100%',
             ]);
-
-            $resultForDb = $request->result;
-            if ($request->result === 'call') {
-                $resultForDb = 'win';
-            } elseif ($request->result === 'put') {
-                $resultForDb = 'loss';
-            }
 
             DB::beginTransaction();
 
-            // Call closeSignal method - opened_at akan diset di dalam method ini
-            $signal->closeSignal($resultForDb, $request->rate_of_return);
+            // Auto-detect result berdasarkan price
+            if ($signal->entry_price < $signal->target_price) {
+                $result = 'win'; // CALL WIN, PUT LOSS
+            } else {
+                $result = 'loss'; // PUT WIN, CALL LOSS
+            }
+
+            $signal->closeSignal($result, $request->rate_of_return);
 
             DB::commit();
 
-            Log::info('=== CLOSE SIGNAL SUCCESS ===', [
-                'signal_id' => $signal->id,
-                'result' => strtoupper($resultForDb),
-                'rate_of_return' => $request->rate_of_return,
-            ]);
-
-            $displayLabel = in_array($request->result, ['call', 'put'])
-                ? strtoupper($request->result)
-                : ($resultForDb === 'win' ? 'CALL' : 'PUT');
+            $displayResult = $result === 'win' ? 'CALL WIN' : 'PUT WIN';
 
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('success', "Signal closed successfully as {$displayLabel} with {$request->rate_of_return}% win rate. Now you can settle all participants.");
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed', [
-                'errors' => $e->errors(),
-                'signal_id' => $id,
-            ]);
-            throw $e;
+                ->with('success', "Signal closed as {$displayResult} with {$request->rate_of_return}% win rate.");
         } catch (\Exception $e) {
             DB::rollBack();
-
-            Log::error('=== CLOSE SIGNAL FAILED ===', [
-                'signal_id' => $id,
-                'error_message' => $e->getMessage(),
-                'stack_trace' => $e->getTraceAsString(),
-            ]);
-
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', 'Failed to close signal: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to close signal: ' . $e->getMessage());
         }
     }
 
@@ -305,21 +262,19 @@ class TradingSignalController extends Controller
         $signal = TradingSignal::with('participants.user')->findOrFail($id);
 
         if ($signal->status !== 'closed') {
-            Log::warning('Signal not closed yet', [
-                'signal_id' => $signal->id,
-                'status' => $signal->status,
-            ]);
-
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('error', 'Signal must be closed before settling. Current status: ' . $signal->status);
+                ->with('error', 'Signal must be closed before settling.');
         }
 
         try {
             DB::beginTransaction();
 
             $settledCount = 0;
+            $winnersCount = 0;
+            $losersCount = 0;
             $totalRewards = 0;
+            $totalLosses = 0;
 
             foreach ($signal->participants as $participant) {
                 if ($participant->isSettled()) {
@@ -329,35 +284,64 @@ class TradingSignalController extends Controller
                 $user = $participant->user;
                 $betAmount = $participant->bet_amount;
 
-                // Unlock balance
-                $user->unlockBalance($betAmount);
+                // Cek apakah participant menang atau kalah
+                // signal->result: 'win' = CALL WIN, 'loss' = PUT WIN
+                $isWinner = ($participant->prediction === $signal->result);
 
-                // Calculate reward
-                $reward = $betAmount * ($signal->rate_of_return / 100);
+                if ($isWinner) {
+                    // MENANG
+                    // 1. Unlock bet amount (kembalikan saldo bet)
+                    $user->unlockBalance($betAmount);
 
-                // Add reward to trade balance
-                $user->addTradeBalance($reward);
+                    // 2. Hitung profit
+                    $profit = $betAmount * ($signal->rate_of_return / 100);
 
-                // Add to achieved volume
+                    // 3. Tambahkan profit ke trade balance
+                    $user->addTradeBalance($profit);
+
+                    $profitLoss = $profit; // Profit saja (bet amount sudah dikembalikan)
+
+                    $winnersCount++;
+                    $totalRewards += $profit;
+
+                    Log::info('Participant WON', [
+                        'participant_id' => $participant->id,
+                        'user_id' => $user->id,
+                        'bet_amount' => $betAmount,
+                        'profit' => $profit,
+                        'prediction' => $participant->prediction,
+                    ]);
+                } else {
+                    // KALAH
+                    // Bet amount tetap locked (hilang)
+                    // Tidak unlock balance, tidak dapat apa-apa
+
+                    $profitLoss = -$betAmount; // Loss
+
+                    $losersCount++;
+                    $totalLosses += $betAmount;
+
+                    Log::info('Participant LOST', [
+                        'participant_id' => $participant->id,
+                        'user_id' => $user->id,
+                        'bet_amount' => $betAmount,
+                        'loss' => $betAmount,
+                        'prediction' => $participant->prediction,
+                    ]);
+                }
+
+                // Add to achieved volume (baik menang atau kalah)
                 $user->addAchievedVolume($betAmount);
 
-                // Update participant - boot method akan protect joined_at
+                // Update participant status
                 $participant->update([
-                    'profit_loss' => $reward,
+                    'profit_loss' => $profitLoss,
                     'fee_amount' => 0,
                     'status' => 'settled',
                     'settled_at' => now(),
                 ]);
 
                 $settledCount++;
-                $totalRewards += $reward;
-
-                Log::info('Participant settled', [
-                    'participant_id' => $participant->id,
-                    'user_id' => $user->id,
-                    'bet_amount' => $betAmount,
-                    'reward' => $reward,
-                ]);
             }
 
             // Mark signal as settled
@@ -367,22 +351,22 @@ class TradingSignalController extends Controller
 
             Log::info('=== SETTLE SIGNAL SUCCESS ===', [
                 'signal_id' => $signal->id,
-                'settled_count' => $settledCount,
+                'total_settled' => $settledCount,
+                'winners' => $winnersCount,
+                'losers' => $losersCount,
                 'total_rewards' => $totalRewards,
+                'total_losses' => $totalLosses,
             ]);
 
             return redirect()
                 ->route('admin.signals.show', $signal->id)
-                ->with('success', "Signal settled successfully! {$settledCount} participants received rewards. Total rewards distributed: " . number_format($totalRewards, 2) . " USDT.");
+                ->with('success', "Signal settled! Winners: {$winnersCount} (Total rewards: " . number_format($totalRewards, 2) . " USDT) | Losers: {$losersCount} (Total losses: " . number_format($totalLosses, 2) . " USDT)");
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('=== SETTLE SIGNAL FAILED ===', [
                 'signal_id' => $signal->id,
-                'error_message' => $e->getMessage(),
-                'stack_trace' => $e->getTraceAsString(),
+                'error' => $e->getMessage(),
             ]);
-
             return redirect()
                 ->route('admin.signals.show', $signal->id)
                 ->with('error', 'Failed to settle signal: ' . $e->getMessage());
