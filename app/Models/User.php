@@ -250,7 +250,13 @@ class User extends Authenticatable
         if ($this->getAvailableTradeBalance() < $amount) {
             throw new \Exception('Insufficient available trade balance to lock');
         }
+
+        // Kurangi trade balance
+        $this->decrement('trade_balance', $amount);
+
+        // Tambah locked balance
         $this->increment('locked_balance', $amount);
+
         return $this->fresh();
     }
 
@@ -262,10 +268,26 @@ class User extends Authenticatable
         if ($this->locked_balance < $amount) {
             throw new \Exception('Cannot unlock more than locked balance');
         }
+
+        // Kurangi locked balance
         $this->decrement('locked_balance', $amount);
+
+        // Tambah kembali ke trade balance
+        $this->increment('trade_balance', $amount);
+
         return $this->fresh();
     }
+    public function removeLockedBalance($amount)
+    {
+        if ($this->locked_balance < $amount) {
+            throw new \Exception('Cannot remove more than locked balance');
+        }
 
+        // Kurangi locked balance saja (trade balance sudah dikurangi saat lock)
+        $this->decrement('locked_balance', $amount);
+
+        return $this->fresh();
+    }
     // ==================== VOLUME METHODS ====================
 
     /**

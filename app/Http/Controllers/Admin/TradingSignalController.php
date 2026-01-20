@@ -23,7 +23,6 @@ class TradingSignalController extends Controller
         return view('admin.pages.signals.index', compact('signals'));
     }
 
-
     public function create()
     {
         $coins = TradingSignal::getAvailableCoins();
@@ -315,7 +314,7 @@ class TradingSignalController extends Controller
 
                 if ($usersWin) {
                     // USERS MENANG (Admin pilih benar)
-                    // 1. Unlock bet amount (kembalikan saldo bet)
+                    // 1. Unlock bet amount (kembalikan bet ke trade balance)
                     $user->unlockBalance($betAmount);
 
                     // 2. Hitung profit
@@ -324,7 +323,7 @@ class TradingSignalController extends Controller
                     // 3. Tambahkan profit ke trade balance
                     $user->addTradeBalance($profit);
 
-                    $profitLoss = $profit; // Profit saja (bet sudah dikembalikan)
+                    $profitLoss = $profit; // Hanya profit yang dicatat
                     $totalRewards += $profit;
 
                     Log::info('Participant WON', [
@@ -332,13 +331,15 @@ class TradingSignalController extends Controller
                         'user_id' => $user->id,
                         'bet_amount' => $betAmount,
                         'profit' => $profit,
+                        'trade_balance_after' => $user->trade_balance,
+                        'locked_balance_after' => $user->locked_balance,
                     ]);
                 } else {
                     // USERS KALAH (Admin pilih salah)
-                    // Bet amount tetap locked (hilang)
-                    // Tidak unlock balance, tidak dapat apa-apa
+                    // Hapus locked balance saja (bet hilang, trade balance sudah dikurangi saat join)
+                    $user->removeLockedBalance($betAmount);
 
-                    $profitLoss = -$betAmount; // Loss
+                    $profitLoss = -$betAmount;
                     $totalLosses += $betAmount;
 
                     Log::info('Participant LOST', [
@@ -346,6 +347,8 @@ class TradingSignalController extends Controller
                         'user_id' => $user->id,
                         'bet_amount' => $betAmount,
                         'loss' => $betAmount,
+                        'trade_balance_after' => $user->trade_balance,
+                        'locked_balance_after' => $user->locked_balance,
                     ]);
                 }
 
