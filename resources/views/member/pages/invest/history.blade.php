@@ -88,25 +88,47 @@
                             </div>
 
                             <!-- Right side: CALL/PUT text only -->
+                            {{-- Replace the existing @php block around line 78-90 with this: --}}
+
                             @php
-                                // Tentukan CALL atau PUT berdasarkan result
                                 $direction = '';
+                                $directionIcon = '';
                                 $textColor = 'text-muted';
+                                $userOutcome = '';
 
                                 if ($isPending) {
                                     $direction = 'PENDING';
+                                    $directionIcon = '';
                                     $textColor = 'text-warning';
-                                } elseif ($signal->result === 'win') {
-                                    $direction = 'CALL';
-                                    $textColor = 'text-success';
-                                } elseif ($signal->result === 'loss') {
-                                    $direction = 'PUT';
-                                    $textColor = 'text-danger';
+                                } else {
+                                    if ($signal->entry_price < $signal->target_price) {
+                                        $direction = 'CALL';
+                                        $directionIcon = '↑';
+                                        $textColor = 'text-success';
+                                    } else {
+                                        $direction = 'PUT';
+                                        $directionIcon = '↓';
+                                        $textColor = 'text-danger';
+                                    }
+
+                                    // Tampilkan apakah user menang atau kalah
+                                    if ($isSettled) {
+                                        if ($signal->result === 'win') {
+                                            // User menang - tampilkan checkmark
+                                            $userOutcome =
+                                                '<i class="bi bi-check-circle-fill text-success ms-1" style="font-size: 10px;"></i>';
+                                        } else {
+                                            // User kalah - tampilkan X
+                                            $userOutcome =
+                                                '<i class="bi bi-x-circle-fill text-danger ms-1" style="font-size: 10px;"></i>';
+                                        }
+                                    }
                                 }
                             @endphp
 
+                            {{-- Update the span display --}}
                             <span class="fw-bold {{ $textColor }}" style="font-size: 12px;">
-                                {{ $direction }}
+                                {{ $direction }} {{ $directionIcon }} {!! $userOutcome !!}
                             </span>
                         </div>
 
