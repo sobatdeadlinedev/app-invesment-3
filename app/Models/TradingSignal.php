@@ -20,6 +20,7 @@ class TradingSignal extends Model
         'bet_value',
         'is_public',
         'status',
+        'admin_choice',
         'result',
         'rate_of_return',
         'opened_at',

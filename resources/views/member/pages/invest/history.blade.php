@@ -74,7 +74,7 @@
                         $isFinalProfit = $netResult > 0;
 
                         // ========================================
-                        // FIX: Tentukan CALL/PUT berdasarkan PRICE MOVEMENT
+                        // Tampilkan ADMIN CHOICE (apa yang admin pilih)
                         // ========================================
                         $direction = '';
                         $directionIcon = '';
@@ -86,27 +86,29 @@
                             $directionIcon = '';
                             $textColor = 'text-warning';
                         } else {
-                            // Market direction ditentukan dari perbandingan harga
-                            // CALL = harga naik (settlement > opening)
-                            // PUT = harga turun (settlement < opening)
-                            if ($signal->entry_price < $signal->target_price) {
+                            // Tampilkan apa yang ADMIN PILIH (bukan actual market)
+                            $adminChoice = strtolower($signal->admin_choice ?? '');
+
+                            if ($adminChoice === 'call') {
                                 $direction = 'CALL';
                                 $directionIcon = '↑';
                                 $textColor = 'text-success';
-                            } else {
+                            } elseif ($adminChoice === 'put') {
                                 $direction = 'PUT';
                                 $directionIcon = '↓';
                                 $textColor = 'text-danger';
+                            } else {
+                                // Fallback jika admin_choice tidak ada (old data)
+                                $direction = 'N/A';
+                                $textColor = 'text-muted';
                             }
 
-                            // Tampilkan apakah user menang atau kalah
+                            // Show user outcome
                             if ($isSettled) {
                                 if ($signal->result === 'win') {
-                                    // User menang - tampilkan checkmark
                                     $userOutcome =
                                         '<i class="bi bi-check-circle-fill text-success ms-1" style="font-size: 10px;"></i>';
                                 } else {
-                                    // User kalah - tampilkan X
                                     $userOutcome =
                                         '<i class="bi bi-x-circle-fill text-danger ms-1" style="font-size: 10px;"></i>';
                                 }
@@ -247,9 +249,7 @@
                     <div>
                         <h6 class="text-white mb-1" style="font-size: 13px;">About Results</h6>
                         <ul class="small text-muted mb-0 ps-3" style="font-size: 12px;">
-                            <li>CALL (↑) means price went UP, PUT (↓) means price went DOWN</li>
-                            <li>✓ = You won this signal, ✗ = You lost this signal</li>
-                            <li>Gross P/L = Your profit/loss before fees</li>
+                            <li>CALL/PUT shows what admin predicted (not actual market movement)</li>
                             <li>Trading Fee = 1% of your bet amount (deducted on win only)</li>
                             <li>Net P/L = Final result after deducting fees</li>
                             <li>Win Rate is calculated from settled signals only</li>

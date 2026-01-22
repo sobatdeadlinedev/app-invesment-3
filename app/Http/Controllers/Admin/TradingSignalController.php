@@ -226,8 +226,14 @@ class TradingSignalController extends Controller
             // Result untuk database (win = user menang, loss = user kalah)
             $result = $isAdminCorrect ? 'win' : 'loss';
 
-            // Close signal dengan result
-            $signal->closeSignal($result, $request->rate_of_return);
+            // UPDATED: Simpan admin_choice ke database
+            $signal->update([
+                'status' => 'closed',
+                'result' => $result,
+                'admin_choice' => $adminChoice, // 👈 Simpan pilihan admin
+                'rate_of_return' => $request->rate_of_return,
+                'closed_at' => now(),
+            ]);
 
             DB::commit();
 
