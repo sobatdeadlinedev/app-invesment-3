@@ -72,6 +72,46 @@
 
                         // Determine if final result is positive (after fees)
                         $isFinalProfit = $netResult > 0;
+
+                        // ========================================
+                        // FIX: Tentukan CALL/PUT berdasarkan PRICE MOVEMENT
+                        // ========================================
+                        $direction = '';
+                        $directionIcon = '';
+                        $textColor = 'text-muted';
+                        $userOutcome = '';
+
+                        if ($isPending) {
+                            $direction = 'PENDING';
+                            $directionIcon = '';
+                            $textColor = 'text-warning';
+                        } else {
+                            // Market direction ditentukan dari perbandingan harga
+                            // CALL = harga naik (settlement > opening)
+                            // PUT = harga turun (settlement < opening)
+                            if ($signal->entry_price < $signal->target_price) {
+                                $direction = 'CALL';
+                                $directionIcon = '↑';
+                                $textColor = 'text-success';
+                            } else {
+                                $direction = 'PUT';
+                                $directionIcon = '↓';
+                                $textColor = 'text-danger';
+                            }
+
+                            // Tampilkan apakah user menang atau kalah
+                            if ($isSettled) {
+                                if ($signal->result === 'win') {
+                                    // User menang - tampilkan checkmark
+                                    $userOutcome =
+                                        '<i class="bi bi-check-circle-fill text-success ms-1" style="font-size: 10px;"></i>';
+                                } else {
+                                    // User kalah - tampilkan X
+                                    $userOutcome =
+                                        '<i class="bi bi-x-circle-fill text-danger ms-1" style="font-size: 10px;"></i>';
+                                }
+                            }
+                        }
                     @endphp
 
                     <div class="card-dark shadow-sm p-3 mb-3">
@@ -87,46 +127,7 @@
                                 <span class="text-white fw-bold">{{ $coinInfo['symbol'] }}</span>
                             </div>
 
-                            <!-- Right side: CALL/PUT text only -->
-                            {{-- Replace the existing @php block around line 78-90 with this: --}}
-
-                            @php
-                                $direction = '';
-                                $directionIcon = '';
-                                $textColor = 'text-muted';
-                                $userOutcome = '';
-
-                                if ($isPending) {
-                                    $direction = 'PENDING';
-                                    $directionIcon = '';
-                                    $textColor = 'text-warning';
-                                } else {
-                                    if ($signal->entry_price < $signal->target_price) {
-                                        $direction = 'CALL';
-                                        $directionIcon = '↑';
-                                        $textColor = 'text-success';
-                                    } else {
-                                        $direction = 'PUT';
-                                        $directionIcon = '↓';
-                                        $textColor = 'text-danger';
-                                    }
-
-                                    // Tampilkan apakah user menang atau kalah
-                                    if ($isSettled) {
-                                        if ($signal->result === 'win') {
-                                            // User menang - tampilkan checkmark
-                                            $userOutcome =
-                                                '<i class="bi bi-check-circle-fill text-success ms-1" style="font-size: 10px;"></i>';
-                                        } else {
-                                            // User kalah - tampilkan X
-                                            $userOutcome =
-                                                '<i class="bi bi-x-circle-fill text-danger ms-1" style="font-size: 10px;"></i>';
-                                        }
-                                    }
-                                }
-                            @endphp
-
-                            {{-- Update the span display --}}
+                            <!-- Right side: CALL/PUT with direction icon and outcome -->
                             <span class="fw-bold {{ $textColor }}" style="font-size: 12px;">
                                 {{ $direction }} {{ $directionIcon }} {!! $userOutcome !!}
                             </span>
@@ -221,15 +222,6 @@
                                     {{ $participant->joined_at->format('Y-m-d H:i:s') }}
                                 </span>
                             </div>
-
-                            @if ($isPending)
-                                <!-- Pending Notice -->
-                                {{-- <div class="mt-2 pt-2" style="border-top: 1px solid var(--border-color);">
-                                    <small class="text-warning">
-                                        <i class="bi bi-info-circle me-1"></i>Waiting for admin to settle this signal
-                                    </small>
-                                </div> --}}
-                            @endif
                         </div>
                     </div>
                 @empty
@@ -255,7 +247,8 @@
                     <div>
                         <h6 class="text-white mb-1" style="font-size: 13px;">About Results</h6>
                         <ul class="small text-muted mb-0 ps-3" style="font-size: 12px;">
-                            <li>Signal result (WIN/LOSS) is determined by admin</li>
+                            <li>CALL (↑) means price went UP, PUT (↓) means price went DOWN</li>
+                            <li>✓ = You won this signal, ✗ = You lost this signal</li>
                             <li>Gross P/L = Your profit/loss before fees</li>
                             <li>Trading Fee = 1% of your bet amount (deducted on win only)</li>
                             <li>Net P/L = Final result after deducting fees</li>
