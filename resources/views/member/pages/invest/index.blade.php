@@ -38,7 +38,7 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="row g-2 mb-3">
+            {{-- <div class="row g-2 mb-3">
                 <div class="col-6">
                     <a href="{{ route('member.invest.history') }}" class="btn btn-outline-light w-100 btn-sm">
                         <i class="bi bi-clock-history me-1"></i>Historical Orders
@@ -49,7 +49,7 @@
                         <i class="bi bi-arrow-left-right me-1"></i>Transfer Balance
                     </a>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Coins List Card -->
             <div class="card-dark shadow-sm p-0 mb-3">
