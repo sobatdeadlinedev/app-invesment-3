@@ -148,14 +148,12 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->g
 
     // Trading Signals (di invest)
     Route::prefix('invest')->name('invest.')->group(function () {
-        Route::get('/', [MemberInvestController::class, 'index'])->name('index'); // List signals
-        Route::get('/detail', [MemberInvestController::class, 'detail'])->name('detail'); // Signal detail
-        Route::get('/history', [MemberSignalController::class, 'history'])->name('history'); // Trading history
+        Route::get('/coin', [MemberInvestController::class, 'coinSignals'])->name('coin'); // All-in-one page
     });
 
     // Signal actions
     Route::post('/signals/{id}/join', [MemberSignalController::class, 'join'])->name('signals.join');
-
+    
     Route::prefix('team')->name('team.')->group(function () {
         Route::get('/', [MemberTeamController::class, 'index'])->name('index');
     });

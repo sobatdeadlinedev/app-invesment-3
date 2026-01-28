@@ -2,442 +2,424 @@
 @section('content')
     <!-- Scrollable Content Area -->
     <div class="scrollable-content">
-        <div class="content-section" style="padding: 0;">
+        <div class="content-section">
 
-            <!-- Team Stats Cards Row - Seamless -->
-            <div class="seamless-stats-section">
-                <div class="row g-3">
-                    <!-- Total Network -->
-                    <div class="col-6">
-                        <div class="stat-card-seamless">
-                            <div class="team-icon-wrapper mb-2">
-                                <i class="bi bi-people-fill"></i>
-                            </div>
-                            <p class="text-muted mb-1 small">Total Network</p>
-                            <h3 class="text-gold mb-0 fw-bold">{{ $totalTeam }}</h3>
-                        </div>
-                    </div>
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
 
-                    <!-- Direct Team -->
-                    <div class="col-6">
-                        <div class="stat-card-seamless">
-                            <div class="team-icon-wrapper mb-2">
-                                <i class="bi bi-person-plus-fill"></i>
-                            </div>
-                            <p class="text-muted mb-1 small">Direct Team</p>
-                            <h3 class="text-gold mb-0 fw-bold">{{ $directTeam }}</h3>
-                        </div>
-                    </div>
+            <!-- QR Code Section -->
+            <div class="qr-section">
+                <div class="qr-code-wrapper">
+                    <div id="qrcode"></div>
                 </div>
             </div>
 
-            <!-- Referral Code & Link Section - Seamless -->
-            <div class="seamless-referral-section">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <div class="referral-icon-small">
-                        <i class="bi bi-gift-fill"></i>
+            <!-- Invitation Code Section -->
+            <div class="invitation-section">
+                <div class="invitation-item">
+                    <label class="invitation-label">My invitation code:</label>
+                    <div class="invitation-value-wrapper">
+                        <span class="invitation-value" id="invitationCode">{{ $user->refferal_code }}</span>
+                        <button class="btn-copy-icon" onclick="copyInvitationCode()" title="Copy Code">
+                            <i class="bi bi-clipboard" id="copyCodeIcon"></i>
+                        </button>
                     </div>
-                    <p class="text-muted mb-0 small fw-bold">Kode Referral</p>
                 </div>
 
-                <!-- Referral Code -->
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="referral-code-display" id="referralCode">{{ $user->refferal_code }}</div>
-                    <button class="btn-copy-small" onclick="copyReferralCode()" title="Copy Kode">
-                        <i class="bi bi-clipboard" id="copyCodeIcon"></i>
-                    </button>
-                </div>
-
-                <!-- Referral Link -->
-                <div>
-                    <p class="text-muted mb-2 small">Link Referral</p>
-                    <div class="d-flex align-items-center justify-content-between gap-2">
-                        <div class="referral-link-display" id="referralLink">{{ $referralLink }}</div>
-                        <button class="btn-copy-small" onclick="copyReferralLink()" title="Copy Link">
+                <div class="invitation-item">
+                    <label class="invitation-label">My invitation code link:</label>
+                    <div class="invitation-value-wrapper">
+                        <span class="invitation-value link" id="invitationLink">{{ $referralLink }}</span>
+                        <button class="btn-copy-icon" onclick="copyInvitationLink()" title="Copy Link">
                             <i class="bi bi-link-45deg" id="copyLinkIcon"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Level Filter Tabs - Seamless -->
-            @if ($totalTeam > 0)
-                <div class="seamless-filter-section">
-                    <div class="d-flex gap-2 overflow-auto pb-2">
-                        <button class="filter-tab active" onclick="filterLevel('all')">
-                            <i class="bi bi-grid-fill"></i> Semua ({{ $totalTeam }})
-                        </button>
-                        @foreach ($levelStats as $level => $stats)
-                            <button class="filter-tab" onclick="filterLevel({{ $level }})">
-                                L{{ $level }} ({{ $stats['count'] }})
-                            </button>
-                        @endforeach
-                    </div>
+            <!-- Click Save Button -->
+            <div class="save-button-section">
+                <button class="btn-save" onclick="saveQRCode()">
+                    <i class="bi bi-download me-2"></i>Save QR
+                </button>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="statistics-section">
+                <div class="stat-item">
+                    <span class="stat-label">Recommended number of people:</span>
+                    <span class="stat-value">{{ $directTeam }} / {{ $totalTeam }}</span>
                 </div>
-            @endif
-
-            <!-- Team Members List Header -->
-            <div class="seamless-list-header">
-                <h6 class="mb-0 fw-bold" style="color: var(--text-primary); font-size: 14px;">Daftar Team Member</h6>
-                @if ($totalTeam > 0)
-                    <span class="badge-signals-count">{{ $totalTeam }} Members</span>
-                @endif
+                <div class="stat-item">
+                    <span class="stat-label">Current level:</span>
+                    <span class="stat-value">LV{{ $user->level ?? 0 }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Revenue:</span>
+                    <span class="stat-value">{{ number_format($totalRevenue ?? 0, 2) }}</span>
+                </div>
             </div>
 
-            <!-- Team Members List - Seamless -->
-            <div class="seamless-members-list">
-                @forelse($teamMembers->sortBy('level') as $member)
-                    <!-- Member Item -->
-                    <div class="team-member-item-seamless" data-level="{{ $member->level }}">
-                        <div class="d-flex align-items-start gap-3">
-                            <!-- Level Badge -->
-                            <div class="level-badge-vertical level-{{ $member->level }}">
-                                <div class="level-text">L{{ $member->level }}</div>
-                            </div>
-
-                            <div class="team-avatar">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <div class="fw-bold" style="font-size: 14px; color: var(--text-primary);">
-                                        {{ $member->username }}
-                                    </div>
-                                </div>
-
-                                <!-- Info Row -->
-                                <div class="d-flex align-items-center gap-3 flex-wrap mb-1">
-                                    <div class="d-flex align-items-center gap-1">
-                                        <i class="bi bi-telephone-fill text-muted" style="font-size: 11px;"></i>
-                                        <small class="text-muted">{{ $member->phone }}</small>
-                                    </div>
-                                </div>
-
-                                <!-- Referrer Info -->
-                                @if ($member->level > 1)
-                                    <div class="referrer-info mb-1">
-                                        <i class="bi bi-arrow-return-right"></i>
-                                        <small>Direferral oleh: <span
-                                                class="text-warning">{{ $member->referrer_name }}</span></small>
-                                    </div>
-                                @endif
-
-                                <!-- Join Date -->
-                                <small class="text-muted" style="font-size: 11px;">
-                                    <i class="bi bi-calendar3"></i>
-                                    Bergabung {{ \Carbon\Carbon::parse($member->created_at)->diffForHumans() }}
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <!-- Empty State -->
-                    <div class="seamless-empty-state">
-                        <i class="bi bi-people"></i>
-                        <p class="mb-1">Belum ada team member</p>
-                        <small>Bagikan kode atau link referral kamu untuk mendapatkan team member</small>
-                    </div>
-                @endforelse
+            <!-- Rules Section -->
+            <div class="rules-section">
+                <div class="rules-header">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Rules</span>
+                </div>
+                <div class="rules-content">
+                    <ul>
+                        <li>Share your referral code or link with friends</li>
+                        <li>Earn commission when they join and trade</li>
+                        <li>Build your network and increase your level</li>
+                        <li>Higher levels get better commission rates</li>
+                    </ul>
+                </div>
             </div>
+
         </div>
     </div>
 
-    @push('styles')
-        <style>
-            /* Seamless Stats Section */
-            .seamless-stats-section {
-                padding: 20px;
-                background: transparent;
+    <style>
+        /* QR Code Section */
+        .qr-section {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .qr-code-wrapper {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #qrcode img,
+        #qrcode canvas {
+            border-radius: 8px;
+        }
+
+        /* Invitation Section */
+        .invitation-section {
+            padding: 0 20px;
+            margin-bottom: 24px;
+        }
+
+        .invitation-item {
+            margin-bottom: 20px;
+        }
+
+        .invitation-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .invitation-value-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            gap: 12px;
+        }
+
+        .invitation-value {
+            color: var(--text-white);
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .invitation-value.link {
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .btn-copy-icon {
+            background: transparent;
+            border: none;
+            color: var(--gold-color);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-copy-icon:hover {
+            color: #d4930f;
+            transform: scale(1.1);
+        }
+
+        .btn-copy-icon:active {
+            transform: scale(0.95);
+        }
+
+        /* Save Button Section */
+        .save-button-section {
+            padding: 0 20px;
+            margin-bottom: 32px;
+        }
+
+        .btn-save {
+            width: 100%;
+            background: linear-gradient(135deg, #f5a623 0%, #d4930f 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 166, 35, 0.4);
+        }
+
+        .btn-save:active {
+            transform: translateY(0);
+        }
+
+        /* Statistics Section */
+        .statistics-section {
+            padding: 0 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .stat-value {
+            color: #4ade80;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Rules Section */
+        .rules-section {
+            padding: 0 20px;
+            margin-bottom: 24px;
+        }
+
+        .rules-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-white);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .rules-header i {
+            color: var(--gold-color);
+            font-size: 18px;
+        }
+
+        .rules-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .rules-content ul {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .rules-content ul li {
+            margin-bottom: 8px;
+        }
+
+        .rules-content ul li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #22c55e;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 9999;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
             }
 
-            .stat-card-seamless {
-                background: transparent;
-                border: 1px solid var(--border-color);
-                border-radius: 12px;
-                padding: 20px 16px;
-                text-align: center;
-                transition: all 0.2s ease;
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .qr-section {
+                padding: 30px 20px;
             }
 
-            .stat-card-seamless:hover {
-                background: rgba(169, 126, 0, 0.03);
-                border-color: rgba(169, 126, 0, 0.3);
-            }
-
-            /* Seamless Referral Section */
-            .seamless-referral-section {
-                padding: 20px;
-                background: transparent;
-            }
-
-            .referral-link-display {
-                background: rgba(169, 126, 0, 0.05);
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                padding: 10px 12px;
-                color: var(--text-muted);
-                font-size: 11px;
-                font-family: monospace;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                flex: 1;
-            }
-
-            /* Seamless Filter Section */
-            .seamless-filter-section {
-                padding: 20px;
-                padding-bottom: 12px;
-                background: transparent;
-            }
-
-            /* Filter Tabs */
-            .filter-tab {
-                background: transparent;
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                padding: 8px 16px;
-                color: var(--text-muted);
-                font-size: 12px;
-                font-weight: 600;
-                white-space: nowrap;
-                transition: all 0.2s ease;
-                cursor: pointer;
-            }
-
-            .filter-tab.active {
-                background: var(--gold-color);
-                color: #fff;
-                border-color: var(--gold-color);
-            }
-
-            .filter-tab:hover:not(.active) {
-                background: rgba(169, 126, 0, 0.05);
-                border-color: rgba(169, 126, 0, 0.3);
-            }
-
-            /* Seamless List Header */
-            .seamless-list-header {
-                padding: 16px 20px;
-                padding-bottom: 12px;
-                background: transparent;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            /* Badge Signals Count */
-            .badge-signals-count {
-                background: transparent;
-                border: 1px solid var(--gold-color);
-                color: var(--gold-color);
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 11px;
-                font-weight: 600;
-            }
-
-            /* Seamless Members List */
-            .seamless-members-list {
-                background: transparent;
-                padding: 0 20px;
-            }
-
-            /* Team Member Item Seamless */
-            .team-member-item-seamless {
-                background: transparent;
-                border: none;
-                border-radius: 12px;
+            .qr-code-wrapper {
                 padding: 16px;
-                margin-bottom: 12px;
-                transition: all 0.2s ease;
             }
-
-            .team-member-item-seamless:last-child {
-                margin-bottom: 0;
-            }
-
-            .team-member-item-seamless:hover {
-                background: rgba(169, 126, 0, 0.03);
-            }
-
-            .team-member-item-seamless.hidden {
-                display: none;
-            }
-
-            /* Level Badge Vertical */
-            .level-badge-vertical {
-                padding: 6px 10px;
-                border-radius: 8px;
-                text-align: center;
-                font-size: 10px;
-                font-weight: bold;
-                min-width: 36px;
-                flex-shrink: 0;
-            }
-
-            .level-badge-vertical.level-1 {
-                background: rgba(40, 167, 69, 0.2);
-                color: #28a745;
-            }
-
-            .level-badge-vertical.level-2 {
-                background: rgba(23, 162, 184, 0.2);
-                color: #17a2b8;
-            }
-
-            .level-badge-vertical.level-3 {
-                background: rgba(255, 193, 7, 0.2);
-                color: #ffc107;
-            }
-
-            .level-badge-vertical.level-4,
-            .level-badge-vertical.level-5,
-            .level-badge-vertical.level-6 {
-                background: rgba(108, 117, 125, 0.2);
-                color: #6c757d;
-            }
-
-            .level-text {
-                font-size: 11px;
-                font-weight: bold;
-            }
-
-            /* Referrer Info */
-            .referrer-info {
-                background: rgba(255, 193, 7, 0.1);
-                border-left: 2px solid #ffc107;
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 11px;
-                color: var(--text-muted);
-            }
-
-            .referrer-info i {
-                color: #ffc107;
-                margin-right: 4px;
-            }
-
-            /* Seamless Empty State */
-            .seamless-empty-state {
-                padding: 60px 20px;
-                text-align: center;
-                background: transparent;
-            }
-
-            .seamless-empty-state i {
-                font-size: 48px;
-                color: var(--border-color);
-                display: block;
-                margin-bottom: 12px;
-            }
-
-            .seamless-empty-state p {
-                color: var(--text-muted);
-                font-size: 14px;
-                margin: 0;
-            }
-
-            .seamless-empty-state small {
-                color: var(--text-muted);
-                font-size: 12px;
-            }
-        </style>
-    @endpush>
+        }
+    </style>
 
     @push('scripts')
+        <!-- QR Code Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
         <script>
+            // Wait for DOM to be ready
+            document.addEventListener('DOMContentLoaded', function() {
+                // Clear any existing QR code
+                const qrcodeDiv = document.getElementById("qrcode");
+                qrcodeDiv.innerHTML = '';
+
+                // Get the referral link
+                const referralLink = "{{ $referralLink }}";
+                console.log('Generating QR Code for:', referralLink); // Debug log
+
+                // Generate QR Code
+                const qrcode = new QRCode(qrcodeDiv, {
+                    text: referralLink,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            });
+
+            // Show Toast Notification
             function showToast(message, type = 'success') {
-                const bgColor = type === 'success' ? '#28a745' : '#dc3545';
+                const bgColor = type === 'success' ? '#22c55e' : '#ef4444';
                 const toast = document.createElement('div');
-                toast.style.cssText = `
-                position: fixed; 
-                top: 20px; 
-                right: 20px; 
-                background: ${bgColor}; 
-                color: white; 
-                padding: 12px 20px; 
-                border-radius: 8px; 
-                z-index: 9999; 
-                font-size: 14px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            `;
-                toast.textContent = message;
+                toast.className = 'toast-notification';
+                toast.style.background = bgColor;
+                toast.innerHTML = `<i class="bi bi-check-circle me-2"></i>${message}`;
                 document.body.appendChild(toast);
 
                 setTimeout(() => {
-                    toast.remove();
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => toast.remove(), 300);
                 }, 2000);
             }
 
-            function copyReferralCode() {
-                const codeElement = document.getElementById('referralCode');
-                const code = codeElement.textContent;
+            // Copy Invitation Code
+            function copyInvitationCode() {
+                const code = document.getElementById('invitationCode').textContent;
                 const icon = document.getElementById('copyCodeIcon');
 
                 navigator.clipboard.writeText(code).then(() => {
                     icon.classList.remove('bi-clipboard');
                     icon.classList.add('bi-check-lg');
-
-                    showToast('Kode referral berhasil disalin!');
+                    showToast('Invitation code copied!');
 
                     setTimeout(() => {
                         icon.classList.remove('bi-check-lg');
                         icon.classList.add('bi-clipboard');
                     }, 2000);
                 }).catch(err => {
-                    showToast('Gagal menyalin kode referral', 'error');
-                    console.error('Error copying:', err);
+                    showToast('Failed to copy code', 'error');
+                    console.error('Error:', err);
                 });
             }
 
-            function copyReferralLink() {
-                const linkElement = document.getElementById('referralLink');
-                const link = linkElement.textContent;
+            // Copy Invitation Link
+            function copyInvitationLink() {
+                const link = document.getElementById('invitationLink').textContent;
                 const icon = document.getElementById('copyLinkIcon');
 
                 navigator.clipboard.writeText(link).then(() => {
                     icon.classList.remove('bi-link-45deg');
                     icon.classList.add('bi-check-lg');
-
-                    showToast('Link referral berhasil disalin!');
+                    showToast('Invitation link copied!');
 
                     setTimeout(() => {
                         icon.classList.remove('bi-check-lg');
                         icon.classList.add('bi-link-45deg');
                     }, 2000);
                 }).catch(err => {
-                    showToast('Gagal menyalin link referral', 'error');
-                    console.error('Error copying:', err);
+                    showToast('Failed to copy link', 'error');
+                    console.error('Error:', err);
                 });
             }
 
-            // Filter by Level
-            function filterLevel(level) {
-                const allMembers = document.querySelectorAll('.team-member-item-seamless');
-                const allTabs = document.querySelectorAll('.filter-tab');
-
-                // Update active tab
-                allTabs.forEach(tab => tab.classList.remove('active'));
-                event.target.classList.add('active');
-
-                // Filter members
-                if (level === 'all') {
-                    allMembers.forEach(member => {
-                        member.classList.remove('hidden');
-                    });
+            // Save QR Code
+            function saveQRCode() {
+                const canvas = document.querySelector('#qrcode canvas');
+                if (canvas) {
+                    const link = document.createElement('a');
+                    link.download = 'referral-qrcode.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    showToast('QR Code saved successfully!');
                 } else {
-                    allMembers.forEach(member => {
-                        const memberLevel = parseInt(member.getAttribute('data-level'));
-                        if (memberLevel === level) {
-                            member.classList.remove('hidden');
-                        } else {
-                            member.classList.add('hidden');
-                        }
-                    });
+                    showToast('Failed to save QR Code', 'error');
                 }
             }
+
+            // Auto hide alerts
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 3000);
         </script>
     @endpush
 @endsection

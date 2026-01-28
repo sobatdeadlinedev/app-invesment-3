@@ -10,62 +10,35 @@ use Illuminate\Http\Request;
 class InvestController extends Controller
 {
     /**
-     * Show coins list with signal count
+     * Show all-in-one coin signals page
      */
-    public function index()
+    public function coinSignals(Request $request)
     {
         $user = auth()->user();
-        $coins = TradingSignal::getAvailableCoins();
+        $coin = strtoupper($request->query('coin', 'BTCUSDT'));
+
+        // ========================================
+        // Data untuk POPUP - All Coins
+        // ========================================
+        $allCoins = TradingSignal::getAvailableCoins();
 
         // Count open signals per coin yang user bisa akses
         $signalCounts = [];
-        foreach (array_keys($coins) as $coinSymbol) {
+        foreach (array_keys($allCoins) as $coinSymbol) {
             $signalCounts[$coinSymbol] = TradingSignal::forCoin($coinSymbol)
                 ->open()
-                ->accessibleBy($user->id) // UPDATED: Filter by access
+                ->accessibleBy($user->id)
                 ->count();
         }
 
-        return view('member.pages.invest.index', compact('coins', 'signalCounts'));
-    }
+        // ========================================
+        // Data untuk CURRENT COIN
+        // ========================================
+        $coinInfo = $allCoins[$coin] ?? $allCoins['BTCUSDT'];
 
-    /**
-     * Show signals for specific coin
-     */
-    public function detail(Request $request)
-    {
-        $user = auth()->user();
-
-        // Get coin from query parameter OR signal_id
-        if ($request->has('signal_id')) {
-            // Direct signal access
-            $signalId = $request->query('signal_id');
-            $signal = TradingSignal::with('creator')
-                ->withCount('participants')
-                ->findOrFail($signalId);
-
-            // UPDATED: Check if user has access to this signal
-            if (!$signal->isUserAllowed($user->id)) {
-                abort(403, 'You do not have access to this signal.');
-            }
-
-            $participant = SignalParticipant::where('signal_id', $signal->id)
-                ->where('user_id', $user->id)
-                ->first();
-
-            $hasJoined = !is_null($participant);
-
-            // UPDATED: Calculate bet amount preview based on signal config
-            $betAmountPreview = $signal->calculateUserBetAmount($user);
-
-            return view('member.pages.invest.detail', compact('signal', 'participant', 'hasJoined', 'betAmountPreview'));
-        }
-
-        // Coin signals list
-        $coin = strtoupper($request->query('coin', 'BTCUSDT'));
-        $coinInfo = TradingSignal::getAvailableCoins()[$coin] ?? TradingSignal::getAvailableCoins()['BTCUSDT'];
-
-        // UPDATED: Filter only accessible signals
+        // ========================================
+        // TAB 1: Trading Signals untuk coin ini
+        // ========================================
         $openSignals = TradingSignal::forCoin($coin)
             ->open()
             ->accessibleBy($user->id)
@@ -74,15 +47,88 @@ class InvestController extends Controller
             ->latest()
             ->get();
 
+        // Get signal IDs yang sudah di-join user
         $joinedSignalIds = SignalParticipant::where('user_id', $user->id)
             ->pluck('signal_id')
             ->toArray();
 
-        // UPDATED: Add bet amount preview for each signal
+        // Calculate bet amount preview untuk setiap signal
         $openSignals->each(function ($signal) use ($user) {
             $signal->betAmountPreview = $signal->calculateUserBetAmount($user);
         });
 
-        return view('member.pages.invest.coin-signals', compact('coin', 'coinInfo', 'openSignals', 'joinedSignalIds'));
+        // ========================================
+        // TAB 2: Historical Orders untuk coin ini
+        // ========================================
+        $historyForThisCoin = SignalParticipant::where('user_id', $user->id)
+            ->whereHas('signal', function ($q) use ($coin) {
+                $q->where('coin', $coin);
+            })
+            ->with('signal')
+            ->latest()
+            ->paginate(10);
+
+        // Calculate statistics untuk history tab
+        $totalJoinedThisCoin = SignalParticipant::where('user_id', $user->id)
+            ->whereHas('signal', function ($q) use ($coin) {
+                $q->where('coin', $coin);
+            })
+            ->count();
+
+        $totalSettledThisCoin = SignalParticipant::where('user_id', $user->id)
+            ->whereHas('signal', function ($q) use ($coin) {
+                $q->where('coin', $coin);
+            })
+            ->settled()
+            ->count();
+
+        $totalProfitLossThisCoin = SignalParticipant::where('user_id', $user->id)
+            ->whereHas('signal', function ($q) use ($coin) {
+                $q->where('coin', $coin);
+            })
+            ->settled()
+            ->sum('profit_loss');
+
+        $totalFeesThisCoin = SignalParticipant::where('user_id', $user->id)
+            ->whereHas('signal', function ($q) use ($coin) {
+                $q->where('coin', $coin);
+            })
+            ->settled()
+            ->sum('fee_amount');
+
+        $totalWinsThisCoin = SignalParticipant::where('user_id', $user->id)
+            ->whereHas('signal', function ($q) use ($coin) {
+                $q->where('coin', $coin);
+            })
+            ->settled()
+            ->where('profit_loss', '>', 0)
+            ->count();
+
+        $winRateThisCoin = $totalSettledThisCoin > 0
+            ? ($totalWinsThisCoin / $totalSettledThisCoin) * 100
+            : 0;
+
+        return view('member.pages.invest.coin-signals', compact(
+            // Current coin
+            'coin',
+            'coinInfo',
+
+            // Popup data
+            'allCoins',
+            'signalCounts',
+
+            // Tab 1: Trading Signals
+            'openSignals',
+            'joinedSignalIds',
+
+            // Tab 2: Historical Orders
+            'historyForThisCoin',
+            'totalJoinedThisCoin',
+            'totalSettledThisCoin',
+            'totalProfitLossThisCoin',
+            'totalFeesThisCoin',
+            'totalWinsThisCoin',
+            'winRateThisCoin'
+        ));
     }
 }

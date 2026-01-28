@@ -19,7 +19,7 @@ class SignalController extends Controller
         $signal = TradingSignal::findOrFail($id);
         $user = auth()->user();
 
-        // UPDATED: Check if user has access to this signal
+        // Check if user has access to this signal
         if (!$signal->isUserAllowed($user->id)) {
             return redirect()
                 ->back()
@@ -44,10 +44,10 @@ class SignalController extends Controller
                 ->with('error', 'You have already joined this signal.');
         }
 
-        // UPDATED: Calculate bet amount based on signal configuration
+        // Calculate bet amount based on signal configuration
         $betAmount = $signal->calculateUserBetAmount($user);
 
-        // UPDATED: Validate minimum balance
+        // Validate minimum balance
         if ($signal->bet_type === 'percentage') {
             // For percentage, check minimum 100 USDT available trade balance
             if (!$user->canJoinSignal()) {
@@ -91,7 +91,7 @@ class SignalController extends Controller
             ]);
 
             return redirect()
-                ->route('member.invest.detail', ['signal_id' => $signal->id])
+                ->back()
                 ->with('success', 'Successfully joined signal: ' . $signal->title . '. Bet amount: ' . number_format($betAmount, 2) . ' USDT has been locked.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -107,36 +107,5 @@ class SignalController extends Controller
         }
     }
 
-    /**
-     * Show user's signal history
-     */
-    public function history()
-    {
-        $user = auth()->user();
-
-        $participants = SignalParticipant::with('signal')
-            ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(15);
-
-        // Statistics
-        $totalJoined = SignalParticipant::where('user_id', $user->id)->count();
-        $totalSettled = SignalParticipant::where('user_id', $user->id)->settled()->count();
-        $totalProfitLoss = SignalParticipant::where('user_id', $user->id)->settled()->sum('profit_loss');
-        $totalFees = SignalParticipant::where('user_id', $user->id)->settled()->sum('fee_amount');
-        $totalWins = SignalParticipant::where('user_id', $user->id)
-            ->settled()
-            ->where('profit_loss', '>', 0)
-            ->count();
-
-        return view('member.pages.invest.history', [
-            'participants' => $participants,
-            'totalJoined' => $totalJoined,
-            'totalSettled' => $totalSettled,
-            'totalProfitLoss' => $totalProfitLoss,
-            'totalFees' => $totalFees,
-            'totalWins' => $totalWins,
-            'winRate' => $totalSettled > 0 ? ($totalWins / $totalSettled) * 100 : 0,
-        ]);
-    }
+    // ❌ HAPUS method history() - sudah tidak dipakai
 }
