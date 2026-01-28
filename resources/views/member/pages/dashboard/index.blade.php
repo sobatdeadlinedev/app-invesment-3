@@ -25,7 +25,7 @@
                 </div>
             @endif
 
-            <!-- Hot Section Card -->
+            <!-- Hot Section Card - Top 4 Crypto -->
             <div class="card-dark shadow-sm p-3 mb-3 mt-3"
                 style="background: linear-gradient(135deg, rgba(169, 126, 0, 0.15) 0%, rgba(169, 126, 0, 0.05) 100%); border: 2px solid rgba(169, 126, 0, 0.3);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -36,207 +36,52 @@
 
                 <!-- Hot Coins Grid -->
                 <div class="row g-2">
-                    <!-- BTC Card -->
-                    <div class="col-6">
-                        <div class="card-dark p-3" style="background: #FFFFFF; border: 1px solid var(--border-color);">
-                            <div class="mb-2">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="fw-bold"
-                                        style="font-size: 13px; color: var(--text-primary);">BTCUSDT</span>
-                                    <div class="coin-icon btc" style="width: 24px; height: 24px;">
-                                        <i class="bi bi-currency-bitcoin" style="font-size: 14px;"></i>
-                                    </div>
-                                </div>
-                                <div class="fw-bold mb-1" style="font-size: 16px; color: var(--text-primary);">
-                                    ${{ $cryptoPrices['BTCUSDT']['price'] ?? '0.00' }}
-                                </div>
-                                <small
-                                    class="price-change {{ $cryptoPrices['BTCUSDT']['isPositive'] ? 'positive' : 'negative' }}"
-                                    style="font-size: 11px;">
-                                    @if ($cryptoPrices['BTCUSDT']['isPositive'])
-                                        <i class="bi bi-arrow-up"></i>
-                                    @else
-                                        <i class="bi bi-arrow-down"></i>
-                                    @endif
-                                    {{ $cryptoPrices['BTCUSDT']['change'] }}%
-                                </small>
-                            </div>
-                            <!-- Mini Chart Placeholder -->
-                            <div class="mini-chart {{ $cryptoPrices['BTCUSDT']['isPositive'] ? 'positive' : 'negative' }}">
-                                <svg width="100%" height="60" viewBox="0 0 100 60" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="gradient-btc" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%"
-                                                style="stop-color:{{ $cryptoPrices['BTCUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.3" />
-                                            <stop offset="100%"
-                                                style="stop-color:{{ $cryptoPrices['BTCUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path
-                                        d="M0,45 L20,40 L40,30 L60,35 L80,25 L100,{{ $cryptoPrices['BTCUSDT']['isPositive'] ? '20' : '40' }}"
-                                        fill="none"
-                                        stroke="{{ $cryptoPrices['BTCUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }}"
-                                        stroke-width="2" />
-                                    <path
-                                        d="M0,45 L20,40 L40,30 L60,35 L80,25 L100,{{ $cryptoPrices['BTCUSDT']['isPositive'] ? '20' : '40' }} L100,60 L0,60 Z"
-                                        fill="url(#gradient-btc)" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                    @php
+                        $hotCoins = array_slice($coinsByCategory['crypto'], 0, 4);
+                    @endphp
 
-                    <!-- ETH Card -->
-                    <div class="col-6">
-                        <div class="card-dark p-3" style="background: #FFFFFF; border: 1px solid var(--border-color);">
-                            <div class="mb-2">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="fw-bold"
-                                        style="font-size: 13px; color: var(--text-primary);">ETHUSDT</span>
-                                    <div class="coin-icon eth" style="width: 24px; height: 24px;">
-                                        <i class="bi bi-currency-exchange" style="font-size: 14px;"></i>
+                    @foreach ($hotCoins as $coin)
+                        @php
+                            $priceData = $allPrices[$coin['symbol']] ?? [
+                                'price' => '0.00',
+                                'change' => '0.00',
+                                'isPositive' => true,
+                            ];
+                        @endphp
+                        <div class="col-6">
+                            <div class="card-dark p-3" style="background: #FFFFFF; border: 1px solid var(--border-color);">
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="fw-bold"
+                                            style="font-size: 13px; color: var(--text-primary);">{{ $coin['symbol'] }}</span>
+                                        <div class="coin-icon"
+                                            style="width: 24px; height: 24px; background: {{ $coin['color'] }}; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="{{ $coin['icon'] }}" style="font-size: 14px; color: white;"></i>
+                                        </div>
                                     </div>
+                                    <div class="fw-bold coin-price" style="font-size: 16px; color: var(--text-primary);"
+                                        data-symbol="{{ $coin['symbol'] }}">
+                                        ${{ $priceData['price'] }}
+                                    </div>
+                                    <small class="price-change {{ $priceData['isPositive'] ? 'positive' : 'negative' }}"
+                                        style="font-size: 11px;" data-symbol="{{ $coin['symbol'] }}">
+                                        @if ($priceData['isPositive'])
+                                            <i class="bi bi-arrow-up"></i>
+                                        @else
+                                            <i class="bi bi-arrow-down"></i>
+                                        @endif
+                                        {{ $priceData['change'] }}%
+                                    </small>
                                 </div>
-                                <div class="fw-bold mb-1" style="font-size: 16px; color: var(--text-primary);">
-                                    ${{ $cryptoPrices['ETHUSDT']['price'] ?? '0.00' }}
+                                <!-- Mini Chart -->
+                                <div class="mini-chart {{ $priceData['isPositive'] ? 'positive' : 'negative' }}"
+                                    data-symbol="{{ $coin['symbol'] }}">
+                                    <canvas class="coin-chart" id="chart-{{ strtolower($coin['symbol']) }}"
+                                        height="60"></canvas>
                                 </div>
-                                <small
-                                    class="price-change {{ $cryptoPrices['ETHUSDT']['isPositive'] ? 'positive' : 'negative' }}"
-                                    style="font-size: 11px;">
-                                    @if ($cryptoPrices['ETHUSDT']['isPositive'])
-                                        <i class="bi bi-arrow-up"></i>
-                                    @else
-                                        <i class="bi bi-arrow-down"></i>
-                                    @endif
-                                    {{ $cryptoPrices['ETHUSDT']['change'] }}%
-                                </small>
-                            </div>
-                            <!-- Mini Chart Placeholder -->
-                            <div class="mini-chart {{ $cryptoPrices['ETHUSDT']['isPositive'] ? 'positive' : 'negative' }}">
-                                <svg width="100%" height="60" viewBox="0 0 100 60" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="gradient-eth" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%"
-                                                style="stop-color:{{ $cryptoPrices['ETHUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.3" />
-                                            <stop offset="100%"
-                                                style="stop-color:{{ $cryptoPrices['ETHUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path
-                                        d="M0,50 L20,45 L40,35 L60,40 L80,30 L100,{{ $cryptoPrices['ETHUSDT']['isPositive'] ? '25' : '45' }}"
-                                        fill="none"
-                                        stroke="{{ $cryptoPrices['ETHUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }}"
-                                        stroke-width="2" />
-                                    <path
-                                        d="M0,50 L20,45 L40,35 L60,40 L80,30 L100,{{ $cryptoPrices['ETHUSDT']['isPositive'] ? '25' : '45' }} L100,60 L0,60 Z"
-                                        fill="url(#gradient-eth)" />
-                                </svg>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- DOGE Card -->
-                    <div class="col-6">
-                        <div class="card-dark p-3" style="background: #FFFFFF; border: 1px solid var(--border-color);">
-                            <div class="mb-2">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="fw-bold"
-                                        style="font-size: 13px; color: var(--text-primary);">DOGEUSDT</span>
-                                    <div class="coin-icon doge" style="width: 24px; height: 24px;">
-                                        <i class="bi bi-coin" style="font-size: 14px;"></i>
-                                    </div>
-                                </div>
-                                <div class="fw-bold mb-1" style="font-size: 16px; color: var(--text-primary);">
-                                    ${{ $cryptoPrices['DOGEUSDT']['price'] ?? '0.00' }}
-                                </div>
-                                <small
-                                    class="price-change {{ $cryptoPrices['DOGEUSDT']['isPositive'] ? 'positive' : 'negative' }}"
-                                    style="font-size: 11px;">
-                                    @if ($cryptoPrices['DOGEUSDT']['isPositive'])
-                                        <i class="bi bi-arrow-up"></i>
-                                    @else
-                                        <i class="bi bi-arrow-down"></i>
-                                    @endif
-                                    {{ $cryptoPrices['DOGEUSDT']['change'] }}%
-                                </small>
-                            </div>
-                            <!-- Mini Chart Placeholder -->
-                            <div
-                                class="mini-chart {{ $cryptoPrices['DOGEUSDT']['isPositive'] ? 'positive' : 'negative' }}">
-                                <svg width="100%" height="60" viewBox="0 0 100 60" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="gradient-doge" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%"
-                                                style="stop-color:{{ $cryptoPrices['DOGEUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.3" />
-                                            <stop offset="100%"
-                                                style="stop-color:{{ $cryptoPrices['DOGEUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path
-                                        d="M0,40 L20,38 L40,42 L60,35 L80,37 L100,{{ $cryptoPrices['DOGEUSDT']['isPositive'] ? '30' : '45' }}"
-                                        fill="none"
-                                        stroke="{{ $cryptoPrices['DOGEUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }}"
-                                        stroke-width="2" />
-                                    <path
-                                        d="M0,40 L20,38 L40,42 L60,35 L80,37 L100,{{ $cryptoPrices['DOGEUSDT']['isPositive'] ? '30' : '45' }} L100,60 L0,60 Z"
-                                        fill="url(#gradient-doge)" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BNB Card -->
-                    <div class="col-6">
-                        <div class="card-dark p-3" style="background: #FFFFFF; border: 1px solid var(--border-color);">
-                            <div class="mb-2">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="fw-bold"
-                                        style="font-size: 13px; color: var(--text-primary);">BNBUSDT</span>
-                                    <div class="coin-icon bnb" style="width: 24px; height: 24px;">
-                                        <i class="bi bi-triangle-fill" style="font-size: 14px;"></i>
-                                    </div>
-                                </div>
-                                <div class="fw-bold mb-1" style="font-size: 16px; color: var(--text-primary);">
-                                    ${{ $cryptoPrices['BNBUSDT']['price'] ?? '0.00' }}
-                                </div>
-                                <small
-                                    class="price-change {{ $cryptoPrices['BNBUSDT']['isPositive'] ? 'positive' : 'negative' }}"
-                                    style="font-size: 11px;">
-                                    @if ($cryptoPrices['BNBUSDT']['isPositive'])
-                                        <i class="bi bi-arrow-up"></i>
-                                    @else
-                                        <i class="bi bi-arrow-down"></i>
-                                    @endif
-                                    {{ $cryptoPrices['BNBUSDT']['change'] }}%
-                                </small>
-                            </div>
-                            <!-- Mini Chart Placeholder -->
-                            <div
-                                class="mini-chart {{ $cryptoPrices['BNBUSDT']['isPositive'] ? 'positive' : 'negative' }}">
-                                <svg width="100%" height="60" viewBox="0 0 100 60" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="gradient-bnb" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%"
-                                                style="stop-color:{{ $cryptoPrices['BNBUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.3" />
-                                            <stop offset="100%"
-                                                style="stop-color:{{ $cryptoPrices['BNBUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }};stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path
-                                        d="M0,42 L20,39 L40,33 L60,38 L80,28 L100,{{ $cryptoPrices['BNBUSDT']['isPositive'] ? '22' : '43' }}"
-                                        fill="none"
-                                        stroke="{{ $cryptoPrices['BNBUSDT']['isPositive'] ? '#22c55e' : '#ef4444' }}"
-                                        stroke-width="2" />
-                                    <path
-                                        d="M0,42 L20,39 L40,33 L60,38 L80,28 L100,{{ $cryptoPrices['BNBUSDT']['isPositive'] ? '22' : '43' }} L100,60 L0,60 Z"
-                                        fill="url(#gradient-bnb)" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -252,324 +97,47 @@
 
                     <!-- Crypto Cards Grid (3 columns) -->
                     <div class="coin-cards-grid crypto-grid">
-                        <!-- BTCUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">BTCUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $43,250.50
+                        @foreach ($coinsByCategory['crypto'] as $coin)
+                            @php
+                                $priceData = $allPrices[$coin['symbol']] ?? [
+                                    'price' => '0.00',
+                                    'change' => '0.00',
+                                    'isPositive' => true,
+                                ];
+                            @endphp
+                            <div class="coin-card" data-symbol="{{ $coin['symbol'] }}">
+                                <div class="coin-card-header">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">
+                                            {{ $coin['symbol'] }}
+                                        </div>
+                                        <div class="coin-icon-small"
+                                            style="width: 20px; height: 20px; background: {{ $coin['color'] }}; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="{{ $coin['icon'] }}" style="font-size: 11px; color: white;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="fw-bold coin-price"
+                                        style="font-size: 16px; color: var(--text-primary); margin: 4px 0;"
+                                        data-symbol="{{ $coin['symbol'] }}">
+                                        ${{ $priceData['price'] }}
+                                    </div>
+                                    <small
+                                        class="price-change-mini {{ $priceData['isPositive'] ? 'positive' : 'negative' }}"
+                                        style="font-size: 11px;" data-symbol="{{ $coin['symbol'] }}">
+                                        @if ($priceData['isPositive'])
+                                            <i class="bi bi-arrow-up"></i>
+                                        @else
+                                            <i class="bi bi-arrow-down"></i>
+                                        @endif
+                                        {{ $priceData['change'] }}%
+                                    </small>
                                 </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +2.45%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-btc" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,50 L10,48 L20,45 L30,42 L40,38 L50,35 L60,32 L70,28 L80,25 L90,22 L100,20"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,50 L10,48 L20,45 L30,42 L40,38 L50,35 L60,32 L70,28 L80,25 L90,22 L100,20 L100,70 L0,70 Z"
-                                        fill="url(#grad-btc)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- ETHUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">ETHUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $2,914.66
+                                <div class="coin-mini-chart {{ $priceData['isPositive'] ? 'positive' : 'negative' }}">
+                                    <canvas class="coin-chart-small" id="chart-small-{{ strtolower($coin['symbol']) }}"
+                                        height="70"></canvas>
                                 </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +1.87%
-                                </small>
                             </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-eth" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,55 L10,52 L20,48 L30,45 L40,40 L50,38 L60,35 L70,30 L80,28 L90,24 L100,22"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,55 L10,52 L20,48 L30,45 L40,40 L50,38 L60,35 L70,30 L80,28 L90,24 L100,22 L100,70 L0,70 Z"
-                                        fill="url(#grad-eth)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- XRPUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">XRPUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.5234
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -0.92%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-xrp" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,20 L10,22 L20,25 L30,28 L40,32 L50,35 L60,38 L70,42 L80,45 L90,48 L100,50"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,20 L10,22 L20,25 L30,28 L40,32 L50,35 L60,38 L70,42 L80,45 L90,48 L100,50 L100,70 L0,70 Z"
-                                        fill="url(#grad-xrp)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- LINKUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">LINKUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $14.23
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +3.12%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-link" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,52 L10,49 L20,46 L30,43 L40,39 L50,36 L60,33 L70,29 L80,26 L90,23 L100,21"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,52 L10,49 L20,46 L30,43 L40,39 L50,36 L60,33 L70,29 L80,26 L90,23 L100,21 L100,70 L0,70 Z"
-                                        fill="url(#grad-link)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- DOTUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">DOTUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $7.89
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +1.23%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-dot" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,48 L10,46 L20,44 L30,41 L40,38 L50,36 L60,33 L70,30 L80,28 L90,25 L100,23"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,48 L10,46 L20,44 L30,41 L40,38 L50,36 L60,33 L70,30 L80,28 L90,25 L100,23 L100,70 L0,70 Z"
-                                        fill="url(#grad-dot)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- DOGEUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">DOGEUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.0812
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -1.45%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-doge2" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,22 L10,24 L20,27 L30,30 L40,33 L50,36 L60,39 L70,41 L80,43 L90,46 L100,48"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,22 L10,24 L20,27 L30,30 L40,33 L50,36 L60,39 L70,41 L80,43 L90,46 L100,48 L100,70 L0,70 Z"
-                                        fill="url(#grad-doge2)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- BCHUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">BCHUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $245.67
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +2.15%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-bch" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,46 L10,44 L20,42 L30,39 L40,36 L50,34 L60,31 L70,28 L80,26 L90,23 L100,21"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,46 L10,44 L20,42 L30,39 L40,36 L50,34 L60,31 L70,28 L80,26 L90,23 L100,21 L100,70 L0,70 Z"
-                                        fill="url(#grad-bch)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- FILUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">FILUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $5.42
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -0.78%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-fil" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,24 L10,26 L20,28 L30,31 L40,34 L50,36 L60,38 L70,40 L80,42 L90,44 L100,46"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,24 L10,26 L20,28 L30,31 L40,34 L50,36 L60,38 L70,40 L80,42 L90,44 L100,46 L100,70 L0,70 Z"
-                                        fill="url(#grad-fil)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- LTCUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">LTCUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $73.21
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +1.56%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-ltc" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,49 L10,47 L20,44 L30,41 L40,38 L50,35 L60,32 L70,29 L80,27 L90,24 L100,22"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,49 L10,47 L20,44 L30,41 L40,38 L50,35 L60,32 L70,29 L80,27 L90,24 L100,22 L100,70 L0,70 Z"
-                                        fill="url(#grad-ltc)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- ZECUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">ZECUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $42.89
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -2.34%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-zec" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,21 L10,23 L20,26 L30,29 L40,32 L50,35 L60,38 L70,41 L80,44 L90,47 L100,49"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,21 L10,23 L20,26 L30,29 L40,32 L50,35 L60,38 L70,41 L80,44 L90,47 L100,49 L100,70 L0,70 Z"
-                                        fill="url(#grad-zec)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- DASHUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">DASHUSDT</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $31.56
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.89%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-dash" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,51 L10,49 L20,46 L30,43 L40,40 L50,37 L60,34 L70,31 L80,28 L90,25 L100,23"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,51 L10,49 L20,46 L30,43 L40,40 L50,37 L60,34 L70,31 L80,28 L90,25 L100,23 L100,70 L0,70 Z"
-                                        fill="url(#grad-dash)" />
-                                </svg>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -583,295 +151,47 @@
 
                     <!-- Forex Cards Grid (2 columns) -->
                     <div class="coin-cards-grid forex-grid">
-                        <!-- HKDUSD -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">HKDUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.1283
+                        @foreach ($coinsByCategory['forex'] as $coin)
+                            @php
+                                $priceData = $allPrices[$coin['symbol']] ?? [
+                                    'price' => '0.00',
+                                    'change' => '0.00',
+                                    'isPositive' => true,
+                                ];
+                            @endphp
+                            <div class="coin-card" data-symbol="{{ $coin['symbol'] }}">
+                                <div class="coin-card-header">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">
+                                            {{ $coin['symbol'] }}
+                                        </div>
+                                        <div class="coin-icon-small"
+                                            style="width: 20px; height: 20px; background: {{ $coin['color'] }}; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="{{ $coin['icon'] }}" style="font-size: 11px; color: white;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="fw-bold coin-price"
+                                        style="font-size: 16px; color: var(--text-primary); margin: 4px 0;"
+                                        data-symbol="{{ $coin['symbol'] }}">
+                                        ${{ $priceData['price'] }}
+                                    </div>
+                                    <small
+                                        class="price-change-mini {{ $priceData['isPositive'] ? 'positive' : 'negative' }}"
+                                        style="font-size: 11px;" data-symbol="{{ $coin['symbol'] }}">
+                                        @if ($priceData['isPositive'])
+                                            <i class="bi bi-arrow-up"></i>
+                                        @else
+                                            <i class="bi bi-arrow-down"></i>
+                                        @endif
+                                        {{ $priceData['change'] }}%
+                                    </small>
                                 </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.12%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-hkd" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,50 L10,48 L20,46 L30,43 L40,40 L50,38 L60,35 L70,32 L80,30 L90,27 L100,25"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,50 L10,48 L20,46 L30,43 L40,40 L50,38 L60,35 L70,32 L80,30 L90,27 L100,25 L100,70 L0,70 Z"
-                                        fill="url(#grad-hkd)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- INRUSD -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">INRUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.0120
+                                <div class="coin-mini-chart {{ $priceData['isPositive'] ? 'positive' : 'negative' }}">
+                                    <canvas class="coin-chart-small" id="chart-small-{{ strtolower($coin['symbol']) }}"
+                                        height="70"></canvas>
                                 </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -0.08%
-                                </small>
                             </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-inr" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,25 L10,27 L20,29 L30,32 L40,35 L50,37 L60,40 L70,42 L80,44 L90,46 L100,48"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,25 L10,27 L20,29 L30,32 L40,35 L50,37 L60,40 L70,42 L80,44 L90,46 L100,48 L100,70 L0,70 Z"
-                                        fill="url(#grad-inr)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- KRWUSD -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">KRWUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.0007
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.15%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-krw" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,52 L10,50 L20,47 L30,44 L40,41 L50,38 L60,35 L70,32 L80,29 L90,26 L100,24"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,52 L10,50 L20,47 L30,44 L40,41 L50,38 L60,35 L70,32 L80,29 L90,26 L100,24 L100,70 L0,70 Z"
-                                        fill="url(#grad-krw)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- SGDUSD -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">SGDUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.7456
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.21%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-sgd" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,48 L10,46 L20,44 L30,41 L40,38 L50,36 L60,33 L70,30 L80,28 L90,25 L100,23"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,48 L10,46 L20,44 L30,41 L40,38 L50,36 L60,33 L70,30 L80,28 L90,25 L100,23 L100,70 L0,70 Z"
-                                        fill="url(#grad-sgd)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- BRLUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">BRLUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.1987
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -0.34%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-brl" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,23 L10,25 L20,28 L30,31 L40,34 L50,36 L60,39 L70,41 L80,43 L90,45 L100,47"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,23 L10,25 L20,28 L30,31 L40,34 L50,36 L60,39 L70,41 L80,43 L90,45 L100,47 L100,70 L0,70 Z"
-                                        fill="url(#grad-brl)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- TRYUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">TRYUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.0312
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -0.56%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-try" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,26 L10,28 L20,30 L30,33 L40,36 L50,38 L60,40 L70,42 L80,44 L90,46 L100,48"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,26 L10,28 L20,30 L30,33 L40,36 L50,38 L60,40 L70,42 L80,44 L90,46 L100,48 L100,70 L0,70 Z"
-                                        fill="url(#grad-try)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- EURUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">EURUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $1.0856
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.18%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-eur" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,49 L10,47 L20,45 L30,42 L40,39 L50,36 L60,33 L70,30 L80,28 L90,25 L100,23"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,49 L10,47 L20,45 L30,42 L40,39 L50,36 L60,33 L70,30 L80,28 L90,25 L100,23 L100,70 L0,70 Z"
-                                        fill="url(#grad-eur)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- GBPUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">GBPUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $1.2734
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.25%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-gbp" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,51 L10,49 L20,46 L30,43 L40,40 L50,37 L60,34 L70,31 L80,28 L90,25 L100,23"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,51 L10,49 L20,46 L30,43 L40,40 L50,37 L60,34 L70,31 L80,28 L90,25 L100,23 L100,70 L0,70 Z"
-                                        fill="url(#grad-gbp)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- AUDUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">AUDUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.6734
-                                </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.32%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-aud" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,50 L10,48 L20,45 L30,42 L40,39 L50,36 L60,33 L70,30 L80,27 L90,24 L100,22"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,50 L10,48 L20,45 L30,42 L40,39 L50,36 L60,33 L70,30 L80,27 L90,24 L100,22 L100,70 L0,70 Z"
-                                        fill="url(#grad-aud)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- NZDUSDT -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">NZDUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $0.6123
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -0.19%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-nzd" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,24 L10,26 L20,29 L30,32 L40,35 L50,37 L60,40 L70,42 L80,44 L90,46 L100,48"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,24 L10,26 L20,29 L30,32 L40,35 L50,37 L60,40 L70,42 L80,44 L90,46 L100,48 L100,70 L0,70 Z"
-                                        fill="url(#grad-nzd)" />
-                                </svg>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -885,92 +205,47 @@
 
                     <!-- Precious Metals Cards Grid (2 columns) -->
                     <div class="coin-cards-grid forex-grid">
-                        <!-- XAGUSD - Silver -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">XAGUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $24.56
+                        @foreach ($coinsByCategory['precious'] as $coin)
+                            @php
+                                $priceData = $allPrices[$coin['symbol']] ?? [
+                                    'price' => '0.00',
+                                    'change' => '0.00',
+                                    'isPositive' => true,
+                                ];
+                            @endphp
+                            <div class="coin-card" data-symbol="{{ $coin['symbol'] }}">
+                                <div class="coin-card-header">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">
+                                            {{ $coin['symbol'] }}
+                                        </div>
+                                        <div class="coin-icon-small"
+                                            style="width: 20px; height: 20px; background: {{ $coin['color'] }}; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="{{ $coin['icon'] }}" style="font-size: 11px; color: white;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="fw-bold coin-price"
+                                        style="font-size: 16px; color: var(--text-primary); margin: 4px 0;"
+                                        data-symbol="{{ $coin['symbol'] }}">
+                                        ${{ $priceData['price'] }}
+                                    </div>
+                                    <small
+                                        class="price-change-mini {{ $priceData['isPositive'] ? 'positive' : 'negative' }}"
+                                        style="font-size: 11px;" data-symbol="{{ $coin['symbol'] }}">
+                                        @if ($priceData['isPositive'])
+                                            <i class="bi bi-arrow-up"></i>
+                                        @else
+                                            <i class="bi bi-arrow-down"></i>
+                                        @endif
+                                        {{ $priceData['change'] }}%
+                                    </small>
                                 </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +1.23%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-xag" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,48 L10,46 L20,44 L30,41 L40,38 L50,35 L60,32 L70,29 L80,26 L90,24 L100,22"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,48 L10,46 L20,44 L30,41 L40,38 L50,35 L60,32 L70,29 L80,26 L90,24 L100,22 L100,70 L0,70 Z"
-                                        fill="url(#grad-xag)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- XAUUSD - Gold -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">XAUUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $2,043.67
+                                <div class="coin-mini-chart {{ $priceData['isPositive'] ? 'positive' : 'negative' }}">
+                                    <canvas class="coin-chart-small" id="chart-small-{{ strtolower($coin['symbol']) }}"
+                                        height="70"></canvas>
                                 </div>
-                                <small class="price-change-mini positive" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-up"></i> +0.87%
-                                </small>
                             </div>
-                            <div class="coin-mini-chart positive">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-xau" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,50 L10,48 L20,46 L30,43 L40,40 L50,37 L60,34 L70,31 L80,28 L90,25 L100,23"
-                                        fill="none" stroke="#22c55e" stroke-width="2" />
-                                    <path
-                                        d="M0,50 L10,48 L20,46 L30,43 L40,40 L50,37 L60,34 L70,31 L80,28 L90,25 L100,23 L100,70 L0,70 Z"
-                                        fill="url(#grad-xau)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- XPTUSD - Platinum -->
-                        <div class="coin-card">
-                            <div class="coin-card-header">
-                                <div class="fw-bold" style="font-size: 12px; color: var(--text-primary);">XPTUSD</div>
-                                <div class="fw-bold" style="font-size: 16px; color: var(--text-primary); margin: 4px 0;">
-                                    $934.21
-                                </div>
-                                <small class="price-change-mini negative" style="font-size: 11px;">
-                                    <i class="bi bi-arrow-down"></i> -0.45%
-                                </small>
-                            </div>
-                            <div class="coin-mini-chart negative">
-                                <svg width="100%" height="70" viewBox="0 0 100 70" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="grad-xpt" x1="0%" y1="0%" x2="0%"
-                                            y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,23 L10,25 L20,28 L30,31 L40,34 L50,36 L60,39 L70,41 L80,43 L90,45 L100,47"
-                                        fill="none" stroke="#ef4444" stroke-width="2" />
-                                    <path
-                                        d="M0,23 L10,25 L20,28 L30,31 L40,34 L50,36 L60,39 L70,41 L80,43 L90,45 L100,47 L100,70 L0,70 Z"
-                                        fill="url(#grad-xpt)" />
-                                </svg>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -983,16 +258,19 @@
                 border-radius: 6px;
                 overflow: hidden;
                 background: rgba(0, 0, 0, 0.02);
+                position: relative;
             }
 
-            .mini-chart svg {
+            .mini-chart canvas {
                 display: block;
+                width: 100% !important;
             }
 
             .price-change {
                 display: inline-flex;
                 align-items: center;
                 gap: 2px;
+                transition: all 0.3s ease;
             }
 
             .price-change.positive {
@@ -1022,6 +300,7 @@
                 border-radius: 12px;
                 padding: 12px;
                 transition: all 0.2s ease;
+                cursor: pointer;
             }
 
             .coin-card:hover {
@@ -1041,15 +320,12 @@
                 margin-top: 8px;
             }
 
-            .coin-mini-chart svg {
-                display: block;
-            }
-
             .price-change-mini {
                 display: inline-flex;
                 align-items: center;
                 gap: 3px;
                 font-weight: 600;
+                transition: all 0.3s ease;
             }
 
             .price-change-mini.positive {
@@ -1063,6 +339,38 @@
             /* Market Section */
             .market-section {
                 margin-bottom: 20px;
+            }
+
+            /* Price update animation */
+            @keyframes priceUpdate {
+                0% {
+                    background: rgba(169, 126, 0, 0.2);
+                }
+
+                100% {
+                    background: transparent;
+                }
+            }
+
+            .price-updated {
+                animation: priceUpdate 0.5s ease;
+            }
+
+            /* Loading skeleton */
+            .skeleton {
+                background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                background-size: 200% 100%;
+                animation: loading 1.5s infinite;
+            }
+
+            @keyframes loading {
+                0% {
+                    background-position: 200% 0;
+                }
+
+                100% {
+                    background-position: -200% 0;
+                }
             }
 
             /* Responsive - 2 columns for smaller screens */
@@ -1088,9 +396,305 @@
     @endpush
 
     @push('scripts')
+        <!-- Chart.js CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
         <script>
-            // Tab Navigation with Smooth Scroll
+            // ============================================
+            // CRYPTOCURRENCY DASHBOARD - REAL-TIME CHARTS
+            // ============================================
+
+            // Store chart instances globally
+            const chartInstances = {};
+
+            // Configuration
+            const CONFIG = {
+                updateInterval: 10000, // Update every 10 seconds
+                chartPoints: 20, // Number of data points in chart
+                priceRoute: '{{ route('member.dashboard.prices') }}',
+                csrfToken: '{{ csrf_token() }}'
+            };
+
+            // ============================================
+            // INITIALIZATION
+            // ============================================
+
             document.addEventListener('DOMContentLoaded', function() {
+                console.log('🚀 Initializing Crypto Dashboard...');
+
+                initializeAllCharts();
+                startPriceUpdates();
+                initializeTabNavigation();
+
+                console.log('✅ Dashboard initialized successfully!');
+            });
+
+            // ============================================
+            // CHART FUNCTIONS
+            // ============================================
+
+            /**
+             * Initialize all charts on page load
+             */
+            function initializeAllCharts() {
+                const canvases = document.querySelectorAll('canvas.coin-chart, canvas.coin-chart-small');
+
+                console.log(`📊 Initializing ${canvases.length} charts...`);
+
+                canvases.forEach(canvas => {
+                    const symbol = canvas.closest('[data-symbol]')?.getAttribute('data-symbol');
+                    if (symbol) {
+                        initializeChart(canvas, symbol);
+                    }
+                });
+            }
+
+            /**
+             * Initialize a single chart
+             */
+            function initializeChart(canvas, symbol) {
+                const ctx = canvas.getContext('2d');
+                const container = canvas.closest('.mini-chart, .coin-mini-chart');
+                const isPositive = container?.classList.contains('positive') ?? true;
+
+                // Generate initial data
+                const data = generateChartData(isPositive);
+
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.values,
+                            borderColor: isPositive ? '#22c55e' : '#ef4444',
+                            backgroundColor: isPositive ?
+                                'rgba(34, 197, 94, 0.1)' :
+                                'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 750,
+                            easing: 'easeInOutQuart'
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: false
+                            },
+                            y: {
+                                display: false
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+
+                // Store chart instance with canvas ID
+                chartInstances[canvas.id] = {
+                    chart: chart,
+                    symbol: symbol,
+                    canvas: canvas
+                };
+            }
+
+            /**
+             * Generate chart data
+             */
+            function generateChartData(isPositive = true) {
+                const points = CONFIG.chartPoints;
+                const labels = [];
+                const values = [];
+                let baseValue = 100;
+
+                for (let i = 0; i < points; i++) {
+                    labels.push('');
+
+                    // Generate trend with some randomness
+                    const change = (Math.random() - 0.5) * 5;
+                    const trend = isPositive ? 0.5 : -0.5;
+                    baseValue += change + trend;
+
+                    values.push(Math.max(baseValue, 0));
+                }
+
+                return {
+                    labels,
+                    values
+                };
+            }
+
+            /**
+             * Update chart with new data
+             */
+            function updateChart(chartId, isPositive) {
+                const chartData = chartInstances[chartId];
+                if (!chartData) return;
+
+                const chart = chartData.chart;
+                const newData = generateChartData(isPositive);
+
+                // Update colors
+                chart.data.datasets[0].borderColor = isPositive ? '#22c55e' : '#ef4444';
+                chart.data.datasets[0].backgroundColor = isPositive ?
+                    'rgba(34, 197, 94, 0.1)' :
+                    'rgba(239, 68, 68, 0.1)';
+
+                // Update data
+                chart.data.labels = newData.labels;
+                chart.data.datasets[0].data = newData.values;
+
+                // Update without animation for smooth transitions
+                chart.update('none');
+            }
+
+            // ============================================
+            // PRICE UPDATE FUNCTIONS
+            // ============================================
+
+            /**
+             * Start real-time price updates
+             */
+            function startPriceUpdates() {
+                // Get all unique symbols
+                const symbols = getUniqueSymbols();
+
+                console.log(`💰 Starting price updates for ${symbols.length} symbols...`);
+
+                // Update prices immediately
+                updatePrices(symbols);
+
+                // Then update every X seconds
+                setInterval(() => {
+                    updatePrices(symbols);
+                }, CONFIG.updateInterval);
+            }
+
+            /**
+             * Get unique symbols from the page
+             */
+            function getUniqueSymbols() {
+                const symbols = Array.from(document.querySelectorAll('[data-symbol]'))
+                    .map(el => el.getAttribute('data-symbol'))
+                    .filter((value, index, self) => self.indexOf(value) === index);
+
+                return symbols;
+            }
+
+            /**
+             * Fetch and update prices
+             */
+            async function updatePrices(symbols) {
+                try {
+                    const response = await fetch(CONFIG.priceRoute, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CONFIG.csrfToken
+                        },
+                        body: JSON.stringify({
+                            symbols
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success && result.data) {
+                        Object.entries(result.data).forEach(([symbol, data]) => {
+                            updatePriceDisplay(symbol, data);
+                        });
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to update prices:', error);
+                }
+            }
+
+            /**
+             * Update price display for a symbol
+             */
+            function updatePriceDisplay(symbol, data) {
+                // Update all price elements for this symbol
+                const priceElements = document.querySelectorAll(`.coin-price[data-symbol="${symbol}"]`);
+                const changeElements = document.querySelectorAll(
+                    `.price-change[data-symbol="${symbol}"], .price-change-mini[data-symbol="${symbol}"]`
+                );
+
+                // Update prices
+                priceElements.forEach(el => {
+                    // Add animation
+                    el.classList.add('price-updated');
+                    setTimeout(() => el.classList.remove('price-updated'), 500);
+
+                    // Update text
+                    el.textContent = '$' + data.price;
+                });
+
+                // Update change percentages
+                changeElements.forEach(el => {
+                    const isPositive = data.isPositive;
+
+                    // Update classes
+                    el.classList.remove('positive', 'negative');
+                    el.classList.add(isPositive ? 'positive' : 'negative');
+
+                    // Update content
+                    const icon = isPositive ? 'bi-arrow-up' : 'bi-arrow-down';
+                    el.innerHTML = `<i class="bi ${icon}"></i> ${data.change}%`;
+                });
+
+                // Update all charts for this symbol
+                updateChartsForSymbol(symbol, data.isPositive);
+
+                // Update chart container classes
+                const miniCharts = document.querySelectorAll(
+                    `[data-symbol="${symbol}"] .mini-chart, [data-symbol="${symbol}"] .coin-mini-chart`
+                );
+                miniCharts.forEach(chart => {
+                    chart.classList.remove('positive', 'negative');
+                    chart.classList.add(data.isPositive ? 'positive' : 'negative');
+                });
+            }
+
+            /**
+             * Update all charts for a specific symbol
+             */
+            function updateChartsForSymbol(symbol, isPositive) {
+                Object.entries(chartInstances).forEach(([chartId, chartData]) => {
+                    if (chartData.symbol === symbol) {
+                        updateChart(chartId, isPositive);
+                    }
+                });
+            }
+
+            // ============================================
+            // TAB NAVIGATION
+            // ============================================
+
+            /**
+             * Initialize tab navigation with smooth scroll
+             */
+            function initializeTabNavigation() {
                 const tabButtons = document.querySelectorAll('.tab-btn');
 
                 tabButtons.forEach(button => {
@@ -1106,11 +710,6 @@
                         // Scroll to target section
                         const targetSection = document.getElementById(`section-${targetTab}`);
                         if (targetSection) {
-                            const yOffset = -80; // Offset untuk sticky header
-                            const y = targetSection.getBoundingClientRect().top + window.pageYOffset +
-                                yOffset;
-
-                            // Smooth scroll
                             targetSection.scrollIntoView({
                                 behavior: 'smooth',
                                 block: 'start'
@@ -1119,7 +718,14 @@
                     });
                 });
 
-                // Optional: Update active tab on scroll
+                // Update active tab on scroll
+                observeMarketSections(tabButtons);
+            }
+
+            /**
+             * Observe market sections for scroll-based tab updates
+             */
+            function observeMarketSections(tabButtons) {
                 const observerOptions = {
                     root: null,
                     rootMargin: '-100px 0px -60% 0px',
@@ -1145,29 +751,73 @@
                 document.querySelectorAll('.market-section').forEach(section => {
                     observer.observe(section);
                 });
-            });
+            }
 
+            // ============================================
+            // UTILITY FUNCTIONS
+            // ============================================
+
+            /**
+             * Show toast notification
+             */
             function showToast(message, type = 'success') {
-                const bgColor = type === 'success' ? '#28a745' : '#dc3545';
+                const bgColor = type === 'success' ? '#22c55e' : '#ef4444';
                 const toast = document.createElement('div');
                 toast.style.cssText = `
-                position: fixed; 
-                top: 20px; 
-                right: 20px; 
-                background: ${bgColor}; 
-                color: white; 
-                padding: 12px 20px; 
-                border-radius: 8px; 
-                z-index: 9999; 
-                font-size: 14px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            `;
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    background: ${bgColor}; 
+                    color: white; 
+                    padding: 12px 20px; 
+                    border-radius: 8px; 
+                    z-index: 9999; 
+                    font-size: 14px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                `;
                 toast.textContent = message;
                 document.body.appendChild(toast);
 
                 setTimeout(() => {
                     toast.remove();
-                }, 2000);
+                }, 3000);
+            }
+
+            /**
+             * Format number as currency
+             */
+            function formatCurrency(value, decimals = 2) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                }).format(value);
+            }
+
+            /**
+             * Format percentage
+             */
+            function formatPercentage(value, decimals = 2) {
+                const sign = value >= 0 ? '+' : '';
+                return sign + value.toFixed(decimals) + '%';
+            }
+
+            // ============================================
+            // DEBUG FUNCTIONS (untuk development)
+            // ============================================
+
+            // Expose functions to window for debugging
+            if (typeof window !== 'undefined') {
+                window.cryptoDashboard = {
+                    charts: chartInstances,
+                    config: CONFIG,
+                    updatePrices: updatePrices,
+                    getSymbols: getUniqueSymbols,
+                    showToast: showToast
+                };
+
+                console.log('💡 Debug: Access dashboard via window.cryptoDashboard');
             }
         </script>
     @endpush

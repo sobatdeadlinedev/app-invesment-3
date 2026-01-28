@@ -7,16 +7,16 @@
             <!-- Header with Back & History Buttons -->
             <div class="seamless-header-nav">
                 <a href="{{ route('member.profile.index') }}" class="btn-back">
-                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                    <i class="bi bi-arrow-left me-2"></i>{{ __('app.back') }}
                 </a>
                 <a href="{{ route('member.deposit.history') }}" class="btn-history">
-                    <i class="bi bi-clock-history me-1"></i>History
+                    <i class="bi bi-clock-history me-1"></i>{{ __('app.history') }}
                 </a>
             </div>
 
             <!-- Page Title -->
             <div class="seamless-page-title">
-                <h5 class="mb-0 fw-bold" style="color: var(--text-primary);">Deposit</h5>
+                <h5 class="mb-0 fw-bold" style="color: var(--text-primary);">{{ __('app.deposit') }}</h5>
             </div>
 
             <!-- Step Indicator -->
@@ -24,12 +24,12 @@
                 <div class="step-indicator">
                     <div class="step-item active" id="step-1-indicator">
                         <div class="step-circle">1</div>
-                        <div class="step-label">Amount</div>
+                        <div class="step-label">{{ __('app.amount') }}</div>
                     </div>
                     <div class="step-line"></div>
                     <div class="step-item" id="step-2-indicator">
                         <div class="step-circle">2</div>
-                        <div class="step-label">Payment</div>
+                        <div class="step-label">{{ __('app.payment') }}</div>
                     </div>
                 </div>
             </div>
@@ -41,7 +41,7 @@
                 <div class="seamless-balance-info">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-muted mb-1 small">Current Balance</p>
+                            <p class="text-muted mb-1 small">{{ __('app.current_balance') }}</p>
                             <h5 class="text-gold mb-0 fw-bold">{{ number_format($userBalance, 2) }} USDT</h5>
                         </div>
                         <div class="balance-icon-wrapper">
@@ -52,21 +52,24 @@
 
                 <!-- Amount Input Section -->
                 <div class="seamless-input-section">
-                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">Deposit Amount</h6>
+                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                        {{ __('app.deposit_amount') }}</h6>
                     <div class="mb-3">
-                        <label class="text-muted small mb-2 d-block">Enter Amount (USDT)</label>
+                        <label class="text-muted small mb-2 d-block">{{ __('app.enter_amount_usdt') }}</label>
                         <div class="input-with-icon">
                             <span class="input-icon">₮</span>
                             <input type="number" id="deposit-amount" class="form-control-dark with-icon"
-                                placeholder="Enter amount manually" value="" step="0.01" min="10">
+                                placeholder="{{ __('app.enter_amount_manually') }}" value="" step="0.01"
+                                min="10">
                         </div>
-                        <small class="text-muted d-block mt-1">Minimum deposit: 10 USDT</small>
+                        <small class="text-muted d-block mt-1">{{ __('app.minimum_deposit') }}: 10 USDT</small>
                     </div>
                 </div>
 
                 <!-- Wallet Type Selection -->
                 <div class="seamless-wallet-section">
-                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">Select Network</h6>
+                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                        {{ __('app.select_network') }}</h6>
                     <div class="wallet-type-selection">
                         <div class="wallet-type-option" onclick="selectWalletType('trc20')">
                             <input type="radio" name="wallet_type_display" id="wallet-trc20" value="trc20" checked>
@@ -76,7 +79,7 @@
                                     <span class="fw-bold">TRC20</span>
                                 </div>
                                 <div class="wallet-type-details">
-                                    <small class="text-muted">TRON Network</small>
+                                    <small class="text-muted">{{ __('app.tron_network') }}</small>
                                 </div>
                             </label>
                         </div>
@@ -89,7 +92,7 @@
                                     <span class="fw-bold">BEP20</span>
                                 </div>
                                 <div class="wallet-type-details">
-                                    <small class="text-muted">Binance Smart Chain</small>
+                                    <small class="text-muted">{{ __('app.binance_smart_chain') }}</small>
                                 </div>
                             </label>
                         </div>
@@ -99,7 +102,7 @@
                 <!-- Continue Button -->
                 <div class="seamless-action-section">
                     <button class="btn btn-gold w-100" type="button" onclick="goToStep2()">
-                        Continue <i class="bi bi-arrow-right ms-2"></i>
+                        {{ __('app.continue') }} <i class="bi bi-arrow-right ms-2"></i>
                     </button>
                 </div>
             </div>
@@ -115,25 +118,25 @@
                     <!-- Amount Summary -->
                     <div class="seamless-summary-section">
                         <div class="d-flex align-items-center justify-content-between">
-                            <p class="text-muted mb-0">Deposit Amount</p>
+                            <p class="text-muted mb-0">{{ __('app.deposit_amount') }}</p>
                             <h5 class="text-gold mb-0 fw-bold" id="summary-amount">100.00 USDT</h5>
                         </div>
                     </div>
 
                     <!-- Payment Details: E-Wallet -->
                     <div class="seamless-payment-section">
-                        <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">Transfer USDT to
-                            E-Wallet</h6>
+                        <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                            {{ __('app.transfer_usdt_to_ewallet') }}</h6>
 
                         <!-- Jaringan -->
                         <div class="payment-info-item">
                             <div class="payment-info-row">
-                                <span class="text-muted small payment-label">Jaringan</span>
+                                <span class="text-muted small payment-label">{{ __('app.network') }}</span>
                                 <div class="payment-value-with-copy">
                                     <span class="fw-bold payment-value-text" style="color: var(--text-primary);"
                                         id="display-network-name">{{ $walletTrc20['name'] }}</span>
                                     <button type="button" class="btn-copy-mini" onclick="copyNetworkName()"
-                                        title="Copy">
+                                        title="{{ __('app.copy') }}">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
@@ -143,13 +146,13 @@
                         <!-- Alamat Setoran -->
                         <div class="payment-info-item">
                             <div class="payment-info-row">
-                                <span class="text-muted small payment-label">Alamat Setoran</span>
+                                <span class="text-muted small payment-label">{{ __('app.deposit_address') }}</span>
                                 <div class="payment-value-with-copy">
                                     <span class="fw-bold payment-value-text wallet-address"
                                         style="color: var(--text-primary);"
                                         id="display-wallet-address">{{ $walletTrc20['address'] }}</span>
                                     <button type="button" class="btn-copy-mini" onclick="copyWalletAddress()"
-                                        title="Copy">
+                                        title="{{ __('app.copy') }}">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
@@ -158,22 +161,21 @@
 
                         <div class="alert-info-box mt-3">
                             <i class="bi bi-info-circle-fill me-2"></i>
-                            <span class="small">Transfer USDT sesuai nominal yang tertera menggunakan network yang dipilih
-                                (<span id="display-network-type">TRC20</span>). Lalu upload bukti transfer</span>
+                            <span class="small">{!! __('app.transfer_info', ['network' => '<span id="display-network-type">TRC20</span>']) !!}</span>
                         </div>
                     </div>
 
                     <!-- Upload Proof -->
                     <div class="seamless-upload-section">
-                        <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">Upload Proof of
-                            Transfer</h6>
+                        <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                            {{ __('app.upload_proof_of_transfer') }}</h6>
                         <div class="upload-area" onclick="document.getElementById('file-upload').click()">
                             <input type="file" name="payment_proof" id="file-upload" accept="image/*"
                                 style="display: none;" onchange="handleFileUpload(event)" required>
                             <div id="upload-placeholder">
                                 <i class="bi bi-cloud-upload upload-icon"></i>
-                                <p class="mb-1" style="color: var(--text-primary);">Click to upload</p>
-                                <small class="text-muted">PNG, JPG up to 5MB</small>
+                                <p class="mb-1" style="color: var(--text-primary);">{{ __('app.click_to_upload') }}</p>
+                                <small class="text-muted">{{ __('app.file_size_limit') }}</small>
                             </div>
                             <div id="upload-preview" style="display: none;">
                                 <img id="preview-image" src="" alt="Preview" class="preview-image">
@@ -190,12 +192,12 @@
                         <div class="row g-2">
                             <div class="col-6">
                                 <button type="button" class="btn btn-outline-gold w-100" onclick="goToStep1()">
-                                    <i class="bi bi-arrow-left me-2"></i>Back
+                                    <i class="bi bi-arrow-left me-2"></i>{{ __('app.back') }}
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button type="button" class="btn btn-gold w-100" onclick="submitDeposit()">
-                                    Submit
+                                    {{ __('app.submit') }}
                                 </button>
                             </div>
                         </div>
@@ -504,6 +506,17 @@
                 }
             };
 
+            // Translation strings
+            const translations = {
+                pleaseEnterValidAmount: "{{ __('app.please_enter_valid_amount') }}",
+                minimumDepositAlert: "{{ __('app.minimum_deposit_alert') }}",
+                pleaseUploadProof: "{{ __('app.please_upload_proof') }}",
+                fileSizeExceeded: "{{ __('app.file_size_exceeded') }}",
+                fileTypeNotAllowed: "{{ __('app.file_type_not_allowed') }}",
+                depositConfirmation: "{{ __('app.deposit_confirmation') }}",
+                copied: "{{ __('app.copied') }}"
+            };
+
             // Show alert messages
             @if (session('success'))
                 alert('{{ session('success') }}');
@@ -529,11 +542,11 @@
             function goToStep2() {
                 const amount = document.getElementById('deposit-amount').value;
                 if (!amount || amount <= 0) {
-                    alert('Please enter a valid amount');
+                    alert(translations.pleaseEnterValidAmount);
                     return;
                 }
                 if (amount < 10) {
-                    alert('Minimum deposit amount is 10 USDT');
+                    alert(translations.minimumDepositAlert);
                     return;
                 }
 
@@ -587,7 +600,7 @@
 
             function copyText(text) {
                 navigator.clipboard.writeText(text).then(() => {
-                    alert('Copied: ' + text);
+                    alert(translations.copied + ': ' + text);
                 });
             }
 
@@ -596,7 +609,7 @@
                 if (file) {
                     // Validate file size (5MB)
                     if (file.size > 5 * 1024 * 1024) {
-                        alert('File size must not exceed 5MB');
+                        alert(translations.fileSizeExceeded);
                         event.target.value = '';
                         return;
                     }
@@ -604,7 +617,7 @@
                     // Validate file type
                     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
                     if (!allowedTypes.includes(file.type)) {
-                        alert('Only JPG, JPEG, and PNG files are allowed');
+                        alert(translations.fileTypeNotAllowed);
                         event.target.value = '';
                         return;
                     }
@@ -626,12 +639,12 @@
                 const fileInput = document.getElementById('file-upload');
 
                 if (!fileInput.files || !fileInput.files[0]) {
-                    alert('Please upload proof of transfer');
+                    alert(translations.pleaseUploadProof);
                     return;
                 }
 
                 // Confirm before submit
-                if (confirm('Are you sure you want to submit this deposit request?')) {
+                if (confirm(translations.depositConfirmation)) {
                     document.getElementById('deposit-form').submit();
                 }
             }

@@ -68,6 +68,51 @@
             overflow: hidden;
         }
 
+        /* Language Dropdown */
+        .dropdown-menu-language {
+            background: var(--card-light) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+            min-width: 160px;
+            padding: 8px 0;
+        }
+
+        .dropdown-menu-language .dropdown-item {
+            color: var(--text-primary) !important;
+            padding: 10px 16px !important;
+            transition: all 0.2s ease !important;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-menu-language .dropdown-item:hover {
+            background: rgba(169, 126, 0, 0.1) !important;
+            color: var(--gold-color) !important;
+        }
+
+        .dropdown-menu-language .dropdown-item.active {
+            background: rgba(169, 126, 0, 0.15) !important;
+            color: var(--gold-color) !important;
+            font-weight: 600 !important;
+        }
+
+        .dropdown-menu-language .dropdown-item i {
+            font-size: 14px;
+            width: 20px;
+        }
+
+        /* Remove default Bootstrap dropdown arrow */
+        .btn-header-icon.dropdown-toggle::after {
+            display: none !important;
+        }
+
+        /* Dropdown positioning */
+        .dropdown-menu-language {
+            margin-top: 8px !important;
+        }
+
         /* Fixed Header */
         .fixed-header {
             position: sticky;

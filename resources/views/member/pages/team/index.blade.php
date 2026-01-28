@@ -21,20 +21,20 @@
             <!-- Invitation Code Section -->
             <div class="invitation-section">
                 <div class="invitation-item">
-                    <label class="invitation-label">My invitation code:</label>
+                    <label class="invitation-label">{{ __('app.my_invitation_code') }}:</label>
                     <div class="invitation-value-wrapper">
                         <span class="invitation-value" id="invitationCode">{{ $user->refferal_code }}</span>
-                        <button class="btn-copy-icon" onclick="copyInvitationCode()" title="Copy Code">
+                        <button class="btn-copy-icon" onclick="copyInvitationCode()" title="{{ __('app.copy_code') }}">
                             <i class="bi bi-clipboard" id="copyCodeIcon"></i>
                         </button>
                     </div>
                 </div>
 
                 <div class="invitation-item">
-                    <label class="invitation-label">My invitation code link:</label>
+                    <label class="invitation-label">{{ __('app.my_invitation_link') }}:</label>
                     <div class="invitation-value-wrapper">
                         <span class="invitation-value link" id="invitationLink">{{ $referralLink }}</span>
-                        <button class="btn-copy-icon" onclick="copyInvitationLink()" title="Copy Link">
+                        <button class="btn-copy-icon" onclick="copyInvitationLink()" title="{{ __('app.copy_link') }}">
                             <i class="bi bi-link-45deg" id="copyLinkIcon"></i>
                         </button>
                     </div>
@@ -44,22 +44,22 @@
             <!-- Click Save Button -->
             <div class="save-button-section">
                 <button class="btn-save" onclick="saveQRCode()">
-                    <i class="bi bi-download me-2"></i>Save QR
+                    <i class="bi bi-download me-2"></i>{{ __('app.save_qr') }}
                 </button>
             </div>
 
             <!-- Statistics Section -->
             <div class="statistics-section">
                 <div class="stat-item">
-                    <span class="stat-label">Recommended number of people:</span>
+                    <span class="stat-label">{{ __('app.recommended_number') }}:</span>
                     <span class="stat-value">{{ $directTeam }} / {{ $totalTeam }}</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Current level:</span>
+                    <span class="stat-label">{{ __('app.current_level') }}:</span>
                     <span class="stat-value">LV{{ $user->level ?? 0 }}</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Total Revenue:</span>
+                    <span class="stat-label">{{ __('app.total_revenue') }}:</span>
                     <span class="stat-value">{{ number_format($totalRevenue ?? 0, 2) }}</span>
                 </div>
             </div>
@@ -68,14 +68,14 @@
             <div class="rules-section">
                 <div class="rules-header">
                     <i class="bi bi-info-circle"></i>
-                    <span>Rules</span>
+                    <span>{{ __('app.rules') }}</span>
                 </div>
                 <div class="rules-content">
                     <ul>
-                        <li>Share your referral code or link with friends</li>
-                        <li>Earn commission when they join and trade</li>
-                        <li>Build your network and increase your level</li>
-                        <li>Higher levels get better commission rates</li>
+                        <li>{{ __('app.rule_share_code') }}</li>
+                        <li>{{ __('app.rule_earn_commission') }}</li>
+                        <li>{{ __('app.rule_build_network') }}</li>
+                        <li>{{ __('app.rule_higher_levels') }}</li>
                     </ul>
                 </div>
             </div>
@@ -321,6 +321,16 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
         <script>
+            // Translation strings from Laravel
+            const translations = {
+                invitationCodeCopied: "{{ __('app.invitation_code_copied') }}",
+                invitationLinkCopied: "{{ __('app.invitation_link_copied') }}",
+                qrCodeSaved: "{{ __('app.qr_code_saved') }}",
+                failedToCopyCode: "{{ __('app.failed_to_copy_code') }}",
+                failedToCopyLink: "{{ __('app.failed_to_copy_link') }}",
+                failedToSaveQr: "{{ __('app.failed_to_save_qr') }}"
+            };
+
             // Wait for DOM to be ready
             document.addEventListener('DOMContentLoaded', function() {
                 // Clear any existing QR code
@@ -366,14 +376,14 @@
                 navigator.clipboard.writeText(code).then(() => {
                     icon.classList.remove('bi-clipboard');
                     icon.classList.add('bi-check-lg');
-                    showToast('Invitation code copied!');
+                    showToast(translations.invitationCodeCopied);
 
                     setTimeout(() => {
                         icon.classList.remove('bi-check-lg');
                         icon.classList.add('bi-clipboard');
                     }, 2000);
                 }).catch(err => {
-                    showToast('Failed to copy code', 'error');
+                    showToast(translations.failedToCopyCode, 'error');
                     console.error('Error:', err);
                 });
             }
@@ -386,14 +396,14 @@
                 navigator.clipboard.writeText(link).then(() => {
                     icon.classList.remove('bi-link-45deg');
                     icon.classList.add('bi-check-lg');
-                    showToast('Invitation link copied!');
+                    showToast(translations.invitationLinkCopied);
 
                     setTimeout(() => {
                         icon.classList.remove('bi-check-lg');
                         icon.classList.add('bi-link-45deg');
                     }, 2000);
                 }).catch(err => {
-                    showToast('Failed to copy link', 'error');
+                    showToast(translations.failedToCopyLink, 'error');
                     console.error('Error:', err);
                 });
             }
@@ -406,9 +416,9 @@
                     link.download = 'referral-qrcode.png';
                     link.href = canvas.toDataURL();
                     link.click();
-                    showToast('QR Code saved successfully!');
+                    showToast(translations.qrCodeSaved);
                 } else {
-                    showToast('Failed to save QR Code', 'error');
+                    showToast(translations.failedToSaveQr, 'error');
                 }
             }
 

@@ -23,7 +23,7 @@
                             <i class="bi bi-arrow-left-right"></i>
                         </button>
                         <h6 class="text-gold mb-0 fw-bold" style="font-size: 20px;">{{ count($openSignals) }}</h6>
-                        <small class="text-muted" style="font-size: 11px;">Open Signals</small>
+                        <small class="text-muted" style="font-size: 11px;">{{ __('app.open_signals') }}</small>
                     </div>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div id="coinPopupOverlay" class="coin-popup-overlay" onclick="closeCoinPopup()" style="display: none;">
                 <div class="coin-popup-modal" onclick="event.stopPropagation()">
                     <div class="popup-header">
-                        <h6 class="mb-0 fw-bold">Select Coin</h6>
+                        <h6 class="mb-0 fw-bold">{{ __('app.select_coin') }}</h6>
                         <button class="btn-popup-close" onclick="closeCoinPopup()">
                             <i class="bi bi-x"></i>
                         </button>
@@ -53,10 +53,10 @@
                                     <div class="text-end">
                                         @if ($signalCounts[$symbol] > 0)
                                             <span class="badge">
-                                                {{ $signalCounts[$symbol] }} signals
+                                                {{ $signalCounts[$symbol] }} {{ __('app.signals') }}
                                             </span>
                                         @else
-                                            <small class="text-muted">No signals</small>
+                                            <small class="text-muted">{{ __('app.no_signals') }}</small>
                                         @endif
                                     </div>
                                 </div>
@@ -74,11 +74,10 @@
                             <i class="bi bi-exclamation-triangle"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="fw-bold mb-1" style="font-size: 13px; color: #dc3545;">Notice:</div>
+                            <div class="fw-bold mb-1" style="font-size: 13px; color: #dc3545;">{{ __('app.notice') }}</div>
                             <p class="mb-0" style="font-size: 12px; color: #dc3545; line-height: 1.6;">
-                                Minimum <strong>$ 100.00</strong> available Trade Balance required to join signals.
-                                Please <a href="{{ route('member.balance.transfer') }}" class="text-decoration-underline"
-                                    style="color: #dc3545; font-weight: 600;">transfer funds</a> first.
+                                {!! __('app.minimum_balance_required') !!}
+                                {!! __('app.please_transfer_funds', ['url' => route('member.balance.transfer')]) !!}
                             </p>
                         </div>
                     </div>
@@ -130,11 +129,11 @@
                 <div class="signal-tabs-modern">
                     <button class="tab-btn-modern active" data-tab="signals">
                         <i class="bi bi-broadcast"></i>
-                        <span>Trading Signals</span>
+                        <span>{{ __('app.trading_signals') }}</span>
                     </button>
                     <button class="tab-btn-modern" data-tab="history">
                         <i class="bi bi-clock-history"></i>
-                        <span>Historical Orders</span>
+                        <span>{{ __('app.historical_orders') }}</span>
                     </button>
                 </div>
             </div>
@@ -142,10 +141,10 @@
             {{-- TAB CONTENT: TRADING SIGNALS (DETAILED) --}}
             <div class="tab-content active" id="tab-signals">
                 <div class="seamless-tab-header">
-                    <h6 class="mb-0 fw-bold" style="color: var(--text-primary); font-size: 14px;">Available Trading
-                        Signals
+                    <h6 class="mb-0 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                        {{ __('app.available_trading_signals') }}
                     </h6>
-                    <span class="badge-signals-count">{{ count($openSignals) }} Signals</span>
+                    <span class="badge-signals-count">{{ count($openSignals) }} {{ __('app.signals') }}</span>
                 </div>
 
                 <div class="seamless-signals-list">
@@ -160,6 +159,12 @@
                                 $signal->bet_type == 'percentage'
                                     ? auth()->user()->canJoinSignal()
                                     : auth()->user()->getAvailableTradeBalance() >= $betAmountPreview;
+
+                            // Prepare bet type text for confirmation
+                            $betTypeText =
+                                $signal->bet_type == 'percentage'
+                                    ? number_format($signal->bet_value, 2) . __('app.of_balance')
+                                    : __('app.fixed') . ' ' . number_format($signal->bet_value, 2) . ' USDT';
                         @endphp
 
                         {{-- SIGNAL CARD DETAILED --}}
@@ -178,7 +183,7 @@
                                         @endif
                                     </div>
                                     <span class="badge-status-open">
-                                        <i class="bi bi-circle-fill" style="font-size: 6px;"></i> OPEN
+                                        <i class="bi bi-circle-fill" style="font-size: 6px;"></i> {{ __('app.open') }}
                                     </span>
                                 </div>
                             </div>
@@ -187,26 +192,28 @@
                             <div class="signal-config-section mb-3">
                                 <div class="row g-3">
                                     <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Signal Bet Type</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.signal_bet_type') }}</small>
                                         @if ($signal->bet_type == 'percentage')
                                             <span class="badge-bet-type badge-percentage">
-                                                {{ number_format($signal->bet_value, 2) }}% of Balance
+                                                {{ number_format($signal->bet_value, 2) }}{{ __('app.of_balance') }}
                                             </span>
                                         @else
                                             <span class="badge-bet-type badge-fixed">
-                                                {{ number_format($signal->bet_value, 2) }} USDT Fixed
+                                                {{ number_format($signal->bet_value, 2) }} USDT {{ __('app.fixed') }}
                                             </span>
                                         @endif
                                     </div>
                                     <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Signal Access</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.signal_access') }}</small>
                                         @if ($signal->is_public)
                                             <span class="badge-access badge-public">
-                                                <i class="bi bi-people"></i> Public
+                                                <i class="bi bi-people"></i> {{ __('app.public') }}
                                             </span>
                                         @else
                                             <span class="badge-access badge-private">
-                                                <i class="bi bi-lock"></i> Private
+                                                <i class="bi bi-lock"></i> {{ __('app.private') }}
                                             </span>
                                         @endif
                                     </div>
@@ -217,19 +224,22 @@
                             <div class="bet-preview-section mb-3">
                                 <div class="row g-3">
                                     <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Your Balance</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.your_balance') }}</small>
                                         <small class="fw-bold" style="color: var(--text-primary); font-size: 13px;">
                                             $ {{ number_format(auth()->user()->trade_balance, 2) }}
                                         </small>
                                     </div>
                                     <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Your Bet</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.your_bet') }}</small>
                                         <small class="text-gold fw-bold" style="font-size: 13px;">
                                             $ {{ number_format($betAmountPreview, 2) }}
                                         </small>
                                     </div>
                                     <div class="col-4">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Participants</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.participants') }}</small>
                                         <small class="fw-bold" style="color: var(--text-primary); font-size: 13px;">
                                             {{ $signal->participants_count }}
                                         </small>
@@ -241,15 +251,17 @@
                             @if ($signal->bet_type == 'percentage')
                                 <div class="calculation-box mb-3">
                                     <i class="bi bi-calculator me-2"></i>
-                                    <strong>Calculation:</strong> {{ number_format(auth()->user()->trade_balance, 2) }}
+                                    <strong>{{ __('app.calculation') }}</strong>
+                                    {{ number_format(auth()->user()->trade_balance, 2) }}
                                     × {{ number_format($signal->bet_value, 2) }}% =
                                     {{ number_format($betAmountPreview, 2) }} USDT
                                 </div>
                             @else
                                 <div class="calculation-box mb-3">
                                     <i class="bi bi-info-circle me-2"></i>
-                                    <strong>Fixed Bet:</strong> All participants bet exactly
-                                    {{ number_format($signal->bet_value, 2) }} USDT regardless of balance
+                                    <strong>{{ __('app.fixed_bet') }}</strong>
+                                    {{ __('app.all_participants_bet_exactly') }}
+                                    {{ number_format($signal->bet_value, 2) }} USDT {{ __('app.regardless_of_balance') }}
                                 </div>
                             @endif
 
@@ -257,7 +269,8 @@
                             <div class="price-info-section mb-3">
                                 <div class="row g-3">
                                     <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Opening Price</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.opening_price') }}</small>
                                         <small class="fw-bold" style="color: var(--text-primary); font-size: 13px;">
                                             @if ($isPending || !$signal->entry_price)
                                                 ~
@@ -267,8 +280,8 @@
                                         </small>
                                     </div>
                                     <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Settlement
-                                            Price</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.settlement_price') }}</small>
                                         <small class="text-gold fw-bold" style="font-size: 13px;">
                                             @if ($isPending || !$signal->target_price)
                                                 ~
@@ -284,7 +297,8 @@
                             <div class="timing-info-section mb-3">
                                 <div class="row g-3">
                                     <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Opened At</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.opened_at') }}</small>
                                         <small class="fw-bold" style="color: var(--text-primary); font-size: 12px;">
                                             @if ($signal->opened_at)
                                                 {{ $signal->opened_at->format('M d, Y H:i') }}
@@ -294,7 +308,8 @@
                                         </small>
                                     </div>
                                     <div class="col-6">
-                                        <small class="text-muted d-block" style="font-size: 11px;">Win Rate</small>
+                                        <small class="text-muted d-block"
+                                            style="font-size: 11px;">{{ __('app.win_rate') }}</small>
                                         <small class="fw-bold" style="color: var(--text-primary); font-size: 12px;">
                                             @if ($isPending || !$signal->rate_of_return)
                                                 ~
@@ -309,8 +324,7 @@
                             {{-- Good News Alert --}}
                             <div class="good-news-alert mb-3">
                                 <i class="bi bi-info-circle me-2"></i>
-                                <strong>Good news!</strong> You will always receive rewards based on the win rate. No
-                                losses, no fees! Your bet is just locked temporarily.
+                                <strong>{{ __('app.good_news') }}</strong> {{ __('app.no_losses_no_fees') }}
                             </div>
 
                             {{-- Action Section --}}
@@ -318,32 +332,29 @@
                                 @if ($hasJoined)
                                     <div class="alert-joined">
                                         <i class="bi bi-check-circle me-2"></i>
-                                        You have joined this signal. Wait for settlement to receive your rewards!
+                                        {{ __('app.you_have_joined') }}
                                     </div>
                                 @else
                                     @if ($hasSufficientBalance)
                                         <form action="{{ route('member.signals.join', $signal->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-join-signal w-100"
-                                                onclick="return confirm('Join this signal?\n\n' + 
-                                            'Bet Type: {{ $signal->bet_type == 'percentage' ? number_format($signal->bet_value, 2) . '% of your balance' : 'Fixed ' . number_format($signal->bet_value, 2) . ' USDT' }}\n' +
-                                            'Your bet: ${{ number_format($betAmountPreview, 2) }} will be locked until settlement.\n\n' +
-                                            'You will receive rewards based on the win rate.\n\n' +
-                                            'Do you want to continue?')">
-                                                <i class="bi bi-check-circle me-2"></i>JOIN THIS SIGNAL
+                                                onclick="return confirm('{{ __('app.join_signal_confirmation', ['bet_type' => $betTypeText, 'bet_amount' => number_format($betAmountPreview, 2)]) }}')">
+                                                <i class="bi bi-check-circle me-2"></i>{{ __('app.join_this_signal') }}
                                             </button>
                                         </form>
                                     @else
                                         <div class="alert-insufficient">
                                             <i class="bi bi-exclamation-triangle me-2"></i>
-                                            <strong>Insufficient Balance:</strong>
+                                            <strong>{{ __('app.insufficient_balance_message') }}</strong>
                                             @if ($signal->bet_type == 'percentage')
-                                                Minimum $100.00 available Trade Balance required.
+                                                {{ __('app.minimum_balance_required_short') }}
                                             @else
-                                                You need at least ${{ number_format($betAmountPreview, 2) }} available.
+                                                {{ __('app.you_need_at_least') }}
+                                                ${{ number_format($betAmountPreview, 2) }} {{ __('app.available_short') }}
                                             @endif
                                             <a href="{{ route('member.balance.transfer') }}"
-                                                class="text-white"><u>Transfer now</u></a>
+                                                class="text-white"><u>{{ __('app.transfer_now') }}</u></a>
                                         </div>
                                     @endif
                                 @endif
@@ -352,8 +363,8 @@
                     @empty
                         <div class="seamless-empty-state">
                             <i class="bi bi-broadcast-pin"></i>
-                            <p class="mb-1">No open signals for {{ $coinInfo['name'] }}</p>
-                            <small>Check back later for new trading signals</small>
+                            <p class="mb-1">{{ __('app.no_open_signals_for') }} {{ $coinInfo['name'] }}</p>
+                            <small>{{ __('app.check_back_later') }}</small>
                         </div>
                     @endforelse
                 </div>
@@ -363,9 +374,9 @@
             <div class="tab-content" id="tab-history">
                 <div class="seamless-tab-header">
                     <h6 class="mb-0 fw-bold" style="color: var(--text-primary); font-size: 14px;">
-                        Your Historical Orders - {{ $coinInfo['name'] }}
+                        {{ __('app.your_historical_orders') }} {{ $coinInfo['name'] }}
                     </h6>
-                    <span class="badge-signals-count">{{ $totalJoinedThisCoin }} Orders</span>
+                    <span class="badge-signals-count">{{ $totalJoinedThisCoin }} {{ __('app.orders') }}</span>
                 </div>
 
                 {{-- Statistics Cards --}}
@@ -374,13 +385,13 @@
                         <div class="row g-2">
                             <div class="col-3">
                                 <div class="stat-card">
-                                    <small class="text-muted">Total</small>
+                                    <small class="text-muted">{{ __('app.total') }}</small>
                                     <div class="fw-bold text-white">{{ $totalJoinedThisCoin }}</div>
                                 </div>
                             </div>
                             <div class="col-3">
                                 <div class="stat-card">
-                                    <small class="text-muted">Win Rate</small>
+                                    <small class="text-muted">{{ __('app.win_rate') }}</small>
                                     <div class="fw-bold text-{{ $winRateThisCoin >= 50 ? 'success' : 'danger' }}">
                                         {{ number_format($winRateThisCoin, 1) }}%
                                     </div>
@@ -388,7 +399,7 @@
                             </div>
                             <div class="col-3">
                                 <div class="stat-card">
-                                    <small class="text-muted">P/L</small>
+                                    <small class="text-muted">{{ __('app.profit_loss') }}</small>
                                     <div class="fw-bold text-{{ $totalProfitLossThisCoin >= 0 ? 'success' : 'danger' }}">
                                         {{ $totalProfitLossThisCoin >= 0 ? '+' : '' }}${{ number_format($totalProfitLossThisCoin, 0) }}
                                     </div>
@@ -396,7 +407,7 @@
                             </div>
                             <div class="col-3">
                                 <div class="stat-card">
-                                    <small class="text-muted">Fees</small>
+                                    <small class="text-muted">{{ __('app.fees') }}</small>
                                     <div class="fw-bold text-warning">
                                         ${{ number_format($totalFeesThisCoin, 0) }}
                                     </div>
@@ -427,20 +438,20 @@
                             $userOutcome = '';
 
                             if ($isPending) {
-                                $direction = 'PENDING';
+                                $direction = __('app.pending_status');
                                 $textColor = 'text-warning';
                             } else {
                                 $adminChoice = strtolower($signal->admin_choice ?? '');
                                 if ($adminChoice === 'call') {
-                                    $direction = 'CALL';
+                                    $direction = __('app.call');
                                     $directionIcon = '↑';
                                     $textColor = 'text-success';
                                 } elseif ($adminChoice === 'put') {
-                                    $direction = 'PUT';
+                                    $direction = __('app.put');
                                     $directionIcon = '↓';
                                     $textColor = 'text-danger';
                                 } else {
-                                    $direction = 'N/A';
+                                    $direction = __('app.na');
                                 }
 
                                 if ($isSettled) {
@@ -474,7 +485,7 @@
                             <div class="d-flex flex-column gap-2">
                                 {{-- Time Period --}}
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-muted" style="font-size: 12px;">time period</span>
+                                    <span class="text-muted" style="font-size: 12px;">{{ __('app.time_period') }}</span>
                                     <span class="text-white" style="font-size: 12px;">
                                         @if ($isPending)
                                             ~
@@ -488,7 +499,8 @@
                                 {{-- Fee Amount --}}
                                 @if (!$isPending && $isSettled && $feeAmount > 0)
                                     <div class="d-flex justify-content-between">
-                                        <span class="text-muted" style="font-size: 12px;">trading fee (1%)</span>
+                                        <span class="text-muted"
+                                            style="font-size: 12px;">{{ __('app.trading_fee') }}</span>
                                         <span class="text-warning" style="font-size: 12px;">
                                             -{{ number_format($feeAmount, 2) }}
                                         </span>
@@ -497,7 +509,8 @@
 
                                 {{-- Net Result --}}
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-muted" style="font-size: 12px;">net profit/loss</span>
+                                    <span class="text-muted"
+                                        style="font-size: 12px;">{{ __('app.net_profit_loss') }}</span>
                                     <span class="text-{{ $isFinalProfit ? 'success' : 'danger' }} fw-bold"
                                         style="font-size: 12px;">
                                         @if ($isPending)
@@ -510,7 +523,8 @@
 
                                 {{-- Rate of Return --}}
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-muted" style="font-size: 12px;">rate of return</span>
+                                    <span class="text-muted"
+                                        style="font-size: 12px;">{{ __('app.rate_of_return') }}</span>
                                     <span class="text-white" style="font-size: 12px;">
                                         @if ($isPending)
                                             ~
@@ -522,7 +536,8 @@
 
                                 {{-- Order Quantity --}}
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-muted" style="font-size: 12px;">order quantity</span>
+                                    <span class="text-muted"
+                                        style="font-size: 12px;">{{ __('app.order_quantity') }}</span>
                                     <span class="text-white" style="font-size: 12px;">
                                         {{ number_format($participant->bet_amount, 2) }}
                                     </span>
@@ -530,7 +545,8 @@
 
                                 {{-- Opening Price --}}
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-muted" style="font-size: 12px;">opening price</span>
+                                    <span class="text-muted"
+                                        style="font-size: 12px;">{{ __('app.opening_price') }}</span>
                                     <span class="text-white" style="font-size: 12px;">
                                         @if ($isPending)
                                             ~
@@ -542,7 +558,8 @@
 
                                 {{-- Settlement Price --}}
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-muted" style="font-size: 12px;">settlement price</span>
+                                    <span class="text-muted"
+                                        style="font-size: 12px;">{{ __('app.settlement_price') }}</span>
                                     <span class="text-white" style="font-size: 12px;">
                                         @if ($isPending)
                                             ~
@@ -554,7 +571,7 @@
 
                                 {{-- Order Time --}}
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-muted" style="font-size: 12px;">order time</span>
+                                    <span class="text-muted" style="font-size: 12px;">{{ __('app.order_time') }}</span>
                                     <span class="text-white" style="font-size: 12px;">
                                         {{ $participant->joined_at->format('Y-m-d H:i:s') }}
                                     </span>
@@ -564,8 +581,8 @@
                     @empty
                         <div class="seamless-empty-state">
                             <i class="bi bi-clock-history"></i>
-                            <p class="mb-1">No historical orders for {{ $coinInfo['name'] }}</p>
-                            <small>Join signals to start trading</small>
+                            <p class="mb-1">{{ __('app.no_historical_orders_for') }} {{ $coinInfo['name'] }}</p>
+                            <small>{{ __('app.join_signals_to_start') }}</small>
                         </div>
                     @endforelse
                 </div>
@@ -584,15 +601,16 @@
                     <i class="bi bi-info-circle-fill text-gold"
                         style="font-size: 20px; margin-top: 2px; flex-shrink: 0;"></i>
                     <div>
-                        <h6 class="mb-2 fw-bold" style="font-size: 13px; color: var(--text-primary);">How It Works</h6>
+                        <h6 class="mb-2 fw-bold" style="font-size: 13px; color: var(--text-primary);">
+                            {{ __('app.how_it_works') }}</h6>
                         <ul class="small text-muted mb-0 ps-3" style="font-size: 12px; line-height: 1.8;">
-                            <li>Bet amount varies by signal: percentage-based or fixed amount</li>
-                            <li>Percentage signals: bet = % of your Trade Balance</li>
-                            <li>Fixed signals: same bet amount for all users</li>
-                            <li>Minimum $ 100.00 available balance required (for percentage signals)</li>
-                            <li>Your bet will be locked until settlement</li>
-                            <li><strong style="color: #28a745;">You always win rewards!</strong> No losses, no fees</li>
-                            <li>CALL/PUT shows admin's prediction (not actual market movement)</li>
+                            <li>{{ __('app.bet_amount_varies') }}</li>
+                            <li>{{ __('app.percentage_signals') }}</li>
+                            <li>{{ __('app.fixed_signals') }}</li>
+                            <li>{{ __('app.minimum_balance_info') }}</li>
+                            <li>{{ __('app.bet_locked_info') }}</li>
+                            <li><strong style="color: #28a745;">{{ __('app.always_win_rewards') }}</strong></li>
+                            <li>{{ __('app.call_put_explanation') }}</li>
                         </ul>
                     </div>
                 </div>

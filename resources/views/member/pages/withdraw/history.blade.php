@@ -6,11 +6,11 @@
             <!-- Back Button -->
             <div class="mb-3">
                 <a href="{{ route('member.profile.index') }}" class="btn-back">
-                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                    <i class="bi bi-arrow-left me-2"></i>{{ __('app.back') }}
                 </a>
             </div>
 
-            <h5 class="text-white mb-3">Withdrawal History</h5>
+            <h5 class="text-white mb-3">{{ __('app.withdrawal_history') }}</h5>
 
             <!-- Summary Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
@@ -21,7 +21,7 @@
                                 <i class="bi bi-clock-history"></i>
                             </div>
                             <div>
-                                <p class="text-muted mb-0 small">Pending</p>
+                                <p class="text-muted mb-0 small">{{ __('app.pending') }}</p>
                                 <h6 class="text-white mb-0 fw-bold">{{ $pendingCount }}</h6>
                             </div>
                         </div>
@@ -32,7 +32,7 @@
                                 <i class="bi bi-check-circle"></i>
                             </div>
                             <div>
-                                <p class="text-muted mb-0 small">Completed</p>
+                                <p class="text-muted mb-0 small">{{ __('app.completed') }}</p>
                                 <h6 class="text-white mb-0 fw-bold">{{ $completedCount }}</h6>
                             </div>
                         </div>
@@ -43,19 +43,19 @@
             <!-- Filter Tabs -->
             <div class="filter-tabs mb-3">
                 <button class="filter-tab active" onclick="filterTransactions('all')">
-                    All
+                    {{ __('app.all') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('pending')">
-                    Pending
+                    {{ __('app.pending') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('approved')">
-                    Approved
+                    {{ __('app.approved') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('rejected')">
-                    Rejected
+                    {{ __('app.rejected') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('completed')">
-                    Completed
+                    {{ __('app.completed') }}
                 </button>
             </div>
 
@@ -81,7 +81,7 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-start mb-1">
                                     <div>
-                                        <h6 class="text-white mb-0 fw-bold">Withdrawal</h6>
+                                        <h6 class="text-white mb-0 fw-bold">{{ __('app.withdrawal') }}</h6>
                                         <p class="text-muted small mb-0">{{ $transaction->reference }}</p>
                                     </div>
                                     <div class="text-end">
@@ -89,7 +89,7 @@
                                             -{{ number_format($transaction->total_amount, 2) }}
                                             USDT</h6>
                                         <span class="status-badge {{ $transaction->status }}">
-                                            {{ ucfirst($transaction->status) }}
+                                            {{ ucfirst(__('app.' . $transaction->status)) }}
                                         </span>
                                     </div>
                                 </div>
@@ -97,46 +97,46 @@
                                 <!-- Transaction Details -->
                                 <div class="transaction-details mt-2">
                                     <div class="detail-row">
-                                        <span class="text-muted small">Wallet Account:</span>
+                                        <span class="text-muted small">{{ __('app.wallet_account') }}:</span>
                                         <span class="text-white small fw-bold">
-                                            {{ $transaction->wallet ? $transaction->wallet->account_name : 'N/A' }}
+                                            {{ $transaction->wallet ? $transaction->wallet->account_name : __('app.na') }}
                                         </span>
                                     </div>
                                     <div class="detail-row">
-                                        <span class="text-muted small">Account Number:</span>
+                                        <span class="text-muted small">{{ __('app.account_number') }}:</span>
                                         <span class="text-white small fw-bold">
-                                            {{ $transaction->wallet ? $transaction->wallet->account_number : 'N/A' }}
+                                            {{ $transaction->wallet ? $transaction->wallet->account_number : __('app.na') }}
                                         </span>
                                     </div>
                                     <div class="detail-row">
-                                        <span class="text-muted small">Withdrawal Amount:</span>
+                                        <span class="text-muted small">{{ __('app.withdrawal_amount') }}:</span>
                                         <span class="text-white small fw-bold">
                                             {{ number_format($transaction->total_amount, 2) }} USDT
                                         </span>
                                     </div>
                                     @if ($transaction->withdrawal_fee > 0)
                                         <div class="detail-row">
-                                            <span class="text-muted small">Fee (5%):</span>
+                                            <span class="text-muted small">{{ __('app.fee_5_percent') }}:</span>
                                             <span class="text-danger small fw-bold">
                                                 -{{ number_format($transaction->withdrawal_fee, 2) }} USDT
                                             </span>
                                         </div>
                                     @endif
                                     <div class="detail-row">
-                                        <span class="text-muted small">You Receive:</span>
+                                        <span class="text-muted small">{{ __('app.you_receive') }}:</span>
                                         <span class="text-success small fw-bold">
                                             {{ number_format($transaction->amount, 2) }} USDT
                                         </span>
                                     </div>
                                     <div class="detail-row">
-                                        <span class="text-muted small">Date:</span>
+                                        <span class="text-muted small">{{ __('app.date') }}:</span>
                                         <span class="text-white small">
                                             {{ $transaction->created_at->format('d M Y, H:i') }}
                                         </span>
                                     </div>
                                     @if ($transaction->status === 'completed' && $transaction->updated_at)
                                         <div class="detail-row">
-                                            <span class="text-muted small">Completed At:</span>
+                                            <span class="text-muted small">{{ __('app.completed_at') }}:</span>
                                             <span class="text-white small">
                                                 {{ $transaction->updated_at->format('d M Y, H:i') }}
                                             </span>
@@ -149,7 +149,7 @@
                                     <div class="mt-2">
                                         <button type="button" class="btn-cancel-withdrawal"
                                             onclick="cancelWithdrawal('{{ $transaction->reference }}')">
-                                            <i class="bi bi-x-circle me-1"></i>Cancel Withdrawal
+                                            <i class="bi bi-x-circle me-1"></i>{{ __('app.cancel_withdrawal') }}
                                         </button>
                                     </div>
                                 @endif
@@ -159,7 +159,7 @@
                 @empty
                     <div class="empty-state">
                         <i class="bi bi-inbox"></i>
-                        <p class="text-muted mb-0">No withdrawal history</p>
+                        <p class="text-muted mb-0">{{ __('app.no_withdrawal_history') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -451,6 +451,11 @@
     </style>
 
     <script>
+        // Translation strings from Laravel
+        const translations = {
+            confirmCancelWithdrawal: "{{ __('app.confirm_cancel_withdrawal') }}"
+        };
+
         // Filter transactions
         function filterTransactions(status) {
             // Update active tab
@@ -476,7 +481,7 @@
 
         // Cancel withdrawal
         function cancelWithdrawal(reference) {
-            if (confirm('Are you sure you want to cancel this withdrawal?')) {
+            if (confirm(translations.confirmCancelWithdrawal)) {
                 // Create form and submit
                 const form = document.createElement('form');
                 form.method = 'POST';

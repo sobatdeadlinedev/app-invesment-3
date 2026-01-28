@@ -25,7 +25,7 @@
                         <div class="balance-icon">
                             <i class="bi bi-wallet2"></i>
                         </div>
-                        <p class="balance-label">Exchange Balance</p>
+                        <p class="balance-label">{{ __('app.exchange_balance') }}</p>
                         <h5 class="balance-amount">{{ number_format($exchangeBalance, 2) }}</h5>
                         <small class="balance-sublabel">USDT</small>
                     </div>
@@ -35,7 +35,7 @@
                         <div class="balance-icon">
                             <i class="bi bi-graph-up"></i>
                         </div>
-                        <p class="balance-label">Trade Balance</p>
+                        <p class="balance-label">{{ __('app.trade_balance') }}</p>
                         <h5 class="balance-amount">{{ number_format($tradeBalance, 2) }}</h5>
                         <small class="balance-sublabel">USDT</small>
                     </div>
@@ -49,11 +49,11 @@
 
                     <!-- From Section -->
                     <div class="form-section">
-                        <label class="form-label">From</label>
+                        <label class="form-label">{{ __('app.from') }}</label>
                         <div class="select-wrapper">
                             <select class="form-select-dark" id="fromAccount" name="from_account">
-                                <option value="exchange">Exchange</option>
-                                <option value="trade">Trade</option>
+                                <option value="exchange">{{ __('app.exchange_balance') }}</option>
+                                <option value="trade">{{ __('app.trade_balance') }}</option>
                             </select>
                             <i class="bi bi-chevron-down select-arrow"></i>
                         </div>
@@ -61,10 +61,10 @@
 
                     <!-- Transfer To Section -->
                     <div class="form-section">
-                        <label class="form-label">Transfer to</label>
+                        <label class="form-label">{{ __('app.transfer_to') }}</label>
                         <div class="select-wrapper">
                             <select class="form-select-dark" id="toAccount" name="to_account" disabled>
-                                <option value="trade">Trade</option>
+                                <option value="trade">{{ __('app.trade_balance') }}</option>
                             </select>
                             <i class="bi bi-chevron-down select-arrow"></i>
                         </div>
@@ -73,8 +73,9 @@
                     <!-- Currency Section -->
                     <div class="form-section">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label mb-0">Please select a currency</label>
-                            <span class="available-balance">Available: <span id="availableAmount">0</span></span>
+                            <label class="form-label mb-0">{{ __('app.select_currency') }}</label>
+                            <span class="available-balance">{{ __('app.available') }}: <span
+                                    id="availableAmount">0</span></span>
                         </div>
                         <div class="currency-select-wrapper">
                             <div class="currency-option selected">
@@ -92,14 +93,14 @@
                     <!-- Amount Section -->
                     <div class="form-section">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label mb-0">Amount of transfers</label>
-                            <button type="button" class="btn-all" id="btnAll">All</button>
+                            <label class="form-label mb-0">{{ __('app.amount_of_transfers') }}</label>
+                            <button type="button" class="btn-all" id="btnAll">{{ __('app.all') }}</button>
                         </div>
                         <div class="input-wrapper">
                             <input type="number" class="form-input-dark" id="transferAmount" name="amount"
-                                placeholder="Please enter the transferred" min="10" step="0.01" required>
+                                placeholder="{{ __('app.enter_amount') }}" min="10" step="0.01" required>
                         </div>
-                        <small class="text-muted d-block mt-2">Minimum transfer: 10.00 USDT</small>
+                        <small class="text-muted d-block mt-2">{{ __('app.minimum_transfer') }}: 10.00 USDT</small>
                     </div>
 
                     <!-- Warning Section (if penalty applies) -->
@@ -107,8 +108,7 @@
                         <div class="d-flex align-items-start gap-2">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <div>
-                                <strong>Warning:</strong> Your trading volume is not completed yet.
-                                A <strong>20% penalty</strong> will be applied to this transfer.
+                                <strong>{{ __('app.warning') }}:</strong> {{ __('app.penalty_warning') }}
                             </div>
                         </div>
                     </div>
@@ -118,14 +118,14 @@
                         <div class="d-flex align-items-start gap-2">
                             <i class="bi bi-info-circle-fill text-gold"></i>
                             <div>
-                                <small>This transfer will increase your trading volume target by the same amount.</small>
+                                <small>{{ __('app.volume_info') }}</small>
                             </div>
                         </div>
                     </div>
 
                     <!-- Confirm Button -->
                     <button type="submit" class="btn-confirm">
-                        <i class="bi bi-check-circle me-2"></i>Confirm
+                        <i class="bi bi-check-circle me-2"></i>{{ __('app.confirm') }}
                     </button>
                 </form>
             </div>
@@ -134,19 +134,19 @@
             @if ($targetVolume > 0)
                 <div class="volume-progress-card">
                     <h6 class="section-title">
-                        <i class="bi bi-graph-up-arrow me-2"></i>Trading Volume Progress
+                        <i class="bi bi-graph-up-arrow me-2"></i>{{ __('app.trading_volume_progress') }}
                     </h6>
                     <div class="volume-stats">
                         <div class="stat-item">
-                            <span class="stat-label">Target Volume</span>
+                            <span class="stat-label">{{ __('app.target_volume') }}</span>
                             <span class="stat-value">{{ number_format($targetVolume, 2) }} USDT</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Achieved Volume</span>
+                            <span class="stat-label">{{ __('app.achieved_volume') }}</span>
                             <span class="stat-value text-gold">{{ number_format($achievedVolume, 2) }} USDT</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Remaining Volume</span>
+                            <span class="stat-label">{{ __('app.remaining_volume') }}</span>
                             <span class="stat-value text-warning">{{ number_format($remainingVolume, 2) }} USDT</span>
                         </div>
                     </div>
@@ -156,7 +156,8 @@
                                 aria-valuenow="{{ $volumePercentage }}" aria-valuemin="0" aria-valuemax="100">
                             </div>
                         </div>
-                        <small class="progress-text">{{ number_format($volumePercentage, 2) }}% Completed</small>
+                        <small class="progress-text">{{ number_format($volumePercentage, 2) }}%
+                            {{ __('app.completed') }}</small>
                     </div>
                 </div>
             @endif
@@ -539,6 +540,14 @@
             const availableTradeBalance = {{ $availableTradeBalance }};
             const needsPenalty = {{ $needsPenalty ? 'true' : 'false' }};
 
+            // Translation strings from Laravel
+            const translations = {
+                exchangeBalance: "{{ __('app.exchange_balance') }}",
+                tradeBalance: "{{ __('app.trade_balance') }}",
+                minimumTransferAlert: "{{ __('app.minimum_transfer_alert') }}",
+                insufficientBalance: "{{ __('app.insufficient_balance') }}"
+            };
+
             const fromAccount = document.getElementById('fromAccount');
             const toAccount = document.getElementById('toAccount');
             const transferAmount = document.getElementById('transferAmount');
@@ -555,14 +564,14 @@
 
                 if (from === 'exchange') {
                     available = exchangeBalance;
-                    toAccount.innerHTML = '<option value="trade">Trade</option>';
+                    toAccount.innerHTML = `<option value="trade">${translations.tradeBalance}</option>`;
                     toAccount.value = 'trade';
                     penaltyWarning.style.display = 'none';
                     volumeInfo.style.display = 'block';
                     transferForm.action = "{{ route('member.balance.transfer.to-trade') }}";
                 } else {
                     available = availableTradeBalance;
-                    toAccount.innerHTML = '<option value="exchange">Exchange</option>';
+                    toAccount.innerHTML = `<option value="exchange">${translations.exchangeBalance}</option>`;
                     toAccount.value = 'exchange';
                     volumeInfo.style.display = 'none';
                     if (needsPenalty) {
@@ -593,12 +602,12 @@
                 const to = toAccount.value;
 
                 if (amount < 10) {
-                    alert('Minimum transfer amount is 10.00 USDT');
+                    alert(translations.minimumTransferAlert);
                     return;
                 }
 
                 if (amount > parseFloat(availableAmount.textContent)) {
-                    alert('Insufficient balance');
+                    alert(translations.insufficientBalance);
                     return;
                 }
 
@@ -607,7 +616,7 @@
                 if (from === 'trade' && needsPenalty) {
                     const penalty = amount * 0.20;
                     const net = amount - penalty;
-                    message = `WARNING: 20% Penalty will be applied!\n\n` +
+                    message = `{{ __('app.warning') }}: 20% Penalty will be applied!\n\n` +
                         `Transfer Amount: ${amount.toFixed(2)} USDT\n` +
                         `Penalty (20%): ${penalty.toFixed(2)} USDT\n` +
                         `You will receive: ${net.toFixed(2)} USDT\n\n` +

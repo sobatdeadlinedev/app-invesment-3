@@ -6,11 +6,11 @@
             <!-- Back Button -->
             <div class="mb-3">
                 <a href="{{ route('member.profile.index') }}" class="btn-back">
-                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                    <i class="bi bi-arrow-left me-2"></i>{{ __('app.back') }}
                 </a>
             </div>
 
-            <h5 class="text-white mb-3">Deposit History</h5>
+            <h5 class="text-white mb-3">{{ __('app.deposit_history') }}</h5>
 
             <!-- Summary Card -->
             <div class="card-dark shadow-sm p-3 mb-3">
@@ -21,7 +21,7 @@
                                 <i class="bi bi-clock-history"></i>
                             </div>
                             <div>
-                                <p class="text-muted mb-0 small">Pending</p>
+                                <p class="text-muted mb-0 small">{{ __('app.pending') }}</p>
                                 <h6 class="text-white mb-0 fw-bold">{{ $pendingCount }}</h6>
                             </div>
                         </div>
@@ -32,7 +32,7 @@
                                 <i class="bi bi-check-circle"></i>
                             </div>
                             <div>
-                                <p class="text-muted mb-0 small">Completed</p>
+                                <p class="text-muted mb-0 small">{{ __('app.completed') }}</p>
                                 <h6 class="text-white mb-0 fw-bold">{{ $completedCount }}</h6>
                             </div>
                         </div>
@@ -43,19 +43,19 @@
             <!-- Filter Tabs -->
             <div class="filter-tabs mb-3">
                 <button class="filter-tab active" onclick="filterTransactions('all')">
-                    All
+                    {{ __('app.all') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('pending')">
-                    Pending
+                    {{ __('app.pending') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('approved')">
-                    Approved
+                    {{ __('app.approved') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('rejected')">
-                    Rejected
+                    {{ __('app.rejected') }}
                 </button>
                 <button class="filter-tab" onclick="filterTransactions('completed')">
-                    Completed
+                    {{ __('app.completed') }}
                 </button>
             </div>
 
@@ -81,14 +81,14 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-start mb-1">
                                     <div>
-                                        <h6 class="text-white mb-0 fw-bold">Deposit</h6>
+                                        <h6 class="text-white mb-0 fw-bold">{{ __('app.deposit') }}</h6>
                                         <p class="text-muted small mb-0">{{ $transaction->reference }}</p>
                                     </div>
                                     <div class="text-end">
                                         <h6 class="text-success mb-0 fw-bold">+{{ number_format($transaction->amount, 2) }}
                                             USDT</h6>
                                         <span class="status-badge {{ $transaction->status }}">
-                                            {{ ucfirst($transaction->status) }}
+                                            {{ __('app.' . $transaction->status) }}
                                         </span>
                                     </div>
                                 </div>
@@ -96,26 +96,26 @@
                                 <!-- Transaction Details -->
                                 <div class="transaction-details mt-2">
                                     <div class="detail-row">
-                                        <span class="text-muted small">Payment Method:</span>
+                                        <span class="text-muted small">{{ __('app.payment_method') }}:</span>
                                         <span class="text-white small fw-bold">
-                                            {{ ucfirst(str_replace('_', ' ', $transaction->payment_method)) }}
+                                            {{ __('app.' . str_replace(' ', '_', strtolower($transaction->payment_method))) }}
                                         </span>
                                     </div>
                                     <div class="detail-row">
-                                        <span class="text-muted small">Amount:</span>
+                                        <span class="text-muted small">{{ __('app.amount') }}:</span>
                                         <span class="text-success small fw-bold">
                                             {{ number_format($transaction->total_amount, 2) }} USDT
                                         </span>
                                     </div>
                                     <div class="detail-row">
-                                        <span class="text-muted small">Date:</span>
+                                        <span class="text-muted small">{{ __('app.date') }}:</span>
                                         <span class="text-white small">
                                             {{ $transaction->created_at->format('d M Y, H:i') }}
                                         </span>
                                     </div>
                                     @if (in_array($transaction->status, ['approved', 'completed']) && $transaction->updated_at)
                                         <div class="detail-row">
-                                            <span class="text-muted small">Processed At:</span>
+                                            <span class="text-muted small">{{ __('app.processed_at') }}:</span>
                                             <span class="text-white small">
                                                 {{ $transaction->updated_at->format('d M Y, H:i') }}
                                             </span>
@@ -123,10 +123,10 @@
                                     @endif
                                     @if ($transaction->payment_proof)
                                         <div class="detail-row">
-                                            <span class="text-muted small">Payment Proof:</span>
+                                            <span class="text-muted small">{{ __('app.payment_proof') }}:</span>
                                             <button type="button" class="btn-view-proof"
                                                 onclick="viewProof('{{ asset('storage/' . $transaction->payment_proof) }}')">
-                                                <i class="bi bi-eye me-1"></i>View
+                                                <i class="bi bi-eye me-1"></i>{{ __('app.view') }}
                                             </button>
                                         </div>
                                     @endif
@@ -137,7 +137,7 @@
                 @empty
                     <div class="empty-state">
                         <i class="bi bi-inbox"></i>
-                        <p class="text-muted mb-0">No deposit history</p>
+                        <p class="text-muted mb-0">{{ __('app.no_deposit_history') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -157,11 +157,12 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="background-color: var(--card-dark); border: 1px solid var(--border-color);">
                 <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
-                    <h5 class="modal-title text-white">Payment Proof</h5>
+                    <h5 class="modal-title text-white">{{ __('app.payment_proof') }}</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="proofImage" src="" alt="Payment Proof" style="max-width: 100%; border-radius: 8px;">
+                    <img id="proofImage" src="" alt="{{ __('app.payment_proof') }}"
+                        style="max-width: 100%; border-radius: 8px;">
                 </div>
             </div>
         </div>

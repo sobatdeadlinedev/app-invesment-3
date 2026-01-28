@@ -7,16 +7,16 @@
             <!-- Header with Back & History Buttons -->
             <div class="seamless-header-nav">
                 <a href="{{ route('member.profile.index') }}" class="btn-back">
-                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                    <i class="bi bi-arrow-left me-2"></i>{{ __('app.back') }}
                 </a>
                 <a href="{{ route('member.withdraw.history') }}" class="btn-history">
-                    <i class="bi bi-clock-history me-1"></i>History
+                    <i class="bi bi-clock-history me-1"></i>{{ __('app.history') }}
                 </a>
             </div>
 
             <!-- Page Title -->
             <div class="seamless-page-title">
-                <h5 class="mb-0 fw-bold" style="color: var(--text-primary);">Withdraw</h5>
+                <h5 class="mb-0 fw-bold" style="color: var(--text-primary);">{{ __('app.withdraw') }}</h5>
             </div>
 
             <!-- Currency Info -->
@@ -26,8 +26,8 @@
                         <span style="color: var(--gold-color); font-size: 20px; font-weight: bold;">₮</span>
                     </div>
                     <div>
-                        <p class="text-muted mb-0 small">Currency</p>
-                        <h6 class="mb-0 fw-bold" style="color: var(--text-primary);">USDT (Tether)</h6>
+                        <p class="text-muted mb-0 small">{{ __('app.currency') }}</p>
+                        <h6 class="mb-0 fw-bold" style="color: var(--text-primary);">{{ __('app.usdt_tether') }}</h6>
                     </div>
                 </div>
             </div>
@@ -40,10 +40,10 @@
                             <i class="bi bi-exclamation-triangle-fill"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 fw-bold" style="font-size: 14px; color: #ffc107;">Akun Belum Terverifikasi</h6>
+                            <h6 class="mb-1 fw-bold" style="font-size: 14px; color: #ffc107;">
+                                {{ __('app.account_not_verified') }}</h6>
                             <p class="small mb-0" style="font-size: 13px; color: var(--text-primary);">
-                                Akun Anda belum terverifikasi. Untuk melakukan verifikasi akun kunjungi profile dan klik
-                                verifikasi akun.
+                                {{ __('app.account_not_verified_message') }}
                             </p>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
                 <div class="seamless-balance-info">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-muted mb-1 small">Available Balance</p>
+                            <p class="text-muted mb-1 small">{{ __('app.available_balance') }}</p>
                             <h5 class="text-gold mb-0 fw-bold">{{ number_format($userBalance, 2) }} USDT</h5>
                         </div>
                         <div class="balance-icon-wrapper">
@@ -68,37 +68,39 @@
 
                 <!-- Withdrawal Amount Section -->
                 <div class="seamless-input-section">
-                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">Withdrawal Amount</h6>
+                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                        {{ __('app.withdrawal_amount') }}</h6>
                     <div class="mb-3">
-                        <label class="text-muted small mb-2 d-block">Amount (USDT)</label>
+                        <label class="text-muted small mb-2 d-block">{{ __('app.amount_usdt') }}</label>
                         <div class="input-with-icon">
                             <span class="input-icon">₮</span>
                             <input type="number" name="amount" id="withdraw-amount" class="form-control-dark with-icon"
-                                placeholder="Enter amount" value="{{ old('amount') }}" step="0.01" min="20"
-                                {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
+                                placeholder="{{ __('app.enter_amount') }}" value="{{ old('amount') }}" step="0.01"
+                                min="20" {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
                         </div>
-                        <small class="text-muted d-block mt-1">Minimum withdrawal: 20 USDT | Fee: 5 USDT (< 100 USDT) or 5%
-                                (≥ 100 USDT)</small>
-                                @error('amount')
-                                    <small class="text-danger mt-1 d-block">{{ $message }}</small>
-                                @enderror
+                        <small class="text-muted d-block mt-1">{{ __('app.minimum_withdrawal_info') }}</small>
+                        @error('amount')
+                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                        @enderror
                     </div>
                 </div>
 
                 <!-- Select Wallet Account Section -->
                 <div class="seamless-wallet-section">
-                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">Select Wallet Account</h6>
+                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                        {{ __('app.select_wallet_account') }}</h6>
                     <div>
-                        <label class="text-muted small mb-2 d-block">Choose your wallet account</label>
+                        <label class="text-muted small mb-2 d-block">{{ __('app.choose_wallet_account') }}</label>
                         <select name="wallet_id" id="wallet-account" class="form-control-dark-select"
                             {{ !auth()->user()->is_verified || $wallets->isEmpty() ? 'disabled' : 'required' }}>
-                            <option value="">-- Select Wallet Account --</option>
+                            <option value="">{{ __('app.select_wallet_placeholder') }}</option>
                             @forelse($wallets as $wallet)
-                                <option value="{{ $wallet->id }}" {{ old('wallet_id') == $wallet->id ? 'selected' : '' }}>
+                                <option value="{{ $wallet->id }}"
+                                    {{ old('wallet_id') == $wallet->id ? 'selected' : '' }}>
                                     {{ $wallet->account_number }} - {{ $wallet->type }}
                                 </option>
                             @empty
-                                <option value="" disabled>No wallet account available</option>
+                                <option value="" disabled>{{ __('app.no_wallet_available') }}</option>
                             @endforelse
                         </select>
                         @error('wallet_id')
@@ -108,9 +110,9 @@
                         @if ($wallets->isEmpty())
                             <div class="alert-info-box mt-2">
                                 <i class="bi bi-info-circle-fill me-2"></i>
-                                <span class="small">You need to add a wallet account first. <a
-                                        href="{{ route('member.profile.index') }}" class="text-gold"
-                                        style="text-decoration: underline;">Add Wallet</a></span>
+                                <span class="small">{{ __('app.need_add_wallet') }}
+                                    href="{{ route('member.profile.index') }}" class="text-gold"
+                                    style="text-decoration: underline;">{{ __('app.add_wallet') }}</a></span>
                             </div>
                         @endif
                     </div>
@@ -118,18 +120,19 @@
 
                 <!-- Fee Calculation -->
                 <div class="seamless-summary-section" id="fee-card" style="display: none;">
-                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">Withdrawal Summary</h6>
+                    <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
+                        {{ __('app.withdrawal_summary') }}</h6>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Withdrawal Amount</span>
+                        <span class="text-muted small">{{ __('app.withdrawal_amount') }}</span>
                         <span class="fw-bold" style="color: var(--text-primary);" id="display-amount">0.00 USDT</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Withdrawal Fee</span>
+                        <span class="text-muted small">{{ __('app.withdrawal_fee') }}</span>
                         <span class="fw-bold" style="color: var(--text-primary);" id="display-fee">0.00 USDT</span>
                     </div>
                     <hr style="border-color: var(--border-color);">
                     <div class="d-flex justify-content-between">
-                        <span class="fw-bold" style="color: var(--text-primary);">You will receive</span>
+                        <span class="fw-bold" style="color: var(--text-primary);">{{ __('app.you_will_receive') }}</span>
                         <span class="text-gold fw-bold" id="display-total">0.00 USDT</span>
                     </div>
                 </div>
@@ -140,10 +143,10 @@
                         <i class="bi bi-info-circle-fill text-gold"
                             style="font-size: 18px; margin-top: 2px; flex-shrink: 0;"></i>
                         <div>
-                            <h6 class="mb-1 fw-bold" style="font-size: 13px; color: var(--text-primary);">Withdrawal
-                                Information</h6>
+                            <h6 class="mb-1 fw-bold" style="font-size: 13px; color: var(--text-primary);">
+                                {{ __('app.withdrawal_information') }}</h6>
                             <p class="small text-muted mb-0" style="font-size: 12px;">
-                                Withdrawal akan diproses dalam 1-3 hari kerja. Pastikan data wallet Anda sudah benar.
+                                {{ __('app.withdrawal_process_info') }}
                             </p>
                         </div>
                     </div>
@@ -153,7 +156,7 @@
                 <div class="seamless-action-section">
                     <button type="button" class="btn btn-gold w-100" onclick="submitWithdraw()"
                         {{ !auth()->user()->is_verified || $wallets->isEmpty() ? 'disabled' : '' }}>
-                        Submit Withdrawal
+                        {{ __('app.submit_withdrawal') }}
                     </button>
                 </div>
             </form>
@@ -376,6 +379,18 @@
             const userBalance = {{ $userBalance }};
             const isVerified = {{ auth()->user()->is_verified ? 'true' : 'false' }};
 
+            // Translation strings from Laravel
+            const translations = {
+                accountNotVerifiedAlert: "{{ __('app.account_not_verified_alert') }}",
+                withdrawalNotProcessed: "{{ __('app.withdrawal_not_processed') }}",
+                enterValidAmount: "{{ __('app.enter_valid_amount') }}",
+                minimumWithdrawal20: "{{ __('app.minimum_withdrawal_20') }}",
+                insufficientBalance: "{{ __('app.insufficient_balance_withdraw') }}",
+                pleaseSelectWallet: "{{ __('app.please_select_wallet') }}",
+                amountTooSmall: "{{ __('app.amount_too_small') }}",
+                confirmWithdrawal: "{{ __('app.confirm_withdrawal') }}"
+            };
+
             // Show alert messages
             @if (session('success'))
                 alert('{{ session('success') }}');
@@ -391,7 +406,7 @@
 
             function setWithdrawAmount(amount) {
                 if (!isVerified) {
-                    alert('Akun Anda belum terverifikasi. Silakan hubungi admin untuk verifikasi akun.');
+                    alert(translations.accountNotVerifiedAlert);
                     return;
                 }
                 document.getElementById('withdraw-amount').value = amount;
@@ -428,7 +443,7 @@
 
             function submitWithdraw() {
                 if (!isVerified) {
-                    alert('Akun Anda belum terverifikasi. Withdrawal tidak dapat diproses. Silakan hubungi admin.');
+                    alert(translations.withdrawalNotProcessed);
                     return;
                 }
 
@@ -436,22 +451,22 @@
                 const walletSelect = document.getElementById('wallet-account');
 
                 if (!amount || amount <= 0) {
-                    alert('Please enter a valid amount');
+                    alert(translations.enterValidAmount);
                     return;
                 }
 
                 if (amount < 20) {
-                    alert('Minimum withdrawal amount is 20 USDT');
+                    alert(translations.minimumWithdrawal20);
                     return;
                 }
 
                 if (amount > userBalance) {
-                    alert('Insufficient balance. Your available balance is ' + userBalance.toFixed(2) + ' USDT');
+                    alert(translations.insufficientBalance.replace(':balance', userBalance.toFixed(2)));
                     return;
                 }
 
                 if (!walletSelect.value) {
-                    alert('Please select a wallet account');
+                    alert(translations.pleaseSelectWallet);
                     return;
                 }
 
@@ -466,13 +481,17 @@
                 const total = amount - fee;
 
                 if (total <= 0) {
-                    alert('Amount too small. After fee deduction, you will receive 0 USDT or less.');
+                    alert(translations.amountTooSmall);
                     return;
                 }
 
                 // Confirm before submit
-                if (confirm('Confirm withdrawal?\n\nAmount: ' + amount.toFixed(2) + ' USDT\nFee: ' + fee.toFixed(2) +
-                        ' USDT\nYou will receive: ' + total.toFixed(2) + ' USDT')) {
+                const confirmMessage = translations.confirmWithdrawal
+                    .replace(':amount', amount.toFixed(2))
+                    .replace(':fee', fee.toFixed(2))
+                    .replace(':total', total.toFixed(2));
+
+                if (confirm(confirmMessage)) {
                     document.getElementById('withdraw-form').submit();
                 }
             }

@@ -25,7 +25,7 @@
                     <!-- Total Assets -->
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <div>
-                            <p class="text-muted mb-1 small">Total Assets</p>
+                            <p class="text-muted mb-1 small">{{ __('app.total_assets') }}</p>
                             <h2 class="text-white mb-0 fw-bold" style="font-size: 36px;">
                                 {{ number_format($balanceBreakdown['total_balance'], 2) }}
                             </h2>
@@ -38,7 +38,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <small class="text-muted d-block mb-1" style="font-size: 10px;">
-                                    Today's PnL
+                                    {{ __('app.today_pnl') }}
                                 </small>
                                 <h6 class="mb-0 fw-bold text-muted" style="font-size: 16px;">
                                     {{ $todayPnl >= 0 ? '+' : '' }}{{ number_format($todayPnl, 2) }} USDT
@@ -62,7 +62,7 @@
                                 <div class="action-icon deposit">
                                     <i class="bi bi-arrow-down-circle"></i>
                                 </div>
-                                <span>Deposit</span>
+                                <span>{{ __('app.deposit') }}</span>
                             </a>
                         </div>
                         <div class="col-4">
@@ -70,7 +70,7 @@
                                 <div class="action-icon withdrawal">
                                     <i class="bi bi-arrow-up-circle"></i>
                                 </div>
-                                <span>Withdrawal</span>
+                                <span>{{ __('app.withdrawal') }}</span>
                             </a>
                         </div>
                         <div class="col-4">
@@ -78,7 +78,7 @@
                                 <div class="action-icon transfer">
                                     <i class="bi bi-arrow-left-right"></i>
                                 </div>
-                                <span>Transfer</span>
+                                <span>{{ __('app.transfer') }}</span>
                             </a>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
             <!-- Section 3: My Account -->
             <div class="seamless-section mb-4">
                 <div class="section-header">
-                    <h6 class="section-title">My Account</h6>
+                    <h6 class="section-title">{{ __('app.my_account') }}</h6>
                 </div>
                 <div class="section-content">
                     <!-- Exchange Balance -->
@@ -98,7 +98,7 @@
                                 <i class="bi bi-wallet2"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <p class="text-muted mb-1 small">Exchange</p>
+                                <p class="text-muted mb-1 small">{{ __('app.exchange') }}</p>
                                 <h5 class="text-white mb-0 fw-bold">
                                     {{ number_format($balanceBreakdown['exchange_balance'], 2) }}
                                 </h5>
@@ -116,14 +116,14 @@
                                 <i class="bi bi-graph-up"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <p class="text-muted mb-1 small">Trade</p>
+                                <p class="text-muted mb-1 small">{{ __('app.trade') }}</p>
                                 <h5 class="text-white mb-0 fw-bold">
                                     {{ number_format($balanceBreakdown['trade_balance'], 2) }}
                                 </h5>
                                 @if ($balanceBreakdown['locked_balance'] > 0)
                                     <small class="text-warning" style="font-size: 10px;">
                                         <i class="bi bi-lock-fill"></i>
-                                        {{ number_format($balanceBreakdown['locked_balance'], 2) }} locked
+                                        {{ number_format($balanceBreakdown['locked_balance'], 2) }} {{ __('app.locked') }}
                                     </small>
                                 @endif
                             </div>
@@ -138,7 +138,7 @@
             <!-- Section 4: Wallet List -->
             <div class="seamless-section mb-4">
                 <div class="section-header">
-                    <h6 class="section-title">Wallet List</h6>
+                    <h6 class="section-title">{{ __('app.wallet_list') }}</h6>
                     <span class="badge-count">{{ $wallets->count() }}/3</span>
                 </div>
 
@@ -149,8 +149,8 @@
                             <span>₮</span>
                         </div>
                         <div>
-                            <p class="text-muted mb-0 small" style="font-size: 11px;">Currency</p>
-                            <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">USDT (Tether)</h6>
+                            <p class="text-muted mb-0 small" style="font-size: 11px;">{{ __('app.currency') }}</p>
+                            <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">{{ __('app.usdt_tether') }}</h6>
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center gap-2 mb-1">
                                         <span class="wallet-type-badge {{ $wallet->type }}">
-                                            {{ strtoupper($wallet->type) }}
+                                            {{ strtoupper(__('app.' . $wallet->type)) }}
                                         </span>
                                     </div>
                                     <div class="text-white fw-bold mb-1" style="font-size: 13px;">
@@ -182,7 +182,7 @@
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <form action="{{ route('member.wallet.destroy', $wallet->id) }}" method="POST"
-                                    onsubmit="return confirm('Yakin ingin menghapus wallet ini?')"
+                                    onsubmit="return confirm('{{ __('app.delete_wallet_confirmation') }}')"
                                     style="display: inline;">
                                     @csrf
                                     @method('DELETE')
@@ -196,7 +196,7 @@
                 @empty
                     <div class="empty-state">
                         <i class="bi bi-wallet2"></i>
-                        <p class="text-muted mb-0">Belum ada wallet</p>
+                        <p class="text-muted mb-0">{{ __('app.no_wallet_yet') }}</p>
                     </div>
                 @endforelse
 
@@ -204,7 +204,7 @@
                 <div class="section-footer">
                     <button class="btn btn-outline-gold w-100" data-bs-toggle="modal" data-bs-target="#addWalletModal"
                         @if ($wallets->count() >= 3) disabled @endif>
-                        <i class="bi bi-plus-circle me-2"></i>Tambah Wallet
+                        <i class="bi bi-plus-circle me-2"></i>{{ __('app.add_wallet') }}
                     </button>
                 </div>
             </div>
@@ -218,7 +218,7 @@
             <div class="modal-content"
                 style="background-color: var(--card-light); border: 1px solid var(--border-color);">
                 <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
-                    <h5 class="modal-title text-white">Tambah Wallet</h5>
+                    <h5 class="modal-title text-white">{{ __('app.add_wallet') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form action="{{ route('member.wallet.store') }}" method="POST">
@@ -233,15 +233,17 @@
                                     <span style="color: var(--gold-color); font-size: 18px; font-weight: bold;">₮</span>
                                 </div>
                                 <div>
-                                    <p class="text-muted mb-0 small" style="font-size: 11px;">Currency</p>
-                                    <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">USDT (Tether)</h6>
+                                    <p class="text-muted mb-0 small" style="font-size: 11px;">{{ __('app.currency') }}
+                                    </p>
+                                    <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">
+                                        {{ __('app.usdt_tether') }}</h6>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Type Selection -->
                         <div class="mb-3">
-                            <label class="form-label text-white">Network Type</label>
+                            <label class="form-label text-white">{{ __('app.network_type') }}</label>
                             <div class="network-type-selector">
                                 <label class="network-type-option">
                                     <input type="radio" name="type" value="trc20" checked>
@@ -250,8 +252,8 @@
                                             <i class="bi bi-circle-fill"></i>
                                         </div>
                                         <div class="network-info">
-                                            <div class="network-name">TRC20</div>
-                                            <small class="network-desc">TRON Network</small>
+                                            <div class="network-name">{{ __('app.trc20') }}</div>
+                                            <small class="network-desc">{{ __('app.tron_network') }}</small>
                                         </div>
                                         <div class="network-check">
                                             <i class="bi bi-check-circle-fill"></i>
@@ -265,8 +267,8 @@
                                             <i class="bi bi-circle-fill"></i>
                                         </div>
                                         <div class="network-info">
-                                            <div class="network-name">BEP20</div>
-                                            <small class="network-desc">Binance Smart Chain</small>
+                                            <div class="network-name">{{ __('app.bep20') }}</div>
+                                            <small class="network-desc">{{ __('app.binance_smart_chain') }}</small>
                                         </div>
                                         <div class="network-check">
                                             <i class="bi bi-check-circle-fill"></i>
@@ -281,11 +283,12 @@
 
                         <!-- Wallet Address -->
                         <div class="mb-3">
-                            <label class="form-label text-white">Wallet Address</label>
+                            <label class="form-label text-white">{{ __('app.wallet_address') }}</label>
                             <input type="text" name="account_number" class="form-control-dark"
-                                placeholder="Masukkan wallet address" required value="{{ old('account_number') }}">
+                                placeholder="{{ __('app.enter_wallet_address') }}" required
+                                value="{{ old('account_number') }}">
                             <small class="text-muted d-block mt-1" style="font-size: 11px;">
-                                <i class="bi bi-info-circle me-1"></i>Pastikan address sesuai dengan network yang dipilih
+                                <i class="bi bi-info-circle me-1"></i>{{ __('app.ensure_address_match') }}
                             </small>
                             @error('account_number')
                                 <small class="text-danger">{{ $message }}</small>
@@ -293,8 +296,9 @@
                         </div>
                     </div>
                     <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
-                        <button type="button" class="btn btn-outline-gold" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-gold">Simpan</button>
+                        <button type="button" class="btn btn-outline-gold"
+                            data-bs-dismiss="modal">{{ __('app.cancel') }}</button>
+                        <button type="submit" class="btn btn-gold">{{ __('app.save') }}</button>
                     </div>
                 </form>
             </div>
@@ -307,7 +311,7 @@
             <div class="modal-content"
                 style="background-color: var(--card-light); border: 1px solid var(--border-color);">
                 <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
-                    <h5 class="modal-title text-white">Edit Wallet</h5>
+                    <h5 class="modal-title text-white">{{ __('app.edit_wallet') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="editWalletForm" method="POST">
@@ -323,15 +327,17 @@
                                     <span style="color: var(--gold-color); font-size: 18px; font-weight: bold;">₮</span>
                                 </div>
                                 <div>
-                                    <p class="text-muted mb-0 small" style="font-size: 11px;">Currency</p>
-                                    <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">USDT (Tether)</h6>
+                                    <p class="text-muted mb-0 small" style="font-size: 11px;">{{ __('app.currency') }}
+                                    </p>
+                                    <h6 class="text-white mb-0 fw-bold" style="font-size: 13px;">
+                                        {{ __('app.usdt_tether') }}</h6>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Type Selection -->
                         <div class="mb-3">
-                            <label class="form-label text-white">Network Type</label>
+                            <label class="form-label text-white">{{ __('app.network_type') }}</label>
                             <div class="network-type-selector">
                                 <label class="network-type-option">
                                     <input type="radio" name="type" value="trc20" id="edit_type_trc20">
@@ -340,8 +346,8 @@
                                             <i class="bi bi-circle-fill"></i>
                                         </div>
                                         <div class="network-info">
-                                            <div class="network-name">TRC20</div>
-                                            <small class="network-desc">TRON Network</small>
+                                            <div class="network-name">{{ __('app.trc20') }}</div>
+                                            <small class="network-desc">{{ __('app.tron_network') }}</small>
                                         </div>
                                         <div class="network-check">
                                             <i class="bi bi-check-circle-fill"></i>
@@ -355,8 +361,8 @@
                                             <i class="bi bi-circle-fill"></i>
                                         </div>
                                         <div class="network-info">
-                                            <div class="network-name">BEP20</div>
-                                            <small class="network-desc">Binance Smart Chain</small>
+                                            <div class="network-name">{{ __('app.bep20') }}</div>
+                                            <small class="network-desc">{{ __('app.binance_smart_chain') }}</small>
                                         </div>
                                         <div class="network-check">
                                             <i class="bi bi-check-circle-fill"></i>
@@ -371,11 +377,11 @@
 
                         <!-- Wallet Address -->
                         <div class="mb-3">
-                            <label class="form-label text-white">Wallet Address</label>
+                            <label class="form-label text-white">{{ __('app.wallet_address') }}</label>
                             <input type="text" name="account_number" id="edit_account_number"
-                                class="form-control-dark" placeholder="Masukkan wallet address" required>
+                                class="form-control-dark" placeholder="{{ __('app.enter_wallet_address') }}" required>
                             <small class="text-muted d-block mt-1" style="font-size: 11px;">
-                                <i class="bi bi-info-circle me-1"></i>Pastikan address sesuai dengan network yang dipilih
+                                <i class="bi bi-info-circle me-1"></i>{{ __('app.ensure_address_match') }}
                             </small>
                             @error('account_number')
                                 <small class="text-danger">{{ $message }}</small>
@@ -383,8 +389,9 @@
                         </div>
                     </div>
                     <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
-                        <button type="button" class="btn btn-outline-gold" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-gold">Update</button>
+                        <button type="button" class="btn btn-outline-gold"
+                            data-bs-dismiss="modal">{{ __('app.cancel') }}</button>
+                        <button type="submit" class="btn btn-gold">{{ __('app.update') }}</button>
                     </div>
                 </form>
             </div>

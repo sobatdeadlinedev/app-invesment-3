@@ -41,6 +41,14 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// routes/web.php
+Route::get('/language/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'id'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('language.switch');
+
 // Guest Routes
 Route::middleware('guest')->group(function () {
     // Login
@@ -144,7 +152,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->group(function () {
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [MemberDashboardController::class, 'index'])->name('index');
+        Route::post('/prices', [MemberDashboardController::class, 'getPrices'])->name('prices');
+        Route::post('/chart-data', [MemberDashboardController::class, 'getChartData'])->name('chart-data');
     });
+
 
     // Trading Signals (di invest)
     Route::prefix('invest')->name('invest.')->group(function () {
@@ -153,7 +164,7 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->g
 
     // Signal actions
     Route::post('/signals/{id}/join', [MemberSignalController::class, 'join'])->name('signals.join');
-    
+
     Route::prefix('team')->name('team.')->group(function () {
         Route::get('/', [MemberTeamController::class, 'index'])->name('index');
     });
