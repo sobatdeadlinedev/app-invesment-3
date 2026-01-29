@@ -29,73 +29,36 @@
                     id="verificationForm">
                     @csrf
 
-                    <!-- Card: Data Diri -->
-                    <div class="card-dark shadow-sm p-3 mb-3">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <div class="verification-icon-small">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <h6 class="text-white mb-0 fw-bold">{{ __('app.personal_data') }}</h6>
-                        </div>
-
-                        <!-- Nama Lengkap -->
-                        <div class="mb-3">
-                            <label class="text-muted small mb-2">{{ __('app.full_name') }}</label>
-                            <input type="text" name="full_name"
-                                class="form-control-dark @error('full_name') is-invalid @enderror"
-                                placeholder="{{ __('app.enter_full_name') }}" value="{{ old('full_name') }}" required>
-                            @error('full_name')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Nomor Identitas -->
-                        <div class="mb-3">
-                            <label class="text-muted small mb-2">{{ __('app.identity_number') }}</label>
-                            <input type="text" name="identity_number"
-                                class="form-control-dark @error('identity_number') is-invalid @enderror"
-                                placeholder="{{ __('app.enter_identity_number') }}" value="{{ old('identity_number') }}"
-                                required>
-                            @error('identity_number')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Jenis Identitas -->
-                        {{-- <div class="mb-0">
-                            <label class="text-muted small mb-2">{{ __('app.identity_type') }}</label>
-                            <select name="identity_type"
-                                class="form-control-dark @error('identity_type') is-invalid @enderror" required>
-                                <option value="">{{ __('app.select_identity_type') }}</option>
-                                <option value="KTP" {{ old('identity_type') == 'KTP' ? 'selected' : '' }}>
-                                    {{ __('app.ktp') }}</option>
-                                <option value="SIM" {{ old('identity_type') == 'SIM' ? 'selected' : '' }}>
-                                    {{ __('app.sim') }}</option>
-                                <option value="Paspor" {{ old('identity_type') == 'Paspor' ? 'selected' : '' }}>
-                                    {{ __('app.passport') }}</option>
-                            </select>
-                            @error('identity_type')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div> --}}
+                    <!-- Nama Lengkap -->
+                    <div class="mb-3">
+                        <input type="text" name="full_name"
+                            class="form-control-dark @error('full_name') is-invalid @enderror"
+                            placeholder="{{ __('app.enter_full_name') }}" value="{{ old('full_name') }}" required
+                            style="padding: 1rem; border-radius: 12px;">
+                        @error('full_name')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
-                    <!-- Card: Upload Foto Identitas -->
-                    <div class="card-dark shadow-sm p-3 mb-3">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <div class="verification-icon-small">
-                                <i class="bi bi-card-image"></i>
-                            </div>
-                            <h6 class="text-white mb-0 fw-bold">{{ __('app.identity_photo') }}</h6>
-                        </div>
+                    <!-- Nomor Identitas -->
+                    <div class="mb-3">
+                        <input type="text" name="identity_number"
+                            class="form-control-dark @error('identity_number') is-invalid @enderror"
+                            placeholder="{{ __('app.enter_identity_number') }}" value="{{ old('identity_number') }}"
+                            required style="padding: 1rem; border-radius: 12px;">
+                        @error('identity_number')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
 
-                        <div class="upload-area" onclick="document.getElementById('identity_photo').click()">
+                    <!-- Upload Foto Identitas -->
+                    <div class="mb-3">
+                        <div class="upload-area-simple" onclick="document.getElementById('identity_photo').click()">
                             <input type="file" id="identity_photo" name="identity_photo" accept="image/*" class="d-none"
                                 onchange="previewImage(this, 'identityPreview')" required>
-                            <div id="identityPreview" class="preview-container">
-                                <i class="bi bi-cloud-upload upload-icon"></i>
-                                <p class="text-white fw-bold mb-1">{{ __('app.upload_identity_photo') }}</p>
-                                <small class="text-muted">{{ __('app.photo_format_info') }}</small>
+                            <div id="identityPreview" class="preview-container-simple">
+                                <i class="bi bi-card-image" style="font-size: 24px; color: #6c757d;"></i>
+                                <span class="text-muted ms-2">{{ __('app.upload_identity_photo') }}</span>
                             </div>
                         </div>
                         @error('identity_photo')
@@ -103,22 +66,14 @@
                         @enderror
                     </div>
 
-                    <!-- Card: Upload Foto Selfie -->
-                    <div class="card-dark shadow-sm p-3 mb-3">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <div class="verification-icon-small">
-                                <i class="bi bi-camera-fill"></i>
-                            </div>
-                            <h6 class="text-white mb-0 fw-bold">{{ __('app.selfie_with_identity') }}</h6>
-                        </div>
-
-                        <div class="upload-area" onclick="document.getElementById('selfie_photo').click()">
+                    <!-- Upload Foto Selfie -->
+                    <div class="mb-4">
+                        <div class="upload-area-simple" onclick="document.getElementById('selfie_photo').click()">
                             <input type="file" id="selfie_photo" name="selfie_photo" accept="image/*" class="d-none"
                                 onchange="previewImage(this, 'selfiePreview')" required>
-                            <div id="selfiePreview" class="preview-container">
-                                <i class="bi bi-cloud-upload upload-icon"></i>
-                                <p class="text-white fw-bold mb-1">{{ __('app.upload_selfie_photo') }}</p>
-                                <small class="text-muted">{{ __('app.selfie_holding_identity') }}</small>
+                            <div id="selfiePreview" class="preview-container-simple">
+                                <i class="bi bi-camera-fill" style="font-size: 24px; color: #6c757d;"></i>
+                                <span class="text-muted ms-2">{{ __('app.upload_selfie_photo') }}</span>
                             </div>
                         </div>
                         @error('selfie_photo')
@@ -126,15 +81,9 @@
                         @enderror
                     </div>
 
-                    <!-- Info Box -->
-                    <div class="alert-info-box mb-3">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        <small>{{ __('app.verification_info') }}</small>
-                    </div>
-
                     <!-- Submit Button -->
-                    <button type="submit" class="btn btn-gold w-100 py-3">
-                        <i class="bi bi-check-circle-fill me-2"></i>{{ __('app.submit_verification') }}
+                    <button type="submit" class="btn btn-gold w-100 py-3" style="border-radius: 12px;">
+                        {{ __('app.submit_verification') }}
                     </button>
                 </form>
             @elseif($verification->submitted_at && !$user->is_verified)
@@ -163,10 +112,6 @@
                     <div class="verification-data-item">
                         <small class="text-muted">{{ __('app.identity_number') }}</small>
                         <p class="text-white mb-0">{{ $verification->identity_number }}</p>
-                    </div>
-                    <div class="verification-data-item">
-                        <small class="text-muted">{{ __('app.identity_type') }}</small>
-                        <p class="text-white mb-0">{{ $verification->identity_type }}</p>
                     </div>
                 </div>
             @elseif($user->is_verified)
@@ -198,14 +143,39 @@
                         <small class="text-muted">{{ __('app.identity_number') }}</small>
                         <p class="text-white mb-0">{{ $verification->identity_number }}</p>
                     </div>
-                    <div class="verification-data-item">
-                        <small class="text-muted">{{ __('app.identity_type') }}</small>
-                        <p class="text-white mb-0">{{ $verification->identity_type }}</p>
-                    </div>
                 </div>
             @endif
         </div>
     </div>
+
+    <style>
+        .upload-area-simple {
+            background: rgba(245, 166, 35, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area-simple:hover {
+            background: rgba(245, 166, 35, 0.1);
+            border-color: var(--gold-color);
+        }
+
+        .preview-container-simple {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .preview-container-simple img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
 
     <script>
         // Translation strings from Laravel
@@ -221,24 +191,13 @@
                 const reader = new FileReader();
 
                 reader.onload = function(e) {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="preview-image">`;
+                    preview.innerHTML =
+                        `<img src="${e.target.result}" alt="Preview" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">`;
                 }
 
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
-        // Enhanced dropdown behavior
-        document.querySelector('select[name="identity_type"]')?.addEventListener('change', function() {
-            // Visual feedback when identity type is selected
-            if (this.value) {
-                this.style.borderColor = 'var(--gold-color)';
-                this.style.backgroundColor = 'rgba(245, 166, 35, 0.1)';
-            } else {
-                this.style.borderColor = 'var(--border-color)';
-                this.style.backgroundColor = 'rgba(245, 166, 35, 0.05)';
-            }
-        });
 
         // Form validation before submit
         document.getElementById('verificationForm')?.addEventListener('submit', function(e) {
