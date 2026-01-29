@@ -131,7 +131,7 @@
             </div>
 
             <!-- Volume Progress Card (shown when trade balance exists) -->
-            @if ($targetVolume > 0)
+            {{-- @if ($targetVolume > 0)
                 <div class="volume-progress-card">
                     <h6 class="section-title">
                         <i class="bi bi-graph-up-arrow me-2"></i>{{ __('app.trading_volume_progress') }}
@@ -160,7 +160,7 @@
                             {{ __('app.completed') }}</small>
                     </div>
                 </div>
-            @endif
+            @endif --}}
 
         </div>
     </div>
