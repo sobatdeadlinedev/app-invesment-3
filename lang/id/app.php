@@ -269,7 +269,7 @@ return [
     // Personal Data Section
     'personal_data' => 'Data Diri',
     'full_name' => 'Nama Lengkap',
-    'enter_full_name' => 'Masukkan nama lengkap sesuai KTP',
+    'enter_full_name' => 'Masukkan nama lengkap',
     'identity_number' => 'Nomor Identitas',
     'enter_identity_number' => 'Masukkan nomor identitas',
     'identity_type' => 'Jenis Identitas',
@@ -389,7 +389,7 @@ return [
     // Actions
     'cancel_withdrawal' => 'Batalkan Penarikan',
 
-    // Empty State
+    // Empty Statem
     'no_withdrawal_history' => 'Tidak ada riwayat penarikan',
 
     // Confirmation Messages

@@ -34,7 +34,6 @@ class VerificationController extends Controller
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
             'identity_number' => 'required|string|max:50',
-            'identity_type' => 'required|in:KTP,SIM,Paspor',
             'identity_photo' => 'required|image|mimes:jpeg,jpg,png|max:2048',
             'selfie_photo' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         ], [
@@ -100,7 +99,6 @@ class VerificationController extends Controller
 
             $data = [
                 'full_name' => $verification->full_name,
-                'identity_type' => $verification->identity_type,
                 'identity_number' => $verification->identity_number,
                 'submitted_at' => $verification->submitted_at->format('d M Y H:i'),
             ];

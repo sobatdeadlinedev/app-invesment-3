@@ -62,7 +62,7 @@
                         </div>
 
                         <!-- Jenis Identitas -->
-                        <div class="mb-0">
+                        {{-- <div class="mb-0">
                             <label class="text-muted small mb-2">{{ __('app.identity_type') }}</label>
                             <select name="identity_type"
                                 class="form-control-dark @error('identity_type') is-invalid @enderror" required>
@@ -77,7 +77,7 @@
                             @error('identity_type')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
-                        </div>
+                        </div> --}}
                     </div>
 
                     <!-- Card: Upload Foto Identitas -->

@@ -269,7 +269,7 @@ return [
     // Personal Data Section
     'personal_data' => 'Personal Data',
     'full_name' => 'Full Name',
-    'enter_full_name' => 'Enter full name as on ID',
+    'enter_full_name' => 'Enter full name',
     'identity_number' => 'Identity Number',
     'enter_identity_number' => 'Enter identity number',
     'identity_type' => 'Identity Type',
