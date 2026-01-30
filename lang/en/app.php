@@ -204,6 +204,7 @@ return [
     'deposit' => 'Deposit',
     'withdrawal' => 'Withdrawal',
     'transfer' => 'Transfer',
+    'logout' => 'Logout',
 
     // Account Types
     'exchange' => 'Exchange',

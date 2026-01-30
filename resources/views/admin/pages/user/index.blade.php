@@ -60,6 +60,7 @@
                                 <th class="min-w-125px">User</th>
                                 <th class="min-w-125px">Username</th>
                                 <th class="min-w-125px">Phone</th>
+                                <th class="min-w-100px">Level</th>
                                 <th class="min-w-125px">Verified Data</th>
                                 <th class="min-w-125px">Joined Date</th>
                                 <th class="text-end min-w-100px">Actions</th>
@@ -76,6 +77,13 @@
                                     </td>
                                     <td>{{ $user->username }}</td>
                                     <td>{{ $user->phone }}</td>
+                                    <td>
+                                        @if ($user->level)
+                                            <span class="badge badge-light-primary">Level {{ $user->level }}</span>
+                                        @else
+                                            <span class="badge badge-light-secondary">-</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         @if ($user->is_verified)
                                             <span class="badge badge-light-success">Verified</span>
@@ -153,6 +161,19 @@
                                                         @enderror
                                                     </div>
 
+                                                    <div class="fv-row mb-7">
+                                                        <label class="fw-semibold fs-6 mb-2">Level</label>
+                                                        <input type="number" name="level"
+                                                            class="form-control form-control-solid @error('level') is-invalid @enderror"
+                                                            placeholder="Enter level (1-100)"
+                                                            value="{{ old('level', $user->level) }}" min="1"
+                                                            max="100" />
+                                                        @error('level')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div class="form-text">Enter a number between 1 and 100</div>
+                                                    </div>
+
                                                     <div class="text-center pt-10">
                                                         <button type="button" class="btn btn-light me-3"
                                                             data-bs-dismiss="modal">Cancel</button>
@@ -166,7 +187,7 @@
                                 <!--end::Modal - Edit User-->
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-10">
+                                    <td colspan="7" class="text-center py-10">
                                         <div class="text-gray-600">No users found</div>
                                     </td>
                                 </tr>

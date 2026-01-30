@@ -39,7 +39,6 @@ class VerificationController extends Controller
         ], [
             'full_name.required' => 'Nama lengkap wajib diisi',
             'identity_number.required' => 'Nomor identitas wajib diisi',
-            'identity_type.required' => 'Jenis identitas wajib dipilih',
             'identity_photo.required' => 'Foto identitas wajib diupload',
             'identity_photo.image' => 'File harus berupa gambar',
             'identity_photo.mimes' => 'Format gambar harus jpeg, jpg, atau png',
@@ -65,7 +64,6 @@ class VerificationController extends Controller
                 [
                     'full_name' => $validated['full_name'],
                     'identity_number' => $validated['identity_number'],
-                    'identity_type' => $validated['identity_type'],
                     'identity_photo_path' => $identityFullUrl,
                     'selfie_with_identity_path' => $selfieFullUrl,
                     'submitted_at' => now(),

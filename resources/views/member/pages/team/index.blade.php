@@ -16,6 +16,14 @@
                 <div class="qr-code-wrapper">
                     <div id="qrcode"></div>
                 </div>
+                <!-- Level Badge -->
+                <div class="level-badge-wrapper">
+                    @if ($user->level)
+                        <span class="badge-level">Level {{ $user->level }}</span>
+                    @else
+                        <span class="badge-level-empty">-</span>
+                    @endif
+                </div>
             </div>
 
             <!-- Invitation Code Section -->
@@ -53,10 +61,6 @@
                 <div class="stat-item">
                     <span class="stat-label">{{ __('app.recommended_number') }}:</span>
                     <span class="stat-value">{{ $directTeam }} / {{ $totalTeam }}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">{{ __('app.current_level') }}:</span>
-                    <span class="stat-value">LV{{ $user->level ?? 0 }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">{{ __('app.total_revenue') }}:</span>
@@ -313,6 +317,33 @@
             .qr-code-wrapper {
                 padding: 16px;
             }
+        }
+
+        /* Level Badge */
+        .level-badge-wrapper {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .badge-level {
+            display: inline-block;
+            background: linear-gradient(135deg, #f5a623 0%, #d4930f 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(245, 166, 35, 0.3);
+        }
+
+        .badge-level-empty {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
         }
     </style>
 
