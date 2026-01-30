@@ -208,7 +208,24 @@
                     </button>
                 </div>
             </div>
-
+            <!-- Section 5: Logout -->
+            <div class="seamless-section mb-4">
+                <div class="section-content">
+                    <a href="{{ route('logout') }}" class="wallet-item"
+                        style="display: block; text-decoration: none; margin-bottom: 0;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bank-icon-circle"
+                                style="background: rgba(169, 126, 0, 0.15); border-color: rgba(169, 126, 0, 0.3);">
+                                <i class="bi bi-box-arrow-right" style="color: #a97e00;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <span class="text-white fw-bold" style="font-size: 14px;">{{ __('app.logout') }}</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -461,7 +478,7 @@
             border: 1px solid rgba(169, 126, 0, 0.1);
         }
 
-        /* PnL Icon Wrapper - DIUBAH KE GOLD/COKLAT */
+        /* PnL Icon Wrapper */
         .pnl-icon-wrapper {
             width: 36px;
             height: 36px;
@@ -494,7 +511,7 @@
             color: #a97e00;
         }
 
-        /* Action Buttons - SEMUA DIUBAH KE GOLD/COKLAT */
+        /* Action Buttons */
         .btn-action-main {
             display: flex;
             flex-direction: column;
@@ -526,7 +543,7 @@
             font-size: 24px;
         }
 
-        /* Deposit - diubah ke gold */
+        /* Deposit */
         .action-icon.deposit {
             background: rgba(245, 166, 35, 0.15);
             border-color: rgba(245, 166, 35, 0.3);
@@ -536,7 +553,7 @@
             color: var(--gold-color);
         }
 
-        /* Withdrawal - tetap gold */
+        /* Withdrawal */
         .action-icon.withdrawal {
             background: rgba(245, 166, 35, 0.15);
             border-color: rgba(245, 166, 35, 0.3);
@@ -546,7 +563,7 @@
             color: var(--gold-color);
         }
 
-        /* Transfer - diubah ke gold */
+        /* Transfer */
         .action-icon.transfer {
             background: rgba(169, 126, 0, 0.15);
             border-color: rgba(169, 126, 0, 0.3);
@@ -562,7 +579,7 @@
             color: var(--text-primary);
         }
 
-        /* Account Item - DIUBAH KE GOLD/COKLAT */
+        /* Account Item */
         .account-item {
             padding: 14px;
             background: rgba(255, 255, 255, 0.3);
@@ -596,7 +613,7 @@
             font-size: 22px;
         }
 
-        /* Exchange - diubah ke gold */
+        /* Exchange */
         .account-icon.exchange {
             background: rgba(245, 166, 35, 0.15);
             border-color: rgba(245, 166, 35, 0.3);
@@ -606,7 +623,7 @@
             color: var(--gold-color);
         }
 
-        /* Trade - diubah ke gold/coklat */
+        /* Trade */
         .account-icon.trade {
             background: rgba(169, 126, 0, 0.15);
             border-color: rgba(169, 126, 0, 0.3);
@@ -671,7 +688,7 @@
             display: block;
         }
 
-        /* Wallet Type Badge - DIUBAH KE GOLD/COKLAT */
+        /* Wallet Type Badge */
         .wallet-type-badge {
             display: inline-block;
             padding: 2px 8px;
@@ -694,7 +711,7 @@
             border: 1px solid rgba(169, 126, 0, 0.3);
         }
 
-        /* Bank Icon with Color Type - DIUBAH KE GOLD/COKLAT */
+        /* Bank Icon with Color Type */
         .bank-icon-circle {
             width: 48px;
             height: 48px;
@@ -728,7 +745,7 @@
             color: #a97e00;
         }
 
-        /* Bank Action Buttons - DIUBAH KE GOLD/COKLAT */
+        /* Bank Action Buttons */
         .btn-bank-action {
             width: 36px;
             height: 36px;
@@ -775,7 +792,7 @@
             color: var(--gold-color);
         }
 
-        /* Network Type Selector - DIUBAH KE GOLD/COKLAT */
+        /* Network Type Selector */
         .network-type-selector {
             display: flex;
             flex-direction: column;
@@ -872,6 +889,43 @@
 
         .network-type-option input[type="radio"]:checked~.network-type-card .network-check {
             opacity: 1;
+        }
+
+        /* Logout Button */
+        .btn-logout {
+            display: block;
+            padding: 14px 16px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(169, 126, 0, 0.05);
+            transform: translateX(4px);
+        }
+
+        .logout-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(169, 126, 0, 0.15);
+            border: 1px solid rgba(169, 126, 0, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logout-icon i {
+            font-size: 22px;
+            color: #a97e00;
+        }
+
+        .logout-text {
+            color: var(--text-white);
+            font-weight: 600;
+            font-size: 14px;
         }
 
         /* Responsive */
