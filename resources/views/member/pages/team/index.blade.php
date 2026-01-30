@@ -51,12 +51,12 @@
             <!-- Statistics Section -->
             <div class="statistics-section">
                 <div class="stat-item">
-                    <span class="stat-label">{{ __('app.recommended_number') }}:</span>
-                    <span class="stat-value">{{ $directTeam }} / {{ $totalTeam }}</span>
+                    <span class="stat-label">{{ __('app.current_level') }}:</span>
+                    <span class="stat-value">{{ $user->level ? 'Level ' . $user->level : '-' }}</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">{{ __('app.current_level') }}:</span>
-                    <span class="stat-value">LV{{ $user->level ?? 0 }}</span>
+                    <span class="stat-label">{{ __('app.recommended_number') }}:</span>
+                    <span class="stat-value">{{ $directTeam }} / {{ $totalTeam }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">{{ __('app.total_revenue') }}:</span>
