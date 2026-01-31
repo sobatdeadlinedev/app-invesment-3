@@ -209,23 +209,26 @@
                 </div>
             </div>
             <!-- Section 5: Logout -->
-            <div class="seamless-section mb-4">
-                <div class="section-content">
-                    <a href="{{ route('logout') }}" class="wallet-item"
-                        style="display: block; text-decoration: none; margin-bottom: 0;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bank-icon-circle"
-                                style="background: rgba(169, 126, 0, 0.15); border-color: rgba(169, 126, 0, 0.3);">
-                                <i class="bi bi-box-arrow-right" style="color: #a97e00;"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <span class="text-white fw-bold" style="font-size: 14px;">{{ __('app.logout') }}</span>
-                            </div>
-                            <i class="bi bi-chevron-right text-muted"></i>
-                        </div>
-                    </a>
+           <div class="seamless-section mb-4">
+    <div class="section-content">
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+            class="wallet-item" style="display: block; text-decoration: none; margin-bottom: 0;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bank-icon-circle"
+                    style="background: rgba(169, 126, 0, 0.15); border-color: rgba(169, 126, 0, 0.3);">
+                    <i class="bi bi-box-arrow-right" style="color: #a97e00;"></i>
                 </div>
+                <div class="flex-grow-1">
+                    <span class="text-white fw-bold" style="font-size: 14px;">{{ __('app.logout') }}</span>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
             </div>
+        </a>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+    </div>
+</div>
         </div>
     </div>
 
