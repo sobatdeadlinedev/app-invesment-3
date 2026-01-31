@@ -137,7 +137,7 @@
                     </div>
                 </div>
 
-                <!-- Info Section -->
+                {{-- <!-- Info Section -->
                 <div class="seamless-info-section">
                     <div class="d-flex align-items-start gap-2">
                         <i class="bi bi-info-circle-fill text-gold"
@@ -150,7 +150,7 @@
                             </p>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Submit Button -->
                 <div class="seamless-action-section">

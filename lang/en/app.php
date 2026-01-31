@@ -345,9 +345,9 @@ return [
     'withdrawal_fee' => 'Withdrawal Fee',
     'you_will_receive' => 'You will receive',
 
-    // Withdrawal Information
-    'withdrawal_information' => 'Withdrawal Information',
-    'withdrawal_process_info' => 'Withdrawal will be processed within 1-3 business days. Make sure your wallet data is correct.',
+    // // Withdrawal Information
+    // 'withdrawal_information' => 'Withdrawal Information',
+    // 'withdrawal_process_info' => 'Withdrawal will be processed within 1-3 business days. Make sure your wallet data is correct.',
 
     // Actions
     'submit_withdrawal' => 'Submit Withdrawal',

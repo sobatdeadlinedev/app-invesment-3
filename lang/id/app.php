@@ -345,9 +345,9 @@ return [
     'withdrawal_fee' => 'Biaya Penarikan',
     'you_will_receive' => 'Anda akan menerima',
 
-    // Withdrawal Information
-    'withdrawal_information' => 'Informasi Penarikan',
-    'withdrawal_process_info' => 'Withdrawal akan diproses dalam 1-3 hari kerja. Pastikan data wallet Anda sudah benar.',
+    // // Withdrawal Information
+    // 'withdrawal_information' => 'Informasi Penarikan',
+    // 'withdrawal_process_info' => 'Withdrawal akan diproses dalam 1-3 hari kerja. Pastikan data wallet Anda sudah benar.',
 
     // Actions
     'submit_withdrawal' => 'Kirim Penarikan',
