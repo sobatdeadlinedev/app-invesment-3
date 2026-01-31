@@ -103,12 +103,13 @@
                         <small class="text-muted d-block mt-2">{{ __('app.minimum_transfer') }}: 10.00 USDT</small>
                     </div>
 
-                    <!-- Warning Section (if penalty applies) -->
+                     <!-- Warning Section (if penalty applies) -->
                     <div id="penaltyWarning" class="penalty-warning" style="display: none;">
                         <div class="d-flex align-items-start gap-2">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <div>
-                                <strong>{{ __('app.warning') }}:</strong> {{ __('app.penalty_warning') }}
+                                <strong>{{ __('app.warning') }}:</strong> 
+                                {{ __('app.penalty_warning') }}
                             </div>
                         </div>
                     </div>
@@ -539,13 +540,16 @@
             const tradeBalance = {{ $tradeBalance }};
             const availableTradeBalance = {{ $availableTradeBalance }};
             const needsPenalty = {{ $needsPenalty ? 'true' : 'false' }};
+            const remainingVolume = {{ $remainingVolume ?? 0 }};
+            const volumePercentage = {{ $volumePercentage ?? 0 }};
 
             // Translation strings from Laravel
             const translations = {
                 exchangeBalance: "{{ __('app.exchange_balance') }}",
                 tradeBalance: "{{ __('app.trade_balance') }}",
                 minimumTransferAlert: "{{ __('app.minimum_transfer_alert') }}",
-                insufficientBalance: "{{ __('app.insufficient_balance') }}"
+                insufficientBalance: "{{ __('app.insufficient_balance') }}",
+                warning: "{{ __('app.warning') }}"
             };
 
             const fromAccount = document.getElementById('fromAccount');
@@ -595,37 +599,40 @@
 
             // Form submission confirmation
             transferForm.addEventListener('submit', function(e) {
-                e.preventDefault();
+    e.preventDefault();
 
-                const amount = parseFloat(transferAmount.value);
-                const from = fromAccount.value;
-                const to = toAccount.value;
+    const amount = parseFloat(transferAmount.value);
+    const from = fromAccount.value;
+    const to = toAccount.value;
 
-                if (amount < 10) {
-                    alert(translations.minimumTransferAlert);
-                    return;
-                }
+    if (amount < 10) {
+        alert(translations.minimumTransferAlert);
+        return;
+    }
 
-                if (amount > parseFloat(availableAmount.textContent)) {
-                    alert(translations.insufficientBalance);
-                    return;
-                }
+    if (amount > parseFloat(availableAmount.textContent)) {
+        alert(translations.insufficientBalance);
+        return;
+    }
 
-                let message = `Transfer ${amount.toFixed(2)} USDT from ${from.toUpperCase()} to ${to.toUpperCase()}?`;
+    let message = `Transfer ${amount.toFixed(2)} USDT from ${from.toUpperCase()} to ${to.toUpperCase()}?`;
 
-                if (from === 'trade' && needsPenalty) {
-                    const penalty = amount * 0.20;
-                    const net = amount - penalty;
-                    message = `{{ __('app.warning') }}: 20% Penalty will be applied!\n\n` +
-                        `Transfer Amount: ${amount.toFixed(2)} USDT\n` +
-                        `Penalty (20%): ${penalty.toFixed(2)} USDT\n` +
-                        `You will receive: ${net.toFixed(2)} USDT\n\n` +
-                        `Do you want to continue?`;
-                }
+    if (from === 'trade' && needsPenalty) {
+        const penalty = amount * 0.20;
+        const net = amount - penalty;
+        const remainingPercent = (100 - volumePercentage).toFixed(2);
+        
+        message = `${translations.warning}: 20% Penalty will be applied!\n\n` +
+            `Remaining Trading Volume: ${remainingVolume.toFixed(2)} USDT (${remainingPercent}%)\n\n` +
+            `Transfer Amount: ${amount.toFixed(2)} USDT\n` +
+            `Penalty (20%): ${penalty.toFixed(2)} USDT\n` +
+            `You will receive: ${net.toFixed(2)} USDT\n\n` +
+            `Do you want to continue?`;
+    }
 
-                if (confirm(message)) {
-                    this.submit();
-                }
+    if (confirm(message)) {
+        this.submit();
+    }
             });
 
             // Initialize

@@ -32,8 +32,9 @@ return [
 
     // Warnings & Messages
     'warning' => 'Peringatan',
-    'penalty_warning' => 'Volume trading Anda belum selesai. Penalti 20% akan dikenakan pada transfer ini.',
-    'volume_info' => 'Transfer ini akan meningkatkan target volume trading Anda sebesar jumlah yang sama.',
+'penalty_warning' => 'Volume trading Anda belum selesai. Penalti 20% akan dikenakan pada transfer ini.',
+'penalty_warning_with_volume' => 'Volume trading Anda belum selesai. Kekurangan: :remaining USDT (:percentage%). Penalti 20% akan dikenakan pada transfer ini.',
+'volume_info' => 'Transfer ini akan meningkatkan target volume trading Anda sebesar jumlah yang sama.',
 
     // Volume Progress
     'trading_volume_progress' => 'Progress Volume Trading',

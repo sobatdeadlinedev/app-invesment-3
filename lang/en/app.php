@@ -31,9 +31,10 @@ return [
     'minimum_transfer' => 'Minimum transfer',
 
     // Warnings & Messages
-    'warning' => 'Warning',
-    'penalty_warning' => 'Your trading volume is not completed yet. A 20% penalty will be applied to this transfer.',
-    'volume_info' => 'This transfer will increase your trading volume target by the same amount.',
+   'warning' => 'Warning',
+'penalty_warning' => 'Your trading volume is not completed yet. A 20% penalty will be applied to this transfer.',
+'penalty_warning_with_volume' => 'Your trading volume is not completed yet. Remaining: :remaining USDT (:percentage%). A 20% penalty will be applied to this transfer.',
+'volume_info' => 'This transfer will increase your trading volume target by the same amount.',
 
     // Volume Progress
     'trading_volume_progress' => 'Trading Volume Progress',
