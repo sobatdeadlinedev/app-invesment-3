@@ -392,6 +392,14 @@ return [
 
     // Empty Statem
     'no_withdrawal_history' => 'Tidak ada riwayat penarikan',
+    
+    // Profile Dropdown
+    'profile' => 'Profil',
+    'verification' => 'Verifikasi',
+    'verified' => 'Sudah Terverifikasi',
+    'must_verify' => 'Harus Verifikasi',
+    'logout' => 'Keluar',
+    'phone_copied' => 'Nomor telepon tersalin!',
 
     // Confirmation Messages
     'confirm_cancel_withdrawal' => 'Yakin ingin membatalkan penarikan ini?',

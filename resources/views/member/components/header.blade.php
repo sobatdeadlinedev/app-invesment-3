@@ -26,10 +26,8 @@
         </div>
 
         <!-- Right: Profile/Notification Icon -->
-        <div class="header-right">
-            <a href="{{ route('member.verification.index') }}" class="btn-header-icon" title="{{ __('app.profile') }}">
-                <i class="bi bi-person-circle"></i>
-            </a>
-        </div>
+       <div class="header-right">
+    @include('member.components.profile-dropdown')
+</div>
     </div>
 </div>

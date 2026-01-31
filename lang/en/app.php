@@ -393,6 +393,14 @@ return [
     // Empty State
     'no_withdrawal_history' => 'No withdrawal history',
 
+     // Profile Dropdown
+    'profile' => 'Profile',
+    'verification' => 'Verification',
+    'verified' => 'Verified',
+    'must_verify' => 'Must Verify',
+    'logout' => 'Logout',
+    'phone_copied' => 'Phone number copied!',
+
     // Confirmation Messages
     'confirm_cancel_withdrawal' => 'Are you sure you want to cancel this withdrawal?',
 ];
