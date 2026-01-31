@@ -534,10 +534,6 @@
                             <span class="path1"></span>
                             <span class="path2"></span>
                         </i>
-                        <div class="alert-content">
-                            <h5>Referral Code Detected</h5>
-                            <span>You will be registered as a referral from <strong>{{ $referrer->username }}</strong></span>
-                        </div>
                     </div>
                 @endif
 
