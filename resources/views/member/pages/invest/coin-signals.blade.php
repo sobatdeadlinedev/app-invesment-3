@@ -188,7 +188,7 @@
                                 </div>
                             </div>
 
-                            {{-- Signal Configuration --}}
+                            {{-- Signal Configuration
                             <div class="signal-config-section mb-3">
                                 <div class="row g-3">
                                     <div class="col-6">
@@ -204,7 +204,7 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-4">
                                         <small class="text-muted d-block"
                                             style="font-size: 11px;">{{ __('app.signal_access') }}</small>
                                         @if ($signal->is_public)
@@ -218,7 +218,7 @@
                                         @endif
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             {{-- Bet Preview --}}
                             <div class="bet-preview-section mb-3">
@@ -237,18 +237,18 @@
                                             $ {{ number_format($betAmountPreview, 2) }}
                                         </small>
                                     </div>
-                                    <div class="col-4">
+                                    {{-- <div class="col-4">
                                         <small class="text-muted d-block"
                                             style="font-size: 11px;">{{ __('app.participants') }}</small>
                                         <small class="fw-bold" style="color: var(--text-primary); font-size: 13px;">
                                             {{ $signal->participants_count }}
                                         </small>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
 
                             {{-- Calculation Explanation --}}
-                            @if ($signal->bet_type == 'percentage')
+                            {{-- @if ($signal->bet_type == 'percentage')
                                 <div class="calculation-box mb-3">
                                     <i class="bi bi-calculator me-2"></i>
                                     <strong>{{ __('app.calculation') }}</strong>
@@ -263,9 +263,9 @@
                                     {{ __('app.all_participants_bet_exactly') }}
                                     {{ number_format($signal->bet_value, 2) }} USDT {{ __('app.regardless_of_balance') }}
                                 </div>
-                            @endif
+                            @endif --}}
 
-                            {{-- Price Information --}}
+                            {{-- Price Information
                             <div class="price-info-section mb-3">
                                 <div class="row g-3">
                                     <div class="col-6">
@@ -291,10 +291,10 @@
                                         </small>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             {{-- Signal Timing --}}
-                            <div class="timing-info-section mb-3">
+                            {{-- <div class="timing-info-section mb-3">
                                 <div class="row g-3">
                                     <div class="col-6">
                                         <small class="text-muted d-block"
@@ -319,13 +319,13 @@
                                         </small>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             {{-- Good News Alert --}}
-                            <div class="good-news-alert mb-3">
+                            {{-- <div class="good-news-alert mb-3">
                                 <i class="bi bi-info-circle me-2"></i>
                                 <strong>{{ __('app.good_news') }}</strong> {{ __('app.no_losses_no_fees') }}
-                            </div>
+                            </div> --}}
 
                             {{-- Action Section --}}
                             <div class="signal-action-section">
@@ -339,7 +339,7 @@
                                         <form action="{{ route('member.signals.join', $signal->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-join-signal w-100"
-                                                onclick="return confirm('{{ __('app.join_signal_confirmation', ['bet_type' => $betTypeText, 'bet_amount' => number_format($betAmountPreview, 2)]) }}')">
+                                                onclick="return confirm('{{ __('app.join_signal_confirmation', ['bet_amount' => number_format($betAmountPreview, 2)]) }}')">
                                                 <i class="bi bi-check-circle me-2"></i>{{ __('app.join_this_signal') }}
                                             </button>
                                         </form>
@@ -595,7 +595,7 @@
                 @endif
             </div>
 
-            {{-- INFO SECTION - Seamless --}}
+            {{-- INFO SECTION - Seamless
             <div class="seamless-info-section">
                 <div class="d-flex align-items-start gap-3">
                     <i class="bi bi-info-circle-fill text-gold"
@@ -614,7 +614,7 @@
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
         </div>
     </div>

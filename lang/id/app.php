@@ -113,20 +113,20 @@ return [
     'open' => 'TERBUKA',
 
     // Signal Configuration
-    'signal_bet_type' => 'Tipe Taruhan Sinyal',
+    // 'signal_bet_type' => 'Tipe Taruhan Sinyal',
     'of_balance' => '% dari Saldo',
     'fixed' => 'Tetap',
-    'signal_access' => 'Akses Sinyal',
+    // 'signal_access' => 'Akses Sinyal',
     'public' => 'Publik',
     'private' => 'Privat',
 
     // Bet Preview
     'your_balance' => 'Saldo Anda',
     'your_bet' => 'Taruhan Anda',
-    'participants' => 'Peserta',
+    // 'participants' => 'Peserta',
 
     // Calculation
-    'calculation' => 'Perhitungan:',
+    // 'calculation' => 'Perhitungan:',
     'fixed_bet' => 'Taruhan Tetap:',
     'all_participants_bet_exactly' => 'Semua peserta bertaruh tepat',
     'regardless_of_balance' => 'tanpa memperhitungkan saldo',
@@ -140,8 +140,8 @@ return [
     'win_rate' => 'Tingkat Kemenangan',
 
     // Good News
-    'good_news' => 'Kabar baik!',
-    'no_losses_no_fees' => 'Anda akan selalu menerima hadiah berdasarkan tingkat kemenangan. Tanpa kerugian, tanpa biaya! Taruhan Anda hanya dikunci sementara.',
+    // 'good_news' => 'Kabar baik!',
+    // 'no_losses_no_fees' => 'Anda akan selalu menerima hadiah berdasarkan tingkat kemenangan. Tanpa kerugian, tanpa biaya! Taruhan Anda hanya dikunci sementara.',
 
     // Actions
     'join_this_signal' => 'GABUNG SINYAL INI',
@@ -153,8 +153,7 @@ return [
     'transfer_now' => 'Transfer sekarang',
 
     // Join Confirmation
-    'join_signal_confirmation' => 'Gabung sinyal ini?\n\nTipe Taruhan: :bet_type\nTaruhan Anda: $:bet_amount akan dikunci hingga penyelesaian.\n\nAnda akan menerima hadiah berdasarkan tingkat kemenangan.\n\nApakah Anda ingin melanjutkan?',
-
+    'join_signal_confirmation' => 'Gabung sinyal ini?\n\nTaruhan Anda: $:bet_amount akan dikunci hingga penyelesaian.\n\nAnda akan menerima hadiah berdasarkan tingkat kemenangan.\n\nApakah Anda ingin melanjutkan?',
     // Empty States
     'no_open_signals_for' => 'Tidak ada sinyal terbuka untuk',
     'check_back_later' => 'Periksa kembali nanti untuk sinyal trading baru',
@@ -184,15 +183,15 @@ return [
     'no_historical_orders_for' => 'Tidak ada riwayat order untuk',
     'join_signals_to_start' => 'Gabung sinyal untuk mulai trading',
 
-    // Info Section
-    'how_it_works' => 'Cara Kerja',
-    'bet_amount_varies' => 'Jumlah taruhan bervariasi per sinyal: berbasis persentase atau jumlah tetap',
-    'percentage_signals' => 'Sinyal persentase: taruhan = % dari Saldo Trading Anda',
-    'fixed_signals' => 'Sinyal tetap: jumlah taruhan sama untuk semua pengguna',
-    'minimum_balance_info' => 'Minimum $ 100.00 saldo tersedia diperlukan (untuk sinyal persentase)',
-    'bet_locked_info' => 'Taruhan Anda akan dikunci hingga penyelesaian',
-    'always_win_rewards' => 'Anda selalu menang hadiah! Tanpa kerugian, tanpa biaya',
-    'call_put_explanation' => 'CALL/PUT menunjukkan prediksi admin (bukan pergerakan pasar sebenarnya)',
+    // // Info Section
+    // 'how_it_works' => 'Cara Kerja',
+    // 'bet_amount_varies' => 'Jumlah taruhan bervariasi per sinyal: berbasis persentase atau jumlah tetap',
+    // 'percentage_signals' => 'Sinyal persentase: taruhan = % dari Saldo Trading Anda',
+    // 'fixed_signals' => 'Sinyal tetap: jumlah taruhan sama untuk semua pengguna',
+    // 'minimum_balance_info' => 'Minimum $ 100.00 saldo tersedia diperlukan (untuk sinyal persentase)',
+    // 'bet_locked_info' => 'Taruhan Anda akan dikunci hingga penyelesaian',
+    // 'always_win_rewards' => 'Anda selalu menang hadiah! Tanpa kerugian, tanpa biaya',
+    // 'call_put_explanation' => 'CALL/PUT menunjukkan prediksi admin (bukan pergerakan pasar sebenarnya)',
 
     // ===== MY ASSETS PAGE =====
     // Section Headers

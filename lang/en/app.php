@@ -113,35 +113,35 @@ return [
     'open' => 'OPEN',
 
     // Signal Configuration
-    'signal_bet_type' => 'Signal Bet Type',
+    // 'signal_bet_type' => 'Signal Bet Type',
     'of_balance' => '% of Balance',
     'fixed' => 'Fixed',
-    'signal_access' => 'Signal Access',
+    // 'signal_access' => 'Signal Access',
     'public' => 'Public',
     'private' => 'Private',
 
     // Bet Preview
     'your_balance' => 'Your Balance',
     'your_bet' => 'Your Bet',
-    'participants' => 'Participants',
+    // 'participants' => 'Participants',
 
     // Calculation
-    'calculation' => 'Calculation:',
+    // 'calculation' => 'Calculation:',
     'fixed_bet' => 'Fixed Bet:',
     'all_participants_bet_exactly' => 'All participants bet exactly',
     'regardless_of_balance' => 'regardless of balance',
 
-    // Price Information
-    'opening_price' => 'Opening Price',
-    'settlement_price' => 'Settlement Price',
+    // // Price Information
+    // 'opening_price' => 'Opening Price',
+    // 'settlement_price' => 'Settlement Price',
 
-    // Signal Timing
-    'opened_at' => 'Opened At',
-    'win_rate' => 'Win Rate',
+    // // Signal Timing
+    // 'opened_at' => 'Opened At',
+    // 'win_rate' => 'Win Rate',
 
     // Good News
-    'good_news' => 'Good news!',
-    'no_losses_no_fees' => 'You will always receive rewards based on the win rate. No losses, no fees! Your bet is just locked temporarily.',
+    // 'good_news' => 'Good news!',
+    // 'no_losses_no_fees' => 'You will always receive rewards based on the win rate. No losses, no fees! Your bet is just locked temporarily.',
 
     // Actions
     'join_this_signal' => 'JOIN THIS SIGNAL',
@@ -153,8 +153,7 @@ return [
     'transfer_now' => 'Transfer now',
 
     // Join Confirmation
-    'join_signal_confirmation' => 'Join this signal?\n\nBet Type: :bet_type\nYour bet: $:bet_amount will be locked until settlement.\n\nYou will receive rewards based on the win rate.\n\nDo you want to continue?',
-
+   'join_signal_confirmation' => 'Join this signal?\n\nYour bet: $:bet_amount will be locked until settlement.\n\nYou will receive rewards based on the win rate.\n\nDo you want to continue?',
     // Empty States
     'no_open_signals_for' => 'No open signals for',
     'check_back_later' => 'Check back later for new trading signals',
@@ -185,14 +184,14 @@ return [
     'join_signals_to_start' => 'Join signals to start trading',
 
     // Info Section
-    'how_it_works' => 'How It Works',
-    'bet_amount_varies' => 'Bet amount varies by signal: percentage-based or fixed amount',
-    'percentage_signals' => 'Percentage signals: bet = % of your Trade Balance',
-    'fixed_signals' => 'Fixed signals: same bet amount for all users',
-    'minimum_balance_info' => 'Minimum $ 100.00 available balance required (for percentage signals)',
-    'bet_locked_info' => 'Your bet will be locked until settlement',
-    'always_win_rewards' => 'You always win rewards! No losses, no fees',
-    'call_put_explanation' => 'CALL/PUT shows admin\'s prediction (not actual market movement)',
+    // 'how_it_works' => 'How It Works',
+    // 'bet_amount_varies' => 'Bet amount varies by signal: percentage-based or fixed amount',
+    // 'percentage_signals' => 'Percentage signals: bet = % of your Trade Balance',
+    // 'fixed_signals' => 'Fixed signals: same bet amount for all users',
+    // 'minimum_balance_info' => 'Minimum $ 100.00 available balance required (for percentage signals)',
+    // 'bet_locked_info' => 'Your bet will be locked until settlement',
+    // 'always_win_rewards' => 'You always win rewards! No losses, no fees',
+    // 'call_put_explanation' => 'CALL/PUT shows admin\'s prediction (not actual market movement)',
 
     // ===== MY ASSETS PAGE =====
     // Section Headers
