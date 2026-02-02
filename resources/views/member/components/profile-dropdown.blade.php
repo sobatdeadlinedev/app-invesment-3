@@ -18,9 +18,9 @@
             <div class="profile-info">
                 <div class="profile-email">{{ auth()->user()->email }}</div>
                 <div class="profile-phone">
-                    <i class="bi bi-telephone-fill"></i>
-                    <span>{{ auth()->user()->phone ?? '+62 812-3456-7890' }}</span>
-                    <button class="btn-copy" onclick="copyToClipboard('{{ auth()->user()->phone ?? '+62 812-3456-7890' }}')">
+                    <i class="bi bi-gift-fill"></i>
+                    <span>{{ auth()->user()->refferal_code ?? '-' }}</span>
+                    <button class="btn-copy" onclick="copyToClipboard('{{ auth()->user()->refferal_code ?? '' }}')">
                         <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Copy to Clipboard
 function copyToClipboard(text) {
     const locale = '{{ app()->getLocale() }}';
-    const message = locale === 'id' ? 'Nomor telepon tersalin!' : 'Phone number copied!';
+    const message = locale === 'id' ? 'Kode undangan tersalin!' : 'Invitation code copied!';
     
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function() {
