@@ -3,13 +3,15 @@
 
 <head>
     <base href="{{ url('/') }}/" />
-    <title>STARS INVESMENT - Register</title>
+    <title>{{ $appConfig['app_name']['value'] }}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
+    <link rel="shortcut icon" href="{{ $appConfig['app_logo']['value'] }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
     <style>
@@ -66,15 +68,22 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(192, 192, 192, 0.05) 0%, transparent 50%);
             animation: pulse 8s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
         }
 
         /* Grid Pattern Overlay */
@@ -84,7 +93,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(255, 215, 0, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 215, 0, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -103,7 +112,7 @@
             border-radius: 24px;
             padding: 48px 40px;
             backdrop-filter: blur(20px);
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.5),
                 0 0 1px rgba(255, 215, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -115,6 +124,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -128,14 +138,22 @@
         }
 
         .logo-wrapper img {
-            height: 48px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            width: 120px;
+            height: auto;
+            /* filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); */
             animation: logoGlow 3s ease-in-out infinite;
         }
 
         @keyframes logoGlow {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); }
-            50% { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.5)); }
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.5));
+            }
         }
 
         /* Header */
@@ -212,7 +230,7 @@
             box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
         }
 
-        .form-control:focus + .input-icon {
+        .form-control:focus+.input-icon {
             color: var(--gold-light);
         }
 
@@ -343,6 +361,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -461,7 +480,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
     <script>
@@ -494,7 +515,7 @@
 
     <div class="register-wrapper">
         <div class="grid-overlay"></div>
-        
+
         <div class="register-container">
             <!-- Logo -->
             <div class="logo-wrapper">
@@ -504,7 +525,7 @@
             <!-- Header -->
             <div class="register-header">
                 <h1>Create New Account</h1>
-                <p>Sign up to start trading with STARS INVESTMENT</p>
+                <p>Sign up to start trading with {{ $appConfig['app_name']['value'] }}</p>
             </div>
 
             <!-- Register Form -->
@@ -541,15 +562,9 @@
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
                     <div class="input-wrapper">
-                        <input 
-                            type="text" 
-                            placeholder="Enter your full name" 
-                            name="name"
-                            autocomplete="off" 
-                            value="{{ old('name') }}"
-                            class="form-control @error('name') is-invalid @enderror"
-                            required 
-                        />
+                        <input type="text" placeholder="Enter your full name" name="name" autocomplete="off"
+                            value="{{ old('name') }}" class="form-control @error('name') is-invalid @enderror"
+                            required />
                         <i class="ki-duotone ki-user input-icon">
                             <span class="path1"></span>
                             <span class="path2"></span>
@@ -564,15 +579,9 @@
                 <div class="form-group">
                     <label class="form-label">Username</label>
                     <div class="input-wrapper">
-                        <input 
-                            type="text" 
-                            placeholder="Choose a username" 
-                            name="username"
-                            autocomplete="off" 
-                            value="{{ old('username') }}"
-                            class="form-control @error('username') is-invalid @enderror"
-                            required 
-                        />
+                        <input type="text" placeholder="Choose a username" name="username" autocomplete="off"
+                            value="{{ old('username') }}" class="form-control @error('username') is-invalid @enderror"
+                            required />
                         <i class="ki-duotone ki-profile-user input-icon">
                             <span class="path1"></span>
                             <span class="path2"></span>
@@ -591,15 +600,9 @@
                     <div class="form-group">
                         <label class="form-label">Email Address</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="email" 
-                                placeholder="Enter your email" 
-                                name="email"
-                                autocomplete="off" 
-                                value="{{ old('email') }}"
-                                class="form-control @error('email') is-invalid @enderror"
-                                required 
-                            />
+                            <input type="email" placeholder="Enter your email" name="email" autocomplete="off"
+                                value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror"
+                                required />
                             <i class="ki-duotone ki-sms input-icon">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
@@ -614,15 +617,9 @@
                     <div class="form-group">
                         <label class="form-label">Phone Number</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="text" 
-                                placeholder="08xxxxxxxxxx" 
-                                name="phone"
-                                autocomplete="off" 
-                                value="{{ old('phone') }}"
-                                class="form-control @error('phone') is-invalid @enderror"
-                                required 
-                            />
+                            <input type="text" placeholder="08xxxxxxxxxx" name="phone" autocomplete="off"
+                                value="{{ old('phone') }}" class="form-control @error('phone') is-invalid @enderror"
+                                required />
                             <i class="ki-duotone ki-phone input-icon">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
@@ -641,20 +638,15 @@
                     <div class="form-group">
                         <label class="form-label">Password</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                placeholder="Create a password" 
-                                name="password"
-                                id="password" 
-                                autocomplete="off"
-                                class="form-control @error('password') is-invalid @enderror"
-                                required 
-                            />
+                            <input type="password" placeholder="Create a password" name="password" id="password"
+                                autocomplete="off" class="form-control @error('password') is-invalid @enderror"
+                                required />
                             <i class="ki-duotone ki-lock input-icon">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
-                            <button type="button" class="password-toggle" onclick="togglePassword('password', 'password-icon')">
+                            <button type="button" class="password-toggle"
+                                onclick="togglePassword('password', 'password-icon')">
                                 <i class="ki-duotone ki-eye" id="password-icon">
                                     <span class="path1"></span>
                                     <span class="path2"></span>
@@ -672,20 +664,14 @@
                     <div class="form-group">
                         <label class="form-label">Confirm Password</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                placeholder="Confirm your password" 
-                                name="password_confirmation"
-                                id="password_confirmation" 
-                                autocomplete="off"
-                                class="form-control"
-                                required 
-                            />
+                            <input type="password" placeholder="Confirm your password" name="password_confirmation"
+                                id="password_confirmation" autocomplete="off" class="form-control" required />
                             <i class="ki-duotone ki-lock input-icon">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
-                            <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation', 'password-confirmation-icon')">
+                            <button type="button" class="password-toggle"
+                                onclick="togglePassword('password_confirmation', 'password-confirmation-icon')">
                                 <i class="ki-duotone ki-eye" id="password-confirmation-icon">
                                     <span class="path1"></span>
                                     <span class="path2"></span>
@@ -700,15 +686,10 @@
                 <div class="form-group">
                     <label class="form-label">Referral Code (Optional)</label>
                     <div class="input-wrapper">
-                        <input 
-                            type="text" 
-                            placeholder="Enter referral code" 
-                            name="referral_code"
-                            autocomplete="off" 
-                            value="{{ old('referral_code', $referralCode ?? '') }}"
+                        <input type="text" placeholder="Enter referral code" name="referral_code"
+                            autocomplete="off" value="{{ old('referral_code', $referralCode ?? '') }}"
                             class="form-control @error('referral_code') is-invalid @enderror"
-                            {{ $referralCode ? 'readonly' : '' }}
-                        />
+                            {{ $referralCode ? 'readonly' : '' }} />
                         <i class="ki-duotone ki-gift input-icon">
                             <span class="path1"></span>
                             <span class="path2"></span>

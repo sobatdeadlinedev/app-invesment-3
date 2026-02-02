@@ -3,13 +3,21 @@
 
 <head>
     <base href="{{ url('/') }}/" />
-    <title>STARS INVESMENT</title>
+    <title>{{ $appConfig['app_name']['value'] }}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" href="{{ $appConfig['app_logo']['value'] }}" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <style>
+        .custom-logo {
+            width: 120px;
+            height: auto;
+            /* filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); */
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+    </style>
 </head>
 
 <body id="kt_body" class="app-blank">
@@ -86,7 +94,7 @@
                     <a href="#" class="mb-12 mb-lg-12">
                         <img alt="Logo"
                             src="{{ $appConfig['app_logo']['value'] ?? 'assets/media/logos/default-dark.svg' }}"
-                            class="h-150px h-lg-180px" />
+                            class="custom-logo" />
                     </a>
                 </div>
             </div>

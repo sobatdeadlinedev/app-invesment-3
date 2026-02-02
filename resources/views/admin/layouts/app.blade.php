@@ -15,7 +15,7 @@ License: For each use you must have a valid license purchased only from above li
 
 <head>
     <base href="{{ url('/') }}/" />
-    <title>STARS INVESMENT</title>
+    <title>{{ $appConfig['app_name']['value'] }}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" href="{{ $appConfig['app_logo']['value'] }}" />
