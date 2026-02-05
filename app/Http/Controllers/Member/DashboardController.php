@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Member;
 use App\Models\User;
 use App\Models\Config;
 use App\Models\Transaction;
-use App\Models\TradingSignal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -23,14 +22,14 @@ class DashboardController extends Controller
         // Generate referral link
         $referralLink = route('register', ['ref' => $user->refferal_code]);
 
-        // Get available coins from model
-        $availableCoins = TradingSignal::getAvailableCoins();
+        // Get available coins with complete data (icon & color)
+        $availableCoins = $this->getAvailableCoinsWithMetadata();
 
         // Group coins by category
         $coinsByCategory = $this->groupCoinsByCategory($availableCoins);
 
-        // Return fallback prices only for initial render
-        $allPrices = $this->getFallbackPricesOnly(array_keys($availableCoins));
+        // Fetch REAL prices immediately from API (no fallback)
+        $allPrices = $this->getAllCoinPricesBatch(array_keys($availableCoins));
 
         return view('member.pages.dashboard.index', compact(
             'user',
@@ -41,6 +40,140 @@ class DashboardController extends Controller
             'allPrices',
             'availableCoins'
         ));
+    }
+
+    /**
+     * Get available coins with metadata (icon & color)
+     */
+    private function getAvailableCoinsWithMetadata()
+    {
+        return [
+            // Cryptocurrency
+            'BTCUSDT' => [
+                'name' => 'Bitcoin',
+                'icon' => 'bi bi-currency-bitcoin',
+                'color' => '#F7931A'
+            ],
+            'ETHUSDT' => [
+                'name' => 'Ethereum',
+                'icon' => 'bi bi-currency-ethereum',
+                'color' => '#627EEA'
+            ],
+            'XRPUSDT' => [
+                'name' => 'Ripple',
+                'icon' => 'bi bi-currency-exchange',
+                'color' => '#23292F'
+            ],
+            'LINKUSDT' => [
+                'name' => 'Chainlink',
+                'icon' => 'bi bi-link-45deg',
+                'color' => '#2A5ADA'
+            ],
+            'DOTUSDT' => [
+                'name' => 'Polkadot',
+                'icon' => 'bi bi-circle-fill',
+                'color' => '#E6007A'
+            ],
+            'DOGEUSDT' => [
+                'name' => 'Dogecoin',
+                'icon' => 'bi bi-coin',
+                'color' => '#C2A633'
+            ],
+            'BCHUSDT' => [
+                'name' => 'Bitcoin Cash',
+                'icon' => 'bi bi-cash-coin',
+                'color' => '#8DC351'
+            ],
+            'FILUSDT' => [
+                'name' => 'Filecoin',
+                'icon' => 'bi bi-database',
+                'color' => '#0090FF'
+            ],
+            'LTCUSDT' => [
+                'name' => 'Litecoin',
+                'icon' => 'bi bi-lightning-charge',
+                'color' => '#345D9D'
+            ],
+            'ZECUSDT' => [
+                'name' => 'Zcash',
+                'icon' => 'bi bi-shield-lock',
+                'color' => '#ECB244'
+            ],
+            'DASHUSDT' => [
+                'name' => 'Dash',
+                'icon' => 'bi bi-speedometer2',
+                'color' => '#008CE7'
+            ],
+
+            // Forex
+            'HKDUSD' => [
+                'name' => 'Hong Kong Dollar',
+                'icon' => 'bi bi-cash-stack',
+                'color' => '#DC143C'
+            ],
+            'INRUSD' => [
+                'name' => 'Indian Rupee',
+                'icon' => 'bi bi-currency-rupee',
+                'color' => '#FF9933'
+            ],
+            'KRWUSD' => [
+                'name' => 'Korean Won',
+                'icon' => 'bi bi-currency-won',
+                'color' => '#003478'
+            ],
+            'SGDUSD' => [
+                'name' => 'Singapore Dollar',
+                'icon' => 'bi bi-currency-dollar',
+                'color' => '#EE2737'
+            ],
+            'BRLUSDT' => [
+                'name' => 'Brazilian Real',
+                'icon' => 'bi bi-currency-dollar',
+                'color' => '#009B3A'
+            ],
+            'TRYUSDT' => [
+                'name' => 'Turkish Lira',
+                'icon' => 'bi bi-currency-exchange',
+                'color' => '#E30A17'
+            ],
+            'EURUSDT' => [
+                'name' => 'Euro',
+                'icon' => 'bi bi-currency-euro',
+                'color' => '#003399'
+            ],
+            'GBPUSDT' => [
+                'name' => 'British Pound',
+                'icon' => 'bi bi-currency-pound',
+                'color' => '#012169'
+            ],
+            'AUDUSDT' => [
+                'name' => 'Australian Dollar',
+                'icon' => 'bi bi-currency-dollar',
+                'color' => '#00008B'
+            ],
+            'NZDUSDT' => [
+                'name' => 'New Zealand Dollar',
+                'icon' => 'bi bi-currency-dollar',
+                'color' => '#00247D'
+            ],
+
+            // Precious Metals
+            'XAGUSD' => [
+                'name' => 'Silver',
+                'icon' => 'bi bi-gem',
+                'color' => '#C0C0C0'
+            ],
+            'XAUUSD' => [
+                'name' => 'Gold',
+                'icon' => 'bi bi-gem',
+                'color' => '#FFD700'
+            ],
+            'XPTUSD' => [
+                'name' => 'Platinum',
+                'icon' => 'bi bi-gem',
+                'color' => '#E5E4E2'
+            ],
+        ];
     }
 
     /**
@@ -72,28 +205,6 @@ class DashboardController extends Controller
         }
 
         return $coinsByCategory;
-    }
-
-    /**
-     * Return fallback prices for initial render
-     */
-    private function getFallbackPricesOnly($symbols)
-    {
-        $fallbackPrices = $this->getAllFallbackPrices();
-        $prices = [];
-
-        foreach ($symbols as $symbol) {
-            $prices[$symbol] = $fallbackPrices[$symbol] ?? [
-                'price' => '0.00',
-                'change' => '0.00',
-                'isPositive' => true,
-                'high' => 0,
-                'low' => 0,
-                'volume' => 0
-            ];
-        }
-
-        return $prices;
     }
 
     /**
@@ -152,45 +263,56 @@ class DashboardController extends Controller
     private function getBinancePricesBatch($symbols)
     {
         try {
-            return Cache::remember('binance_prices_batch', 10, function () use ($symbols) {
-                $prices = [];
-                $response = Http::timeout(8)->get('https://api.binance.com/api/v3/ticker/24hr');
+            $prices = [];
+            $response = Http::timeout(8)->get('https://api.binance.com/api/v3/ticker/24hr');
 
-                if ($response->successful()) {
-                    $allTickers = $response->json();
+            if ($response->successful()) {
+                $allTickers = $response->json();
 
-                    foreach ($allTickers as $ticker) {
-                        if (in_array($ticker['symbol'], $symbols)) {
-                            $lastPrice = (float)$ticker['lastPrice'];
+                foreach ($allTickers as $ticker) {
+                    if (in_array($ticker['symbol'], $symbols)) {
+                        $lastPrice = (float)$ticker['lastPrice'];
 
-                            // Format based on price range
-                            if ($lastPrice < 1) {
-                                $formattedPrice = number_format($lastPrice, 4, '.', '');
-                            } elseif ($lastPrice < 100) {
-                                $formattedPrice = number_format($lastPrice, 2, '.', '');
-                            } else {
-                                $formattedPrice = number_format($lastPrice, 2, '.', ',');
-                            }
-
-                            $prices[$ticker['symbol']] = [
-                                'price' => $formattedPrice,
-                                'change' => number_format((float)$ticker['priceChangePercent'], 2, '.', ''),
-                                'isPositive' => (float)$ticker['priceChangePercent'] >= 0,
-                                'high' => (float)$ticker['highPrice'],
-                                'low' => (float)$ticker['lowPrice'],
-                                'volume' => (float)$ticker['volume']
-                            ];
+                        // Format based on price range
+                        if ($lastPrice < 1) {
+                            $formattedPrice = number_format($lastPrice, 4, '.', '');
+                        } elseif ($lastPrice < 100) {
+                            $formattedPrice = number_format($lastPrice, 2, '.', '');
+                        } else {
+                            $formattedPrice = number_format($lastPrice, 2, '.', ',');
                         }
-                    }
 
-                    return $prices;
+                        $prices[$ticker['symbol']] = [
+                            'price' => $formattedPrice,
+                            'change' => number_format((float)$ticker['priceChangePercent'], 2, '.', ''),
+                            'isPositive' => (float)$ticker['priceChangePercent'] >= 0,
+                            'high' => (float)$ticker['highPrice'],
+                            'low' => (float)$ticker['lowPrice'],
+                            'volume' => (float)$ticker['volume']
+                        ];
+                    }
                 }
 
-                throw new \Exception('Binance API failed');
-            });
+                return $prices;
+            }
+
+            throw new \Exception('Binance API failed');
         } catch (\Exception $e) {
-            Log::warning("Binance batch fetch failed: " . $e->getMessage());
-            return $this->getFallbackPricesForSymbols($symbols);
+            Log::error("Binance API failed: " . $e->getMessage());
+            
+            // Return empty array or $0.00 if API fails
+            $fallback = [];
+            foreach ($symbols as $symbol) {
+                $fallback[$symbol] = [
+                    'price' => '0.00',
+                    'change' => '0.00',
+                    'isPositive' => true,
+                    'high' => 0,
+                    'low' => 0,
+                    'volume' => 0
+                ];
+            }
+            return $fallback;
         }
     }
 
@@ -200,34 +322,45 @@ class DashboardController extends Controller
     private function getForexPricesBatch($symbols)
     {
         try {
-            return Cache::remember('forex_prices_batch', 30, function () use ($symbols) {
-                $prices = [];
-                $response = Http::timeout(8)->get("https://api.exchangerate-api.com/v4/latest/USD");
+            $prices = [];
+            $response = Http::timeout(8)->get("https://api.exchangerate-api.com/v4/latest/USD");
 
-                if ($response->successful()) {
-                    $data = $response->json();
+            if ($response->successful()) {
+                $data = $response->json();
 
-                    foreach ($symbols as $symbol) {
-                        $rate = $this->calculateForexRate($symbol, $data['rates']);
+                foreach ($symbols as $symbol) {
+                    $rate = $this->calculateForexRate($symbol, $data['rates']);
 
-                        $prices[$symbol] = [
-                            'price' => number_format($rate['price'], 4, '.', ''),
-                            'change' => number_format($rate['change'], 2, '.', ''),
-                            'isPositive' => $rate['change'] >= 0,
-                            'high' => $rate['price'] * 1.002,
-                            'low' => $rate['price'] * 0.998,
-                            'volume' => 0
-                        ];
-                    }
-
-                    return $prices;
+                    $prices[$symbol] = [
+                        'price' => number_format($rate['price'], 4, '.', ''),
+                        'change' => number_format($rate['change'], 2, '.', ''),
+                        'isPositive' => $rate['change'] >= 0,
+                        'high' => $rate['price'] * 1.002,
+                        'low' => $rate['price'] * 0.998,
+                        'volume' => 0
+                    ];
                 }
 
-                throw new \Exception('Forex API failed');
-            });
+                return $prices;
+            }
+
+            throw new \Exception('Forex API failed');
         } catch (\Exception $e) {
-            Log::warning("Forex batch fetch failed: " . $e->getMessage());
-            return $this->getFallbackPricesForSymbols($symbols);
+            Log::error("Forex API failed: " . $e->getMessage());
+            
+            // Return empty array or $0.00 if API fails
+            $fallback = [];
+            foreach ($symbols as $symbol) {
+                $fallback[$symbol] = [
+                    'price' => '0.00',
+                    'change' => '0.00',
+                    'isPositive' => true,
+                    'high' => 0,
+                    'low' => 0,
+                    'volume' => 0
+                ];
+            }
+            return $fallback;
         }
     }
 
@@ -251,65 +384,5 @@ class DashboardController extends Controller
         if ($symbol === 'XPTUSD') return ['price' => 934.21, 'change' => -0.45];
 
         return ['price' => 1.0, 'change' => 0];
-    }
-
-    /**
-     * Get fallback prices for specific symbols
-     */
-    private function getFallbackPricesForSymbols($symbols)
-    {
-        $allFallbacks = $this->getAllFallbackPrices();
-        $result = [];
-
-        foreach ($symbols as $symbol) {
-            $result[$symbol] = $allFallbacks[$symbol] ?? [
-                'price' => '0.00',
-                'change' => '0.00',
-                'isPositive' => true,
-                'high' => 0,
-                'low' => 0,
-                'volume' => 0
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * All fallback prices
-     */
-    private function getAllFallbackPrices()
-    {
-        return [
-            // Crypto
-            'BTCUSDT' => ['price' => '43250.50', 'change' => '2.45', 'isPositive' => true, 'high' => 43500, 'low' => 42800, 'volume' => 15000],
-            'ETHUSDT' => ['price' => '2914.66', 'change' => '1.87', 'isPositive' => true, 'high' => 2950, 'low' => 2880, 'volume' => 8000],
-            'XRPUSDT' => ['price' => '0.5234', 'change' => '-0.92', 'isPositive' => false, 'high' => 0.53, 'low' => 0.52, 'volume' => 50000],
-            'LINKUSDT' => ['price' => '14.23', 'change' => '3.12', 'isPositive' => true, 'high' => 14.5, 'low' => 13.8, 'volume' => 2000],
-            'DOTUSDT' => ['price' => '7.89', 'change' => '1.23', 'isPositive' => true, 'high' => 8.0, 'low' => 7.7, 'volume' => 3000],
-            'DOGEUSDT' => ['price' => '0.0812', 'change' => '-1.45', 'isPositive' => false, 'high' => 0.083, 'low' => 0.080, 'volume' => 100000],
-            'BCHUSDT' => ['price' => '245.67', 'change' => '2.15', 'isPositive' => true, 'high' => 248, 'low' => 242, 'volume' => 1200],
-            'FILUSDT' => ['price' => '5.42', 'change' => '-0.78', 'isPositive' => false, 'high' => 5.5, 'low' => 5.3, 'volume' => 1500],
-            'LTCUSDT' => ['price' => '73.21', 'change' => '1.56', 'isPositive' => true, 'high' => 74, 'low' => 72, 'volume' => 800],
-            'ZECUSDT' => ['price' => '42.89', 'change' => '-2.34', 'isPositive' => false, 'high' => 44, 'low' => 42, 'volume' => 600],
-            'DASHUSDT' => ['price' => '31.56', 'change' => '0.89', 'isPositive' => true, 'high' => 32, 'low' => 31, 'volume' => 400],
-
-            // Forex
-            'HKDUSD' => ['price' => '0.1283', 'change' => '0.12', 'isPositive' => true, 'high' => 0.129, 'low' => 0.128, 'volume' => 0],
-            'INRUSD' => ['price' => '0.0120', 'change' => '-0.08', 'isPositive' => false, 'high' => 0.0121, 'low' => 0.0119, 'volume' => 0],
-            'KRWUSD' => ['price' => '0.0007', 'change' => '0.15', 'isPositive' => true, 'high' => 0.00071, 'low' => 0.00069, 'volume' => 0],
-            'SGDUSD' => ['price' => '0.7456', 'change' => '0.21', 'isPositive' => true, 'high' => 0.747, 'low' => 0.744, 'volume' => 0],
-            'BRLUSDT' => ['price' => '0.1987', 'change' => '-0.34', 'isPositive' => false, 'high' => 0.200, 'low' => 0.197, 'volume' => 0],
-            'TRYUSDT' => ['price' => '0.0312', 'change' => '-0.56', 'isPositive' => false, 'high' => 0.0314, 'low' => 0.0310, 'volume' => 0],
-            'EURUSDT' => ['price' => '1.0856', 'change' => '0.18', 'isPositive' => true, 'high' => 1.087, 'low' => 1.084, 'volume' => 0],
-            'GBPUSDT' => ['price' => '1.2734', 'change' => '0.25', 'isPositive' => true, 'high' => 1.275, 'low' => 1.272, 'volume' => 0],
-            'AUDUSDT' => ['price' => '0.6734', 'change' => '0.32', 'isPositive' => true, 'high' => 0.675, 'low' => 0.672, 'volume' => 0],
-            'NZDUSDT' => ['price' => '0.6123', 'change' => '-0.19', 'isPositive' => false, 'high' => 0.614, 'low' => 0.611, 'volume' => 0],
-
-            // Precious Metals
-            'XAGUSD' => ['price' => '24.56', 'change' => '1.23', 'isPositive' => true, 'high' => 24.7, 'low' => 24.3, 'volume' => 0],
-            'XAUUSD' => ['price' => '2043.67', 'change' => '0.87', 'isPositive' => true, 'high' => 2050, 'low' => 2035, 'volume' => 0],
-            'XPTUSD' => ['price' => '934.21', 'change' => '-0.45', 'isPositive' => false, 'high' => 938, 'low' => 930, 'volume' => 0],
-        ];
     }
 }
