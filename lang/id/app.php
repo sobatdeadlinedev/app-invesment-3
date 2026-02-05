@@ -337,7 +337,6 @@ return [
     'choose_wallet_account' => 'Pilih akun wallet Anda',
     'select_wallet_placeholder' => '-- Pilih Akun Wallet --',
     'no_wallet_available' => 'Tidak ada akun wallet tersedia',
-    'need_add_wallet' => 'Anda perlu menambahkan akun wallet terlebih dahulu.',
     'add_wallet' => 'Tambah Wallet',
 
     // Withdrawal Summary

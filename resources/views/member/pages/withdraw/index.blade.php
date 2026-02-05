@@ -107,14 +107,7 @@
                             <small class="text-danger mt-1 d-block">{{ $message }}</small>
                         @enderror
 
-                        @if ($wallets->isEmpty())
-                            <div class="alert-info-box mt-2">
-                                <i class="bi bi-info-circle-fill me-2"></i>
-                                <span class="small">{{ __('app.need_add_wallet') }}
-                                    href="{{ route('member.profile.index') }}" class="text-gold"
-                                    style="text-decoration: underline;">{{ __('app.add_wallet') }}</a></span>
-                            </div>
-                        @endif
+                        
                     </div>
                 </div>
 
