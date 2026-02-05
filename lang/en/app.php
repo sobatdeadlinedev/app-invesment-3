@@ -337,6 +337,7 @@ return [
     'choose_wallet_account' => 'Choose your wallet account',
     'select_wallet_placeholder' => '-- Select Wallet Account --',
     'no_wallet_available' => 'No wallet account available',
+    // 'need_add_wallet' => 'You need to add a wallet account first.',
     'add_wallet' => 'Add Wallet',
 
     // Withdrawal Summary

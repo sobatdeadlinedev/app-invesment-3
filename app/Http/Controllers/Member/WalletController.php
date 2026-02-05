@@ -31,13 +31,15 @@ class WalletController extends Controller
         return back()->with('success', 'Wallet berhasil ditambahkan');
     }
 
-    public function update(Request $request, Wallet $wallet)
+    public function update(Request $request, $id)
     {
         $user = User::current();
+        
+        // Cari wallet milik user ini
+        $wallet = $user->wallets()->find($id);
 
-        // Pastikan wallet milik user yang login
-        if ($wallet->user_id !== $user->id) {
-            return back()->with('error', 'Unauthorized');
+        if (!$wallet) {
+            return back()->with('error', 'Wallet tidak ditemukan atau bukan milik Anda');
         }
 
         $request->validate([
@@ -53,13 +55,15 @@ class WalletController extends Controller
         return back()->with('success', 'Wallet berhasil diupdate');
     }
 
-    public function destroy(Wallet $wallet)
+    public function destroy($id)
     {
         $user = User::current();
+        
+        // Cari wallet milik user ini
+        $wallet = $user->wallets()->find($id);
 
-        // Pastikan wallet milik user yang login
-        if ($wallet->user_id !== $user->id) {
-            return back()->with('error', 'Unauthorized');
+        if (!$wallet) {
+            return back()->with('error', 'Wallet tidak ditemukan atau bukan milik Anda');
         }
 
         $wallet->delete();

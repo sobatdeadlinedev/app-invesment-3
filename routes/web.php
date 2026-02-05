@@ -193,11 +193,11 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->g
     });
 
     // Wallet Routes
-    Route::prefix('wallet')->name('wallet.')->group(function () {
-        Route::post('/', [MemberWalletController::class, 'store'])->name('store');
-        Route::put('/{wallet}', [MemberWalletController::class, 'update'])->name('update');
-        Route::delete('/{wallet}', [MemberWalletController::class, 'destroy'])->name('destroy');
-    });
+       Route::prefix('wallet')->name('wallet.')->group(function () {
+    Route::post('/', [MemberWalletController::class, 'store'])->name('store');
+    Route::put('/{id}', [MemberWalletController::class, 'update'])->name('update');
+    Route::delete('/{id}', [MemberWalletController::class, 'destroy'])->name('destroy');
+});
 
     // Balance Transfer
     Route::prefix('balance')->name('balance.')->group(function () {
