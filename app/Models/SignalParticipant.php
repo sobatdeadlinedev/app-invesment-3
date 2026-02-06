@@ -9,6 +9,9 @@ class SignalParticipant extends Model
 {
     use HasFactory;
 
+    // ✅ DISABLE auto timestamps Laravel
+    public $timestamps = false;
+
     protected $fillable = [
         'signal_id',
         'user_id',
@@ -27,21 +30,6 @@ class SignalParticipant extends Model
         'joined_at' => 'datetime',
         'settled_at' => 'datetime',
     ];
-
-    // ==================== BOOT METHOD ====================
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        // Protect joined_at from being updated after initial set
-        static::updating(function ($participant) {
-            // Jangan biarkan joined_at berubah setelah diset pertama kali
-            if ($participant->isDirty('joined_at') && $participant->getOriginal('joined_at') !== null) {
-                $participant->joined_at = $participant->getOriginal('joined_at');
-            }
-        });
-    }
 
     // ==================== RELATIONSHIPS ====================
 
