@@ -19,9 +19,12 @@ class SignalParticipant extends Model
         'profit_loss',
         'fee_amount',
         'status',
-        'joined_at',
+        'joined_at',  // ⚠️ Ini masih fillable, jadi bisa di-update
         'settled_at',
     ];
+
+    // ✅ TAMBAHKAN INI - Protect joined_at dari mass assignment update
+    protected $guarded = ['id', 'joined_at'];
 
     protected $casts = [
         'bet_amount' => 'decimal:2',
@@ -30,6 +33,20 @@ class SignalParticipant extends Model
         'joined_at' => 'datetime',
         'settled_at' => 'datetime',
     ];
+
+    // ==================== BOOT METHOD ====================
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Set joined_at hanya saat create pertama kali
+        static::creating(function ($participant) {
+            if (empty($participant->joined_at)) {
+                $participant->joined_at = now();
+            }
+        });
+    }
 
     // ==================== RELATIONSHIPS ====================
 

@@ -282,6 +282,17 @@ class TradingSignalController extends Controller
 
         $signal = TradingSignal::with('participants.user')->findOrFail($id);
 
+        // ✅ DEBUG LOG - Track signal timestamps
+        Log::info('=== SIGNAL TIMESTAMPS DEBUG ===', [
+            'signal_id' => $signal->id,
+            'status' => $signal->status,
+            'opened_at' => $signal->opened_at?->format('Y-m-d H:i:s'),
+            'closed_at' => $signal->closed_at?->format('Y-m-d H:i:s'),
+            'settled_at' => $signal->settled_at?->format('Y-m-d H:i:s'),
+            'created_at' => $signal->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $signal->updated_at?->format('Y-m-d H:i:s'),
+        ]);
+
         if ($signal->status !== 'closed') {
             Log::warning('Signal not closed yet', [
                 'signal_id' => $signal->id,
@@ -305,7 +316,20 @@ class TradingSignalController extends Controller
             $usersWin = ($signal->result === 'win');
 
             foreach ($signal->participants as $participant) {
+                // ✅ DEBUG LOG - Track participant timestamps BEFORE update
+                Log::info('=== PARTICIPANT TIMESTAMPS BEFORE SETTLEMENT ===', [
+                    'participant_id' => $participant->id,
+                    'user_id' => $participant->user_id,
+                    'status_before' => $participant->status,
+                    'joined_at_before' => $participant->joined_at?->format('Y-m-d H:i:s'),
+                    'settled_at_before' => $participant->settled_at?->format('Y-m-d H:i:s'),
+                    'bet_amount' => $participant->bet_amount,
+                ]);
+
                 if ($participant->isSettled()) {
+                    Log::info('Participant already settled, skipping', [
+                        'participant_id' => $participant->id,
+                    ]);
                     continue;
                 }
 
@@ -355,6 +379,9 @@ class TradingSignalController extends Controller
                 // Add to achieved volume (baik menang atau kalah)
                 $user->addAchievedVolume($betAmount);
 
+                // ✅ Store joined_at sebelum update untuk comparison
+                $joinedAtBeforeUpdate = $participant->joined_at;
+
                 // Update participant status
                 $participant->update([
                     'profit_loss' => $profitLoss,
@@ -363,11 +390,45 @@ class TradingSignalController extends Controller
                     'settled_at' => now(),
                 ]);
 
+                // ✅ Refresh model untuk get data terbaru dari DB
+                $participant->refresh();
+
+                // ✅ DEBUG LOG - Track participant timestamps AFTER update
+                Log::info('=== PARTICIPANT TIMESTAMPS AFTER SETTLEMENT ===', [
+                    'participant_id' => $participant->id,
+                    'user_id' => $participant->user_id,
+                    'status_after' => $participant->status,
+                    'joined_at_after' => $participant->joined_at?->format('Y-m-d H:i:s'),
+                    'settled_at_after' => $participant->settled_at?->format('Y-m-d H:i:s'),
+                    'joined_at_changed' => $joinedAtBeforeUpdate != $participant->joined_at ? 'YES ⚠️' : 'NO ✅',
+                    'profit_loss' => $participant->profit_loss,
+                ]);
+
                 $settledCount++;
             }
 
+            // ✅ DEBUG LOG - Signal timestamps BEFORE markAsSettled
+            Log::info('=== SIGNAL TIMESTAMPS BEFORE MARK AS SETTLED ===', [
+                'signal_id' => $signal->id,
+                'opened_at' => $signal->opened_at?->format('Y-m-d H:i:s'),
+                'closed_at_before' => $signal->closed_at?->format('Y-m-d H:i:s'),
+                'settled_at_before' => $signal->settled_at?->format('Y-m-d H:i:s'),
+            ]);
+
             // Mark signal as settled
             $signal->markAsSettled();
+
+            // ✅ Refresh signal untuk get data terbaru
+            $signal->refresh();
+
+            // ✅ DEBUG LOG - Signal timestamps AFTER markAsSettled
+            Log::info('=== SIGNAL TIMESTAMPS AFTER MARK AS SETTLED ===', [
+                'signal_id' => $signal->id,
+                'status' => $signal->status,
+                'opened_at' => $signal->opened_at?->format('Y-m-d H:i:s'),
+                'closed_at_after' => $signal->closed_at?->format('Y-m-d H:i:s'),
+                'settled_at_after' => $signal->settled_at?->format('Y-m-d H:i:s'),
+            ]);
 
             DB::commit();
 
