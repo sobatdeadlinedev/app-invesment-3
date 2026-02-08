@@ -62,7 +62,6 @@
                                 placeholder="{{ __('app.enter_amount_manually') }}" value="" step="0.01"
                                 min="10">
                         </div>
-                        <small class="text-muted d-block mt-1">{{ __('app.minimum_deposit') }}: 10 USDT</small>
                     </div>
                 </div>
 

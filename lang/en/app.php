@@ -54,7 +54,7 @@ return [
     'deposit_amount' => 'Deposit Amount',
     'enter_amount_usdt' => 'Enter Amount (USDT)',
     'enter_amount_manually' => 'Enter amount manually',
-    'minimum_deposit' => 'Minimum deposit',
+    // 'minimum_deposit' => 'Minimum deposit',
     'select_network' => 'Select Network',
     'amount' => 'Amount',
     'payment' => 'Payment',
@@ -72,7 +72,7 @@ return [
 
     // Validation Messages - Deposit
     'please_enter_valid_amount' => 'Please enter a valid amount',
-    'minimum_deposit_alert' => 'Minimum deposit amount is 10 USDT',
+    // 'minimum_deposit_alert' => 'Minimum deposit amount is 10 USDT',
     'please_upload_proof' => 'Please upload proof of transfer',
     'file_size_exceeded' => 'File size must not exceed 5MB',
     'file_type_not_allowed' => 'Only JPG, JPEG, and PNG files are allowed',

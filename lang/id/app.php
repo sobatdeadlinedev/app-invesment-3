@@ -54,7 +54,7 @@ return [
     'deposit_amount' => 'Jumlah Deposit',
     'enter_amount_usdt' => 'Masukkan Jumlah (USDT)',
     'enter_amount_manually' => 'Masukkan jumlah manual',
-    'minimum_deposit' => 'Deposit minimum',
+    // 'minimum_deposit' => 'Deposit minimum',
     'select_network' => 'Pilih Jaringan',
     'amount' => 'Jumlah',
     'payment' => 'Pembayaran',
@@ -72,7 +72,7 @@ return [
 
     // Validation Messages - Deposit
     'please_enter_valid_amount' => 'Silakan masukkan jumlah yang valid',
-    'minimum_deposit_alert' => 'Jumlah deposit minimum adalah 10 USDT',
+    // 'minimum_deposit_alert' => 'Jumlah deposit minimum adalah 10 USDT',
     'please_upload_proof' => 'Silakan upload bukti transfer',
     'file_size_exceeded' => 'Ukuran file tidak boleh melebihi 5MB',
     'file_type_not_allowed' => 'Hanya file JPG, JPEG, dan PNG yang diperbolehkan',
