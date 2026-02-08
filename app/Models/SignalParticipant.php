@@ -9,7 +9,6 @@ class SignalParticipant extends Model
 {
     use HasFactory;
 
-    // ✅ DISABLE auto timestamps Laravel
     public $timestamps = false;
 
     protected $fillable = [
@@ -19,7 +18,7 @@ class SignalParticipant extends Model
         'profit_loss',
         'fee_amount',
         'status',
-        'joined_at',  // ⚠️ Ini masih fillable, jadi bisa di-update
+        'joined_at',
         'settled_at',
     ];
 
