@@ -683,25 +683,25 @@
                 </div>
 
                 <!-- Referral Code Input -->
-                <div class="form-group">
-                    <label class="form-label">Referral Code (Optional)</label>
-                    <div class="input-wrapper">
-                        <input type="text" placeholder="Enter referral code" name="referral_code"
-                            autocomplete="off" value="{{ old('referral_code', $referralCode ?? '') }}"
-                            class="form-control @error('referral_code') is-invalid @enderror"
-                            {{ $referralCode ? 'readonly' : '' }} />
-                        <i class="ki-duotone ki-gift input-icon">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                            <span class="path3"></span>
-                            <span class="path4"></span>
-                        </i>
-                        @error('referral_code')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="form-text">Enter referral code if you have one</div>
-                </div>
+<div class="form-group">
+    <label class="form-label">Referral Code <span style="color: var(--error);">*</span></label>
+    <div class="input-wrapper">
+        <input type="text" placeholder="Enter referral code" name="referral_code"
+            autocomplete="off" value="{{ old('referral_code', $referralCode ?? '') }}"
+            class="form-control @error('referral_code') is-invalid @enderror"
+            {{ $referralCode ? 'readonly' : '' }} required />
+        <i class="ki-duotone ki-gift input-icon">
+            <span class="path1"></span>
+            <span class="path2"></span>
+            <span class="path3"></span>
+            <span class="path4"></span>
+        </i>
+        @error('referral_code')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+    <div class="form-text">You must have a referral code to register</div>
+</div>
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn-submit">
