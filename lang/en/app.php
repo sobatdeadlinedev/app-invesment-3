@@ -144,7 +144,7 @@ return [
     // 'no_losses_no_fees' => 'You will always receive rewards based on the win rate. No losses, no fees! Your bet is just locked temporarily.',
 
     // Actions
-    'join_this_signal' => 'JOIN THIS SIGNAL',
+    'join_this_signal' => 'CONFIRM TO FOLLOW ORDER',
     'you_have_joined' => 'You have joined this signal. Wait for settlement to receive your rewards!',
     'insufficient_balance_message' => 'Insufficient Balance:',
     'minimum_balance_required_short' => 'Minimum $100.00 available Trade Balance required.',

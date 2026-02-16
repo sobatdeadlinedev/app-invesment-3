@@ -144,7 +144,7 @@ return [
     // 'no_losses_no_fees' => 'Anda akan selalu menerima hadiah berdasarkan tingkat kemenangan. Tanpa kerugian, tanpa biaya! Taruhan Anda hanya dikunci sementara.',
 
     // Actions
-    'join_this_signal' => 'GABUNG SINYAL INI',
+    'join_this_signal' => 'MENGONFIRMASI UNTUK MENGGIKUTI TRANSAKSI',
     'you_have_joined' => 'Anda telah bergabung dengan sinyal ini. Tunggu penyelesaian untuk menerima hadiah Anda!',
     'insufficient_balance_message' => 'Saldo Tidak Mencukupi:',
     'minimum_balance_required_short' => 'Minimum $100.00 Saldo Trading tersedia diperlukan.',
