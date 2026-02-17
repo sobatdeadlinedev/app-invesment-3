@@ -472,7 +472,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <span
                                         class="badge {{ $signal->result === 'win' ? 'badge-success' : ($signal->result === 'loss' ? 'badge-danger' : 'badge-warning') }}"
-                                        style="font-size: 11px;">
+                                        style="font-size: 11px; color: #212121 !important;">
                                         {{ strtoupper($signal->title ?? 'SIGNAL') }}
                                     </span>
                                 </div>
