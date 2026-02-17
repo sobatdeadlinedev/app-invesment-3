@@ -55,6 +55,8 @@ return [
     'enter_amount_usdt' => 'Masukkan Jumlah (USDT)',
     'enter_amount_manually' => 'Masukkan jumlah manual',
     // 'minimum_deposit' => 'Deposit minimum',
+    'minimum_deposit_hint'   => 'Minimal deposit adalah 200 USDT',
+    'minimum_deposit_alert'  => 'Minimal deposit adalah 200 USDT',
     'select_network' => 'Pilih Jaringan',
     'amount' => 'Jumlah',
     'payment' => 'Pembayaran',

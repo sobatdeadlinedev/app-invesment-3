@@ -44,18 +44,18 @@ class DepositController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:10',
-            'wallet_type' => 'required|in:trc20,bep20',
+            'amount'        => 'required|numeric|min:200',
+            'wallet_type'   => 'required|in:trc20,bep20',
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ], [
-            'amount.required' => 'Jumlah deposit harus diisi',
-            'amount.min' => 'Minimal deposit adalah 10 USDT',
-            'wallet_type.required' => 'Pilih tipe jaringan',
-            'wallet_type.in' => 'Tipe jaringan tidak valid',
-            'payment_proof.required' => 'Bukti transfer harus diupload',
-            'payment_proof.image' => 'File harus berupa gambar',
-            'payment_proof.mimes' => 'Format file harus jpeg, png, atau jpg',
-            'payment_proof.max' => 'Ukuran file maksimal 5MB',
+            'amount.required'       => __('app.amount_required'),
+            'amount.min'            => __('app.minimum_deposit_alert'),
+            'wallet_type.required'  => __('app.wallet_type_required'),
+            'wallet_type.in'        => __('app.wallet_type_invalid'),
+            'payment_proof.required'=> __('app.payment_proof_required'),
+            'payment_proof.image'   => __('app.payment_proof_image'),
+            'payment_proof.mimes'   => __('app.payment_proof_mimes'),
+            'payment_proof.max'     => __('app.file_size_exceeded'),
         ]);
 
         try {
@@ -74,19 +74,19 @@ class DepositController extends Controller
 
             // Create transaction
             $transaction = Transaction::create([
-                'user_id' => auth()->id(),
-                'reference' => $reference,
-                'amount' => $depositAmount,
-                'total_amount' => $depositAmount,
-                'type' => 'deposit',
-                'balance_type' => 'exchange',
-                'wallet_id' => null,
+                'user_id'        => auth()->id(),
+                'reference'      => $reference,
+                'amount'         => $depositAmount,
+                'total_amount'   => $depositAmount,
+                'type'           => 'deposit',
+                'balance_type'   => 'exchange',
+                'wallet_id'      => null,
                 'withdrawal_fee' => null,
                 'source_user_id' => null,
-                'status' => 'pending',
-                'payment_method' => $walletTypeLabel, // Store wallet type as payment method
-                'payment_proof' => $proofPath,
-                'approved_by' => null,
+                'status'         => 'pending',
+                'payment_method' => $walletTypeLabel,
+                'payment_proof'  => $proofPath,
+                'approved_by'    => null,
             ]);
 
             // Send email notification to admin
@@ -129,10 +129,10 @@ class DepositController extends Controller
             $user = $transaction->user;
 
             $data = [
-                'reference' => $transaction->reference,
-                'amount' => $transaction->amount,
+                'reference'      => $transaction->reference,
+                'amount'         => $transaction->amount,
                 'payment_method' => $transaction->payment_method,
-                'created_at' => $transaction->created_at->format('d M Y H:i'),
+                'created_at'     => $transaction->created_at->format('d M Y H:i'),
             ];
 
             Mail::to($adminEmail)->send(new AdminNotificationMail(
@@ -188,7 +188,7 @@ class DepositController extends Controller
 
         return response()->json([
             'success' => true,
-            'count' => $count,
+            'count'   => $count,
         ]);
     }
 }

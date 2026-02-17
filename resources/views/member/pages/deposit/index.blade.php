@@ -54,15 +54,19 @@
                 <div class="seamless-input-section">
                     <h6 class="mb-3 fw-bold" style="color: var(--text-primary); font-size: 14px;">
                         {{ __('app.deposit_amount') }}</h6>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="text-muted small mb-2 d-block">{{ __('app.enter_amount_usdt') }}</label>
                         <div class="input-with-icon">
                             <span class="input-icon">₮</span>
                             <input type="number" id="deposit-amount" class="form-control-dark with-icon"
                                 placeholder="{{ __('app.enter_amount_manually') }}" value="" step="0.01"
-                                min="10">
+                                min="200">
                         </div>
                     </div>
+                    <!-- Minimum deposit hint -->
+                    <small class="text-muted d-block mt-1">
+                        <i class="bi bi-info-circle me-1"></i>{{ __('app.minimum_deposit_hint') }}
+                    </small>
                 </div>
 
                 <!-- Wallet Type Selection -->
@@ -118,7 +122,7 @@
                     <div class="seamless-summary-section">
                         <div class="d-flex align-items-center justify-content-between">
                             <p class="text-muted mb-0">{{ __('app.deposit_amount') }}</p>
-                            <h5 class="text-gold mb-0 fw-bold" id="summary-amount">100.00 USDT</h5>
+                            <h5 class="text-gold mb-0 fw-bold" id="summary-amount">200.00 USDT</h5>
                         </div>
                     </div>
 
@@ -493,6 +497,9 @@
             let selectedFile = null;
             let selectedWalletType = 'trc20';
 
+            // Minimum deposit amount
+            const MIN_DEPOSIT = 200;
+
             // Wallet data from backend
             const walletData = {
                 trc20: {
@@ -539,12 +546,13 @@
             }
 
             function goToStep2() {
-                const amount = document.getElementById('deposit-amount').value;
+                const amount = parseFloat(document.getElementById('deposit-amount').value);
+
                 if (!amount || amount <= 0) {
                     alert(translations.pleaseEnterValidAmount);
                     return;
                 }
-                if (amount < 10) {
+                if (amount < MIN_DEPOSIT) {
                     alert(translations.minimumDepositAlert);
                     return;
                 }
@@ -553,7 +561,7 @@
                 const walletType = document.querySelector('input[name="wallet_type_display"]:checked').value;
 
                 // Update form data
-                document.getElementById('summary-amount').textContent = parseFloat(amount).toFixed(2) + ' USDT';
+                document.getElementById('summary-amount').textContent = amount.toFixed(2) + ' USDT';
                 document.getElementById('form-amount').value = amount;
                 document.getElementById('form-wallet-type').value = walletType;
 
@@ -634,7 +642,6 @@
             }
 
             function submitDeposit() {
-                const amount = document.getElementById('deposit-amount').value;
                 const fileInput = document.getElementById('file-upload');
 
                 if (!fileInput.files || !fileInput.files[0]) {
