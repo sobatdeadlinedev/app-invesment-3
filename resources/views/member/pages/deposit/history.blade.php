@@ -95,12 +95,12 @@
 
                                 <!-- Transaction Details -->
                                 <div class="transaction-details mt-2">
-                                    <div class="detail-row">
+                                    {{-- <div class="detail-row">
                                         <span class="text-muted small">{{ __('app.payment_method') }}:</span>
                                         <span class="text-white small fw-bold">
                                             {{ __('app.' . str_replace(' ', '_', strtolower($transaction->payment_method))) }}
                                         </span>
-                                    </div>
+                                    </div> --}}
                                     <div class="detail-row">
                                         <span class="text-muted small">{{ __('app.amount') }}:</span>
                                         <span class="text-success small fw-bold">
