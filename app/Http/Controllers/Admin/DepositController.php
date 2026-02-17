@@ -65,9 +65,9 @@ class DepositController extends Controller
 
             $isFirstDeposit = ($previousApprovedDeposits === 0);
 
-            // Give 5% bonus for first deposit
+            // Give 4% bonus for first deposit
             if ($isFirstDeposit) {
-                $bonusAmount = $deposit->total_amount * 0.05;
+                $bonusAmount = $deposit->total_amount * 0.04;
 
                 // Add bonus to exchange balance
                 $user->addExchangeBalance($bonusAmount);
@@ -94,7 +94,7 @@ class DepositController extends Controller
             DB::commit();
 
             $message = $isFirstDeposit
-                ? 'Deposit has been approved successfully and added to Exchange Balance. Bonus 5% has been credited!'
+                ? 'Deposit has been approved successfully and added to Exchange Balance. Bonus 4% has been credited!'
                 : 'Deposit has been approved successfully and added to Exchange Balance.';
 
             return redirect()->route('admin.deposit.index')
@@ -186,8 +186,8 @@ class DepositController extends Controller
 
         $depositAmount = $deposit->total_amount;
 
-        // Level 1: 5%
-        $level1Commission = $depositAmount * 0.05;
+        // Level 1: 3%
+        $level1Commission = $depositAmount * 0.03;
         $this->createCommissionTransaction(
             $referralUsage->referrer_id,
             $deposit->user_id,
@@ -195,11 +195,11 @@ class DepositController extends Controller
             'Level 1 Commission - First Deposit'
         );
 
-        // Level 2: 2%
+        // Level 2: 1%
         $level2ReferralUsage = ReferralUsage::where('referred_id', $referralUsage->referrer_id)->first();
 
         if ($level2ReferralUsage) {
-            $level2Commission = $depositAmount * 0.02;
+            $level2Commission = $depositAmount * 0.01;
             $this->createCommissionTransaction(
                 $level2ReferralUsage->referrer_id,
                 $deposit->user_id,
