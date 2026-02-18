@@ -53,7 +53,7 @@ class SignalController extends Controller
             if (!$user->canJoinSignal()) {
                 return redirect()
                     ->back()
-                    ->with('error', 'Minimum available Trade Balance to join signal is 100 USDT. Your available balance: ' . number_format($user->getAvailableTradeBalance(), 2) . ' USDT.');
+                    ->with('error', 'Minimum available Trade Balance to join signal is 200 USDT. Your available balance: ' . number_format($user->getAvailableTradeBalance(), 2) . ' USDT.');
             }
         } else {
             // For fixed amount, check if user has sufficient balance

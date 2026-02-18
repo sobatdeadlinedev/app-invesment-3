@@ -57,11 +57,11 @@ class WithdrawController extends Controller
         }
 
         $request->validate([
-            'amount' => 'required|numeric|min:20',
+            'amount' => 'required|numeric|min:50',
             'wallet_id' => 'required|exists:wallets,id',
         ], [
             'amount.required' => 'Jumlah withdrawal harus diisi',
-            'amount.min' => 'Minimal withdrawal adalah 20 USDT',
+            'amount.min' => 'Minimal withdrawal adalah 50  USDT',
             'wallet_id.required' => 'Wallet account harus dipilih',
             'wallet_id.exists' => 'Wallet account tidak valid',
         ]);

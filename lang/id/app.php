@@ -103,7 +103,7 @@ return [
 
     // Notice & Warnings
     'notice' => 'Pemberitahuan:',
-    'minimum_balance_required' => 'Minimum <strong>$ 100.00</strong> Saldo Trading tersedia diperlukan untuk bergabung dengan sinyal.',
+    'minimum_balance_required' => 'Minimum <strong>$ 200.00</strong> Saldo Trading tersedia diperlukan untuk bergabung dengan sinyal.',
     'please_transfer_funds' => 'Silakan <a href=":url" class="text-decoration-underline" style="color: #dc3545; font-weight: 600;">transfer dana</a> terlebih dahulu.',
 
     // Tabs
@@ -149,7 +149,7 @@ return [
     'join_this_signal' => 'MENGONFIRMASI UNTUK MENGIKUTI TRANSAKSI',
     'you_have_joined' => 'Anda telah bergabung dengan sinyal ini. Tunggu penyelesaian untuk menerima hadiah Anda!',
     'insufficient_balance_message' => 'Saldo Tidak Mencukupi:',
-    'minimum_balance_required_short' => 'Minimum $100.00 Saldo Trading tersedia diperlukan.',
+    'minimum_balance_required_short' => 'Minimum $200.00 Saldo Trading tersedia diperlukan.',
     'you_need_at_least' => 'Anda membutuhkan setidaknya',
     'available_short' => 'tersedia.',
     'transfer_now' => 'Transfer sekarang',
@@ -332,7 +332,7 @@ return [
     'withdrawal_amount' => 'Jumlah Penarikan',
     'amount_usdt' => 'Jumlah (USDT)',
     'enter_amount' => 'Masukkan jumlah',
-    'minimum_withdrawal_info' => 'Penarikan minimum: 20 USDT | Biaya: 5 USDT (< 100 USDT) atau 5% (≥ 100 USDT)',
+    // 'minimum_withdrawal_info' => 'Penarikan minimum: 20 USDT | Biaya: 5 USDT (< 100 USDT) atau 5% (≥ 100 USDT)',
 
     // Wallet Selection
     'select_wallet_account' => 'Pilih Akun Wallet',

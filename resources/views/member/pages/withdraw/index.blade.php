@@ -76,9 +76,9 @@
                             <span class="input-icon">₮</span>
                             <input type="number" name="amount" id="withdraw-amount" class="form-control-dark with-icon"
                                 placeholder="{{ __('app.enter_amount') }}" value="{{ old('amount') }}" step="0.01"
-                                min="20" {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
+                                min="50" {{ !auth()->user()->is_verified ? 'disabled' : 'required' }}>
                         </div>
-                        <small class="text-muted d-block mt-1">{{ __('app.minimum_withdrawal_info') }}</small>
+                        {{-- <small class="text-muted d-block mt-1">{{ __('app.minimum_withdrawal_info') }}</small> --}}
                         @error('amount')
                             <small class="text-danger mt-1 d-block">{{ $message }}</small>
                         @enderror
@@ -377,7 +377,7 @@
                 accountNotVerifiedAlert: "{{ __('app.account_not_verified_alert') }}",
                 withdrawalNotProcessed: "{{ __('app.withdrawal_not_processed') }}",
                 enterValidAmount: "{{ __('app.enter_valid_amount') }}",
-                minimumWithdrawal20: "{{ __('app.minimum_withdrawal_20') }}",
+                  minimumWithdrawal50: "Minimum withdrawal is 50 USDT",
                 insufficientBalance: "{{ __('app.insufficient_balance_withdraw') }}",
                 pleaseSelectWallet: "{{ __('app.please_select_wallet') }}",
                 amountTooSmall: "{{ __('app.amount_too_small') }}",
@@ -448,8 +448,8 @@
                     return;
                 }
 
-                if (amount < 20) {
-                    alert(translations.minimumWithdrawal20);
+                if (amount < 50) {
+                    alert(translations.minimumWithdrawal50);
                     return;
                 }
 

@@ -104,7 +104,7 @@ return [
 
     // Notice & Warnings
     'notice' => 'Notice:',
-    'minimum_balance_required' => 'Minimum <strong>$ 100.00</strong> available Trade Balance required to join signals.',
+    'minimum_balance_required' => 'Minimum <strong>$ 200.00</strong> available Trade Balance required to join signals.',
     'please_transfer_funds' => 'Please <a href=":url" class="text-decoration-underline" style="color: #dc3545; font-weight: 600;">transfer funds</a> first.',
 
     // Tabs
@@ -140,7 +140,7 @@ return [
 
     // // Signal Timing
     // 'opened_at' => 'Opened At',
-    // 'win_rate' => 'Win Rate',
+    'win_rate' => 'Win Rate',
 
     // Good News
     // 'good_news' => 'Good news!',
@@ -150,7 +150,7 @@ return [
     'join_this_signal' => 'CONFIRM TO FOLLOW ORDER',
     'you_have_joined' => 'You have joined this signal. Wait for settlement to receive your rewards!',
     'insufficient_balance_message' => 'Insufficient Balance:',
-    'minimum_balance_required_short' => 'Minimum $100.00 available Trade Balance required.',
+    'minimum_balance_required_short' => 'Minimum $200.00 available Trade Balance required.',
     'you_need_at_least' => 'You need at least',
     'available_short' => 'available.',
     'transfer_now' => 'Transfer now',
@@ -333,7 +333,7 @@ return [
     'withdrawal_amount' => 'Withdrawal Amount',
     'amount_usdt' => 'Amount (USDT)',
     'enter_amount' => 'Enter amount',
-    'minimum_withdrawal_info' => 'Minimum withdrawal: 20 USDT | Fee: 5 USDT (< 100 USDT) or 5% (≥ 100 USDT)',
+    // 'minimum_withdrawal_info' => 'Minimum withdrawal: 20 USDT | Fee: 5 USDT (< 100 USDT) or 5% (≥ 100 USDT)',
 
     // Wallet Selection
     'select_wallet_account' => 'Select Wallet Account',
