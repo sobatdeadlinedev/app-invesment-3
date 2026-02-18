@@ -60,13 +60,14 @@ class InvestController extends Controller
         // ========================================
         // TAB 2: Historical Orders untuk coin ini
         // ========================================
-        $historyForThisCoin = SignalParticipant::where('user_id', $user->id)
-            ->whereHas('signal', function ($q) use ($coin) {
-                $q->where('coin', $coin);
-            })
-            ->with('signal')
-            ->latest()
-            ->paginate(10);
+        // Sesudah
+$historyForThisCoin = SignalParticipant::where('user_id', $user->id)
+    ->whereHas('signal', function ($q) use ($coin) {
+        $q->where('coin', $coin);
+    })
+    ->with('signal')
+    ->orderBy('joined_at', 'desc')  // ← ganti latest() dengan ini
+    ->paginate(10);
 
         // Calculate statistics untuk history tab
         $totalJoinedThisCoin = SignalParticipant::where('user_id', $user->id)

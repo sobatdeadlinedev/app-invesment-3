@@ -40,7 +40,7 @@
                                 <small class="text-muted d-block mb-1" style="font-size: 10px;">
                                     {{ __('app.today_pnl') }}
                                 </small>
-                                <h6 class="mb-0 fw-bold text-muted" style="font-size: 16px;">
+                                <h6 class="mb-0 fw-bold {{ $todayPnl >= 0 ? 'text-success' : 'text-danger' }}" style="font-size: 16px;">
                                     {{ $todayPnl >= 0 ? '+' : '' }}{{ number_format($todayPnl, 2) }} USDT
                                 </h6>
                             </div>
