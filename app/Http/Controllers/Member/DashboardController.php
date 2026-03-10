@@ -264,7 +264,7 @@ class DashboardController extends Controller
     {
         try {
             $prices = [];
-            $response = Http::timeout(8)->get('https://api.binance.com/api/v3/ticker/24hr');
+            $response = Http::timeout(8)->get('https://api.binance.us/api/v3/ticker/24hr');
 
             if ($response->successful()) {
                 $allTickers = $response->json();
@@ -299,7 +299,7 @@ class DashboardController extends Controller
             throw new \Exception('Binance API failed');
         } catch (\Exception $e) {
             Log::error("Binance API failed: " . $e->getMessage());
-            
+
             // Return empty array or $0.00 if API fails
             $fallback = [];
             foreach ($symbols as $symbol) {
@@ -347,7 +347,7 @@ class DashboardController extends Controller
             throw new \Exception('Forex API failed');
         } catch (\Exception $e) {
             Log::error("Forex API failed: " . $e->getMessage());
-            
+
             // Return empty array or $0.00 if API fails
             $fallback = [];
             foreach ($symbols as $symbol) {
