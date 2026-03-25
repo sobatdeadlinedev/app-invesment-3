@@ -1,4 +1,5 @@
-#!/usr/bin/env php
+php artisan view:clear
+php artisan config:clear#!/usr/bin/env php
 <?php
 
 use Illuminate\Foundation\Application;

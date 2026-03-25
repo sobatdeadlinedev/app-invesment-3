@@ -11,7 +11,6 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        // Redirect jika sudah login
         if (Auth::check()) {
             return $this->redirectBasedOnRole();
         }
@@ -22,30 +21,24 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'login' => 'required|string',
+            'email'    => 'required|email',
             'password' => 'required|string',
         ], [
-            'login.required' => 'Username atau nomor telepon harus diisi',
-            'password.required' => 'Password harus diisi',
+            'email.required'    => 'Email harus diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'password.required' => 'Password harus diisi.',
         ]);
 
-        $loginField = $request->input('login');
-        $password = $request->input('password');
+        $credentials = $request->only('email', 'password');
 
-        // Cek apakah input adalah nomor telepon atau username
-        $fieldType = filter_var($loginField, FILTER_VALIDATE_REGEXP, [
-            'options' => ['regexp' => '/^[0-9]+$/']
-        ]) ? 'phone' : 'username';
-
-        // Attempt login
-        if (Auth::attempt([$fieldType => $loginField, 'password' => $password], $request->filled('remember'))) {
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
             return $this->redirectBasedOnRole();
         }
 
         throw ValidationException::withMessages([
-            'login' => 'Username/nomor telepon atau password salah.',
+            'email' => 'Email atau password salah.',
         ]);
     }
 

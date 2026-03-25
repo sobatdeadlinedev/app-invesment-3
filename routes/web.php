@@ -57,7 +57,14 @@ Route::middleware('guest')->group(function () {
 
     // Register
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
+Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
+ 
+// Register - Step 2: OTP Verification
+Route::get('/register/verify-otp', [RegisterController::class, 'showVerifyOtpForm'])->name('register.verify-otp');
+Route::post('/register/verify-otp', [RegisterController::class, 'verifyOtp'])->name('register.verify-otp.post');
+ 
+// Register - Resend OTP
+Route::get('/register/resend-otp', [RegisterController::class, 'resendOtp'])->name('register.resend-otp');
 
     // Forgot password
     Route::get('/forget-password', [ForgetPasswordController::class, 'showForgetPasswordForm'])->name('forget-password');
