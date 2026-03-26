@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <base href="{{ url('/') }}/" />
     <title>{{ $appConfig['app_name']['value'] }}</title>
@@ -9,462 +8,347 @@
     <link rel="shortcut icon" href="{{ $appConfig['app_logo']['value'] }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --gold: #FFD700;
-            --gold-dark: #DAA520;
-            --gold-light: #FFED4E;
-            --silver: #C0C0C0;
-            --silver-light: #E5E5E5;
-            --silver-dark: #9A9A9A;
-            --black: #0A0A0A;
-            --black-light: #1A1A1A;
-            --black-lighter: #2A2A2A;
-            --success: #10B981;
-            --success-light: #34D399;
-            --error: #EF4444;
-            --error-light: #FCA5A5;
+            --gold: #F5C842;
+            --gold-dim: #C9A227;
+            --gold-muted: rgba(245,200,66,0.12);
+            --gold-border: rgba(245,200,66,0.25);
+            --bg: #080B10;
+            --bg-card: #0D1117;
+            --bg-input: #111620;
+            --bg-panel: #0F1419;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(255,255,255,0.14);
+            --text-primary: #F0F4F8;
+            --text-secondary: #6B7A8D;
+            --text-muted: #3D4A58;
+            --red: #F04F59;
+            --red-dim: rgba(240,79,89,0.12);
+            --green: #16A879;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Space Grotesk', sans-serif;
         }
 
-        html {
-            height: 100%;
-            background: var(--black);
-        }
+        html, body { height: 100%; }
 
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--black);
-            color: var(--silver-light);
-            min-height: 100%;
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text-primary);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Animated Background */
-        .forgot-wrapper {
+        /* ── Background canvas ── */
+        .bg-canvas {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden;
+        }
+
+        .bg-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(245,200,66,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245,200,66,0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        .bg-glow-1 {
+            position: absolute; top: -20%; left: -10%;
+            width: 60vw; height: 60vw; border-radius: 50%;
+            background: radial-gradient(circle, rgba(245,200,66,0.06) 0%, transparent 65%);
+            animation: drift1 18s ease-in-out infinite;
+        }
+
+        .bg-glow-2 {
+            position: absolute; bottom: -20%; right: -10%;
+            width: 50vw; height: 50vw; border-radius: 50%;
+            background: radial-gradient(circle, rgba(22,168,121,0.05) 0%, transparent 65%);
+            animation: drift2 22s ease-in-out infinite;
+        }
+
+        .bg-scanline {
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.08) 2px,
+                rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+        }
+
+        @keyframes drift1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(4%, 6%) scale(1.08); }
+        }
+        @keyframes drift2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-5%, -4%) scale(1.06); }
+        }
+
+        /* ── Page wrap ── */
+        .page-wrap {
             min-height: 100vh;
-            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            padding: 20px;
-            background: var(--black);
+            position: relative; z-index: 1;
+            padding: 40px 20px;
         }
 
-        .forgot-wrapper::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(192, 192, 192, 0.05) 0%, transparent 50%);
-            animation: pulse 8s ease-in-out infinite;
-            z-index: 1;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.6;
-            }
-        }
-
-        /* Grid Pattern Overlay */
-        .grid-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image:
-                linear-gradient(rgba(255, 215, 0, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 215, 0, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            opacity: 0.3;
-            z-index: 1;
-        }
-
-        /* Forgot Password Container */
-        .forgot-container {
-            position: relative;
-            z-index: 10;
+        /* ── Form box ── */
+        .form-box {
             width: 100%;
             max-width: 440px;
-            background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.95));
-            border: 1px solid rgba(192, 192, 192, 0.1);
-            border-radius: 24px;
-            padding: 48px 40px;
-            backdrop-filter: blur(20px);
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                0 0 1px rgba(255, 215, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            animation: slideUp 0.6s ease-out;
+            animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* Logo */
-        .logo-wrapper {
-            text-align: center;
-            margin-bottom: 36px;
+        /* Brand */
+        .brand {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 10px; margin-bottom: 40px;
         }
 
-        .logo-wrapper img {
-            width: 120px;
-            height: auto;
-            /* filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); */
-            animation: logoGlow 3s ease-in-out infinite;
+        .brand img {
+            width: 52px; height: 52px; object-fit: contain;
+            filter: drop-shadow(0 0 14px rgba(245,200,66,0.4));
         }
 
-        @keyframes logoGlow {
-
-            0%,
-            100% {
-                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
-            }
-
-            50% {
-                filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.5));
-            }
-        }
-
-        /* Header */
-        .forgot-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .forgot-header h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            color: #FFFFFF;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .forgot-header p {
-            font-size: 14px;
-            color: var(--silver-dark);
-            font-weight: 400;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--silver);
-            margin-bottom: 8px;
-            letter-spacing: 0.3px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
+        .brand-name {
+            font-family: var(--mono);
+            font-size: 9px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
             color: var(--gold);
-            font-size: 18px;
+        }
+
+        /* Form header */
+        .form-head { margin-bottom: 32px; text-align: center; }
+
+        .form-head h1 {
+            font-size: 24px; font-weight: 700;
+            color: var(--text-primary); letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+
+        .form-head p {
+            font-size: 13px; color: var(--text-secondary);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .divider-line {
+            flex: 1; height: 1px; background: var(--border);
+        }
+
+        .divider-label {
+            font-family: var(--mono);
+            font-size: 9px; font-weight: 700; letter-spacing: 2px;
+            color: var(--text-muted); text-transform: uppercase;
+        }
+
+        /* Alert */
+        .alert {
+            display: flex; gap: 12px; align-items: flex-start;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .alert-success {
+            background: rgba(22,168,121,0.1);
+            border: 1px solid rgba(22,168,121,0.25);
+            border-left: 3px solid var(--green);
+        }
+
+        .alert-success i { color: var(--green); font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .alert-success .alert-msg { font-size: 12px; color: #6ee7b7; line-height: 1.5; }
+
+        .alert-error {
+            background: var(--red-dim);
+            border: 1px solid rgba(240,79,89,0.3);
+            border-left: 3px solid var(--red);
+            animation: shake 0.45s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .alert-error i { color: var(--red); font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .alert-error-title { font-size: 12px; font-weight: 700; color: var(--red); margin-bottom: 3px; }
+        .alert-error .alert-msg { font-size: 12px; color: #fca5a5; line-height: 1.5; }
+        .alert-error ul { margin: 0; padding-left: 16px; }
+        .alert-error li { font-size: 12px; color: #fca5a5; line-height: 1.6; }
+
+        /* Fields */
+        .field { margin-bottom: 18px; }
+
+        .field-label {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .field-label span {
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.8px; text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .input-wrap { position: relative; }
+
+        .input-prefix {
+            position: absolute; left: 0; top: 0; bottom: 0;
+            width: 46px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gold); font-size: 16px;
+            border-right: 1px solid var(--border);
             pointer-events: none;
-            transition: all 0.3s ease;
         }
 
-        .form-control {
+        .field-input {
             width: 100%;
-            padding: 14px 16px 14px 48px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(192, 192, 192, 0.15);
-            border-radius: 12px;
+            height: 50px;
+            padding: 0 16px 0 56px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             font-size: 14px;
-            color: #FFFFFF;
-            font-family: 'DM Sans', sans-serif;
-            transition: all 0.3s ease;
+            font-family: var(--sans);
+            color: var(--text-primary);
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
 
-        .form-control::placeholder {
-            color: rgba(192, 192, 192, 0.4);
+        .field-input::placeholder { color: var(--text-muted); }
+
+        .field-input:focus {
+            border-color: var(--gold-border);
+            background: #131820;
+            box-shadow: 0 0 0 3px rgba(245,200,66,0.08);
         }
 
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        .field-input.is-invalid {
+            border-color: rgba(240,79,89,0.5);
         }
 
-        .form-control:focus+.input-icon {
-            color: var(--gold-light);
-        }
-
-        .form-control.is-invalid {
-            border-color: var(--error);
-        }
-
-        .form-control.is-invalid:focus {
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-        }
-
-        /* Invalid Feedback */
-        .invalid-feedback {
-            display: block;
-            margin-top: 6px;
-            font-size: 12px;
-            color: var(--error-light);
-        }
-
-        /* Submit Button */
+        /* Submit button */
         .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: 'Syne', sans-serif;
-            color: var(--black);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
-            position: relative;
-            overflow: hidden;
+            width: 100%; height: 52px;
+            background: var(--gold);
+            border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 700;
+            font-family: var(--sans);
+            color: #080B10;
+            cursor: pointer; letter-spacing: 0.3px;
+            position: relative; overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            box-shadow: 0 4px 24px rgba(245,200,66,0.25);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-bottom: 0;
         }
 
-        .btn-submit::before {
+        .btn-submit::after {
             content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+            pointer-events: none;
         }
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(245,200,66,0.35);
         }
 
-        .btn-submit:hover::before {
-            left: 100%;
-        }
+        .btn-submit:active { transform: translateY(0); }
 
-        .btn-submit:active {
-            transform: translateY(0);
-        }
+        .btn-submit.loading { pointer-events: none; opacity: 0.75; }
 
-        /* Back to Login Link */
-        .back-link {
-            text-align: center;
-            margin-top: 28px;
-            padding-top: 28px;
-            border-top: 1px solid rgba(192, 192, 192, 0.1);
-            font-size: 14px;
-            color: var(--silver-dark);
-        }
-
-        .back-link a {
-            color: var(--gold);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .back-link a:hover {
-            color: var(--gold-light);
-        }
-
-        /* Alert Styles */
-        .alert {
-            padding: 16px;
-            margin-bottom: 24px;
-            border-radius: 12px;
-            display: flex;
-            gap: 12px;
-            animation: slideDown 0.4s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: var(--success-light);
-        }
-
-        .alert-success i {
-            color: var(--success);
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--error-light);
-        }
-
-        .alert-danger i {
-            color: var(--error);
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .alert ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .alert li {
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        /* Info Badge */
-        .info-badge {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 28px;
-            padding: 16px;
-            background: rgba(255, 215, 0, 0.05);
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            border-radius: 12px;
-        }
-
-        .info-icon {
-            flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 8px;
-            color: var(--gold);
-            font-size: 18px;
-        }
-
-        .info-content h5 {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 2px;
-        }
-
-        .info-content p {
-            font-size: 11px;
-            color: var(--silver-dark);
-            line-height: 1.4;
-            margin: 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .forgot-container {
-                padding: 36px 28px;
-            }
-
-            .forgot-header h1 {
-                font-size: 24px;
-            }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--black-light);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold-dark);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gold);
-        }
-
-        /* Loading Animation */
-        .btn-submit.loading {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .btn-submit.loading::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 50%;
-            left: 50%;
-            margin-left: -8px;
-            margin-top: -8px;
-            border: 2px solid var(--black);
+        .btn-submit .spinner {
+            display: none;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(0,0,0,0.3);
+            border-top-color: #080B10;
             border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.6s linear infinite;
+            animation: spin 0.7s linear infinite;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .btn-submit.loading .spinner { display: block; }
+        .btn-submit.loading .btn-text { opacity: 0.6; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Back to login */
+        .back-row {
+            text-align: center; margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            font-size: 13px; color: var(--text-secondary);
         }
+
+        .back-row a {
+            color: var(--gold); text-decoration: none;
+            font-weight: 600; margin-left: 4px;
+            transition: color 0.2s;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .back-row a:hover { color: #fde68a; }
+
+        /* Info badge */
+        .info-badge {
+            display: flex; align-items: center; gap: 12px;
+            margin-top: 20px;
+            padding: 12px 14px;
+            background: var(--gold-muted);
+            border: 1px solid var(--gold-border);
+            border-radius: 10px;
+        }
+
+        .info-badge-icon {
+            flex-shrink: 0;
+            width: 34px; height: 34px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(245,200,66,0.12);
+            border-radius: 8px;
+            color: var(--gold); font-size: 16px;
+        }
+
+        .info-badge-text h5 {
+            font-size: 12px; font-weight: 700;
+            color: var(--gold); margin-bottom: 2px;
+        }
+
+        .info-badge-text p {
+            font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;
+        }
+
+        @media (max-width: 480px) {
+            .form-head h1 { font-size: 20px; }
+            .field-input { height: 48px; }
+            .btn-submit { height: 50px; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #1e2533; border-radius: 3px; }
     </style>
     <script>
         if (window.top != window.self) {
@@ -494,125 +378,140 @@
         }
     </script>
 
-    <div class="forgot-wrapper">
-        <div class="grid-overlay"></div>
+    <!-- Background -->
+    <div class="bg-canvas">
+        <div class="bg-grid"></div>
+        <div class="bg-glow-1"></div>
+        <div class="bg-glow-2"></div>
+        <div class="bg-scanline"></div>
+    </div>
 
-        <div class="forgot-container">
-            <!-- Logo -->
-            <div class="logo-wrapper">
-                <img alt="Logo" src="{{ $appConfig['app_logo']['value'] }}" />
+    <div class="page-wrap">
+        <div class="form-box">
+
+            <!-- Brand -->
+            <div class="brand">
+                <img src="{{ $appConfig['app_logo']['value'] }}" alt="Logo" />
+                <div class="brand-name">{{ $appConfig['app_name']['value'] }}</div>
             </div>
 
-            <!-- Header -->
-            <div class="forgot-header">
+            <div class="form-head">
                 <h1>Forgot Password?</h1>
-                <p>Enter your email to receive OTP code</p>
+                <p>Enter your email to receive a one-time verification code</p>
             </div>
 
-            <!-- Forgot Password Form -->
-            <form class="form" method="POST" action="{{ route('forget-password.send-otp') }}">
+            <div class="divider">
+                <div class="divider-line"></div>
+                <div class="divider-label">Password Reset</div>
+                <div class="divider-line"></div>
+            </div>
+
+            @if (session('success'))
+                <div class="alert alert-success">
+                    <i class="ki-duotone ki-check-circle">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                    <div class="alert-msg">{{ session('success') }}</div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-error">
+                    <i class="ki-duotone ki-cross-circle">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                    <div>
+                        <div class="alert-error-title">Error</div>
+                        <div class="alert-msg">{{ session('error') }}</div>
+                    </div>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-error">
+                    <i class="ki-duotone ki-shield-cross">
+                        <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                    </i>
+                    <div>
+                        <div class="alert-error-title">Validation Error</div>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('forget-password.send-otp') }}">
                 @csrf
 
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        <i class="ki-duotone ki-check-circle">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                        </i>
-                        <div>{{ session('success') }}</div>
+                <div class="field">
+                    <div class="field-label">
+                        <span>Email Address</span>
                     </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        <i class="ki-duotone ki-cross-circle">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                        </i>
-                        <div>{{ session('error') }}</div>
-                    </div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <i class="ki-duotone ki-information">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                            <span class="path3"></span>
-                        </i>
-                        <div>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                    <div class="input-wrap">
+                        <div class="input-prefix">
+                            <i class="ki-duotone ki-sms">
+                                <span class="path1"></span><span class="path2"></span>
+                            </i>
                         </div>
-                    </div>
-                @endif
-
-                <!-- Email Input -->
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <div class="input-wrapper">
-                        <input type="email" placeholder="Enter your email address" name="email" autocomplete="off"
-                            value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror"
-                            required />
-                        <i class="ki-duotone ki-sms input-icon">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                        </i>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            autocomplete="off"
+                            value="{{ old('email') }}"
+                            class="field-input @error('email') is-invalid @enderror"
+                            required
+                        />
                     </div>
                 </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn-submit">
-                    <span>Send OTP Code</span>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <div class="spinner"></div>
+                    <span class="btn-text">Send OTP Code</span>
+                    <i class="ki-duotone ki-send" style="font-size:16px;">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
                 </button>
-
-                <!-- Back to Login Link -->
-                <div class="back-link">
-                    <a href="{{ route('login') }}">
-                        <i class="ki-duotone ki-arrow-left" style="font-size: 16px; vertical-align: middle;">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                        </i>
-                        Back to Login
-                    </a>
-                </div>
             </form>
 
-            <!-- Info Badge -->
             <div class="info-badge">
-                <div class="info-icon">
+                <div class="info-badge-icon">
                     <i class="ki-duotone ki-information-5">
-                        <span class="path1"></span>
-                        <span class="path2"></span>
-                        <span class="path3"></span>
+                        <span class="path1"></span><span class="path2"></span><span class="path3"></span>
                     </i>
                 </div>
-                <div class="info-content">
+                <div class="info-badge-text">
                     <h5>How it works</h5>
-                    <p>We'll send a verification code to your email. Use it to reset your password securely.</p>
+                    <p>We'll send a 6-digit OTP to your email. Use it to reset your password securely.</p>
                 </div>
             </div>
+
+            <div class="back-row">
+                <a href="{{ route('login') }}">
+                    <i class="ki-duotone ki-arrow-left" style="font-size:14px;">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                    Back to Login
+                </a>
+            </div>
+
         </div>
     </div>
 
     <script>
         var hostUrl = "assets/";
 
-        // Form submit animation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const btn = document.querySelector('.btn-submit');
+        document.querySelector('form').addEventListener('submit', function () {
+            const btn = document.getElementById('submitBtn');
             btn.classList.add('loading');
-            btn.querySelector('span').textContent = 'Sending...';
+            btn.querySelector('.btn-text').textContent = 'Sending...';
         });
     </script>
+
     <script src="assets/plugins/global/plugins.bundle.js"></script>
     <script src="assets/js/scripts.bundle.js"></script>
 </body>
-
 </html>
